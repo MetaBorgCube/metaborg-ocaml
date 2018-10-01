@@ -1,0 +1,13 @@
+---
+id: org.metaborg:org.metaborg.lang.ocaml.example:0.1.0-SNAPSHOT
+name: ocaml
+dependencies:
+  compile:
+  - org.metaborg:org.metaborg.lang.ocaml:0.1.0-SNAPSHOT
+debug:
+  typesmart: false
+runtime:
+  nabl2:
+    debug: analysis files
+build:
+  useBuildSystemSpec: true
