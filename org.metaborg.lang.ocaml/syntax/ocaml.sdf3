@@ -1,4 +1,4 @@
-module ocaml
+module OCaml
 
 imports 
   Lexical

@@ -1,4 +1,4 @@
-package org.metaborg.lang.ocaml.strategies;
+package OCaml.strategies;
 
 import org.strategoxt.lang.Context;
 

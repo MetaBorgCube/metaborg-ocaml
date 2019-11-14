@@ -5,8 +5,8 @@ imports
   libstratego-gpp
   libspoofax/sdf/pp
   libspoofax/editor/refactoring/-
-  pp/ocaml-parenthesize
-  pp/ocaml-pp
+  pp/OCaml-parenthesize
+  pp/OCaml-pp
 
 rules
 
@@ -18,32 +18,35 @@ rules
     ; result   := <pp-debug> node
 
 rules
+
+  prettyprint-OCaml-Start =
+    prettyprint-OCaml-TopLevel
   
-  pp-ocaml-string =
-    parenthesize-ocaml
-    ; prettyprint-ocaml-start-symbols
+  pp-OCaml-string =
+    parenthesize-OCaml
+    ; prettyprint-OCaml-start-symbols
     ; !V([], <id>)
     ; box2text-string(|120)
       
-  pp-partial-ocaml-string =
-    parenthesize-ocaml
-    ; prettyprint-ocaml
+  pp-partial-OCaml-string =
+    parenthesize-OCaml
+    ; prettyprint-OCaml
     ; !V([], <id>)
     ; box2text-string(|120)
     
-  pp-partial-ocaml-string(|sort) =
-    parenthesize-ocaml
-    ; prettyprint-ocaml(|sort)
+  pp-partial-OCaml-string(|sort) =
+    parenthesize-OCaml
+    ; prettyprint-OCaml(|sort)
     ; !V([], <id>)
     ; box2text-string(|120)  
       
   pp-debug :
     ast -> result
     with
-       result := <pp-ocaml-string> ast
-    <+ <bottomup(try(not(is-string); not(is-list); not(pp-ocaml-string); debug(!"cannot pp ")))> ast
+       result := <pp-OCaml-string> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-OCaml-string); debug(!"cannot pp ")))> ast
     ;  result := ""
 
 rules
   
-  construct-textual-change = construct-textual-change(pp-partial-ocaml-string, parenthesize, override-reconstruction, resugar)
+  construct-textual-change = construct-textual-change(pp-partial-OCaml-string, parenthesize, override-reconstruction, resugar)

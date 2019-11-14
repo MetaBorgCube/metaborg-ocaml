@@ -1,16 +1,16 @@
 ---
-id: org.metaborg:org.metaborg.lang.ocaml:0.1.0-SNAPSHOT
-name: ocaml
+id: org.example:OCaml:0.1.0-SNAPSHOT
+name: OCaml
 dependencies:
   compile:
   - org.metaborg:org.metaborg.meta.lang.esv:${metaborgVersion}
   - org.metaborg:org.metaborg.meta.lang.template:${metaborgVersion}
-  - org.metaborg:org.metaborg.meta.nabl2.lang:${metaborgVersion}
+  - org.metaborg:org.metaborg.meta.lang.nabl:${metaborgVersion}
+  - org.metaborg:org.metaborg.meta.lang.ts:${metaborgVersion}
   - org.metaborg:dynsem:${metaborgVersion}
   source:
   - org.metaborg:meta.lib.spoofax:${metaborgVersion}
-  - org.metaborg:org.metaborg.meta.nabl2.shared:${metaborgVersion}
-  - org.metaborg:org.metaborg.meta.nabl2.runtime:${metaborgVersion}
+  - org.metaborg:org.metaborg.meta.lib.analysis:${metaborgVersion}
 pardonedLanguages:
 - EditorService
 - Stratego-Sugar
@@ -19,8 +19,9 @@ debug:
   typesmart: false
 language:
   sdf:
-    pretty-print: ocaml
-    sdf2table: c
+    pretty-print: OCaml
+    sdf2table: dynamic
+    jsglr-version: v2
     placeholder:
       prefix: "$"
   stratego:
