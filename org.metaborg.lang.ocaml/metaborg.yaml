@@ -20,7 +20,7 @@ debug:
 language:
   sdf:
     pretty-print: OCaml
-    sdf2table: dynamic
+    sdf2table: java
     jsglr-version: v2
     placeholder:
       prefix: "$"
