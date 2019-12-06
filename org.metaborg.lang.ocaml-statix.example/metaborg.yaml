@@ -1,0 +1,10 @@
+---
+id: org.metaborg:org.metaborg.lang.ocaml-statix.example:0.1.0-SNAPSHOT
+name: OCaml
+dependencies:
+  compile:
+  - org.metaborg:org.metaborg.lang.ocaml-statix:0.1.0-SNAPSHOT
+debug:
+  typesmart: false
+build:
+  useBuildSystemSpec: true
