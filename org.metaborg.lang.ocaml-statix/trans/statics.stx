@@ -1,15 +1,14 @@
-module static-semantics
+module statics
 
-signature
-  sorts Start
-  constructors
-    Empty : Start
+imports
+
+  statics/syntax
 
 rules // single-file entry point
 
   programOK : Start
 
-  programOK(Empty()).
+  programOK(_).
 
 rules // multi-file entry point
 
@@ -19,4 +18,4 @@ rules // multi-file entry point
 //  
 //  fileOk : scope * Start
 //  
-//  fileOk(s, Empty()).
+//  fileOk(s, _).
