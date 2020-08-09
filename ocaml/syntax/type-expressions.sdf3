@@ -1,54 +1,64 @@
 module type-expressions 
 
-imports lex names
+imports lex names patterns
 
 // 7.4  Type expressions
 // *=*=*=*=*=*=*=*=*=*=*
 
 sorts Typexpr TypeVar
-lexical syntax // TODO: check
-  TypeVar.TypeVar = "'" Ident
+lexical syntax // TODO: check that this composition is lexical
+  TypeVar = "'" Ident
   
 context-free syntax
-  Typexpr.TVar     = TypeVar
-  Typexpr.TAnon    = "_"
-  Typexpr          = "(" Typexpr ")" {bracket}
-  Typexpr.TFun     = Typexpr "->" Typexpr {right}
-  Typexpr.TFunL    = Optlabel Typexpr "->" Typexpr {right}
-  Typexpr.TTup     = Typexpr "*" {Typexpr "*"}+ // TODO: make infix?
-  Typexpr.TConstr0 = Typeconstr
-  Typexpr.TConstr1 = Typexpr Typeconstr {non-assoc}
-  Typexpr.TConstrN = "(" {Typexpr ","}+ ")" Typeconstr
-  Typexpr.TAlias   = Typexpr "as" TypeVar
+  Typexpr             = "(" Typexpr ")" {bracket}
   
-  Typexpr            = PolymorphicVariantType
-  Typexpr.Typexpr110 = "<" ">"
-  Typexpr.Typexpr110 = "<" ".." ">"
-  Typexpr.Typexpr111 = "<" {MethodType ";"}+ ">"
-  Typexpr.Typexpr111 = "<" {MethodType ";"}+ ";" ">"
-  Typexpr.Typexpr111 = "<" {MethodType ";"}+ ";" ".." ">"
+  Typexpr.TypeVar     = TypeVar
+  Typexpr.TypeAnon    = "_"
   
-  Typexpr.Typexpr112 =                        "#" ClassPath
-  Typexpr.Typexpr113 =                Typexpr "#" ClassPath
-  Typexpr.Typexpr114 = "(" {Typexpr ","}+ ")" "#" ClassPath
+  Typexpr.TypeFun     = Typexpr "->" Typexpr {right}
+  Typexpr.TypeFunL    = Optlabel Typexpr "->" Typexpr {right}
+  
+  //Typexpr.TypeTup     = Typexpr "*" {Typexpr "*"}+ {non-assoc} 
+  Typexpr.TypeTup     = {Typexpr "*"}+ {non-assoc} // Note combination with prio
+  
+  Typexpr             = Typeconstr
+  Typexpr.TypeApp     = Typexpr Typeconstr {non-assoc}
+  Typexpr.TypeAppN    = "(" {Typexpr ","}+ ")" Typeconstr
+  
+  Typexpr.TypeAlias   = Typexpr "as" TypeVar
+  
+  Typexpr             = PolymorphicVariantType
+  
+sorts MethodType PolyTypexpr // object types
+context-free syntax 
+  Typexpr.ObjTypeMt    = "<" ">"
+  Typexpr.ObjTypeMtRow = "<" ".." ">"
+  Typexpr.ObjType      = "<" {MethodType ";"}+ OptSemicolon ">"
+  Typexpr.ObjTypeRow   = "<" {MethodType ";"}+ ";" ".." ">"
+  
+  MethodType.MethodType = MethodName ":" PolyTypexpr
+  
+  PolyTypexpr.PolyTypexpr  = Typexpr
+  PolyTypexpr.PolyTypexprN = TypeVar+ "." Typexpr
+  
+context-free syntax // # types
+
+  Typexpr.HashType  =                        "#" ClassPath
+  Typexpr.HashType1 =                Typexpr "#" ClassPath
+  Typexpr.HashTypeN = "(" {Typexpr ","}+ ")" "#" ClassPath
   
 context-free priorities
 
-  {Typexpr.TConstr1 Typexpr.TConstrN}
-  >  {Typexpr.Typexpr112 Typexpr.Typexpr113 Typexpr.Typexpr114}
-  > Typexpr.TTup
-  > {right: Typexpr.TFun Typexpr.TFunL}
-  > Typexpr.TAlias
+  {Typexpr.TypeApp Typexpr.TypeAppN}
+  >  {Typexpr.HashType Typexpr.HashType1 Typexpr.HashTypeN}
+  > Typexpr.TypeTup
+  > {right: Typexpr.TypeFun Typexpr.TypeFunL}
+  > Typexpr.TypeAlias,
+  
+  Typexpr.TypeTup  <0> .> Typexpr.TypeTup,  
+  Typexpr.TypeAppN <1> .> {Typexpr ","}+ = Typexpr,  
+  Typexpr.TypeTup  <0> .> {Typexpr "*"}+ = Typexpr
 
-sorts PolyTypexpr 
-context-free syntax
-  PolyTypexpr.PolyTypexpr14 = Typexpr
-  PolyTypexpr.PolyTypexpr15 = TypeVar+ "." Typexpr
-  
-  
-sorts MethodType
-context-free syntax
-  MethodType.MethodType0 = MethodName ":" PolyTypexpr
   
 // See also the following language extensions: first-class modules, attributes
 // and extension nodes.
@@ -56,7 +66,7 @@ context-free syntax
 // and non-closed type constructions. The constructions with higher precedences
 // come first.
 
-// 
+
 // Type expressions denote types in definitions of data types as well as in type
 // constraints over patterns and expressions.
 
@@ -142,13 +152,14 @@ context-free syntax
 // Polymorphic variant types
 // -------------------------
 
+// TODO: improve constructor names
+
 sorts PolymorphicVariantType TagSpecFirst TagSpec TagSpecFull
 context-free syntax
 //  PolymorphicVariantType.PolyVarExact  = "["  TagSpecFirst ("|" TagSpec)* "]"
   
-  PolymorphicVariantType.PolyVarExact  = "["  {TagSpec "|"}+ "]" // TODO: check refactoring
-  
-  PolymorphicVariantType.PolyVarOpen   = "[>" {TagSpec "|"}* "]"
+  PolymorphicVariantType.PolyVarExact   = "["  {TagSpec "|"}+                          "]" // TODO: check refactoring
+  PolymorphicVariantType.PolyVarOpen    = "[>" {TagSpec "|"}*                          "]"
   PolymorphicVariantType.PolyVarClosed1 = "[<" BarOpt {TagSpecFull "|"}+               "]"
   PolymorphicVariantType.PolyVarClosed2 = "[<" BarOpt {TagSpecFull "|"}+ ">" TagNameQ+ "]"
  
