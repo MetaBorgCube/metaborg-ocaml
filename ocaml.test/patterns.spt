@@ -1,8 +1,83 @@
-module compilation-units
+module patterns
 
 language ocaml
+start symbol Definition
 
-test foo [[
-
+test var pattern [[ 
+  let xyab
+  = 1
 ]] parse succeeds
 
+test keyword in pattern [[ 
+  let for
+  = 1
+]] parse fails
+
+test var pattern [[ 
+  let _ 
+  = 1
+]] parse succeeds
+
+test constant pattern [[ 
+  let 4
+  = 1
+]] parse succeeds
+
+test alias pattern [[ 
+  let 4 as xyz
+  = 1
+]] parse succeeds
+ 
+test alias pattern [[ 
+  let Cons(x, xs) as xyz
+  = 1
+]] parse succeeds
+
+test ascription pattern [[ 
+  let (Cons(x, xs) : int list)
+  = 1
+]] parse succeeds
+
+
+test or pattern [[ 
+  let a | b | c 
+  = 1
+]] parse succeeds
+
+
+test or pattern [[ 
+  let a, b | c, d, e 
+  = 1
+]] parse succeeds
+
+test as / tuple pattern [[    
+  let a, b as c
+  = 1
+]] parse succeeds
+
+test as / tuple pattern [[    
+  let a as c, d, e 
+  = 1
+]] parse succeeds  
+
+
+test constructor pattern [[  
+  let Cons a, b, c
+  = 1
+]] parse to [[ 
+  let (Cons a), b, c
+  = 1
+]]
+
+
+test constructor pattern [[ 
+  let Cons(x, xs)
+  = 1
+]] parse succeeds
+
+test tuple pattern [[   
+  let a, b, c
+  = 1
+]] parse succeeds
+
+ 
