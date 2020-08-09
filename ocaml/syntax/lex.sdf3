@@ -46,18 +46,25 @@ lexical restrictions
   Ident            -/- [a-zA-Z0-9\_\']
   CapitalizedIdent -/- [a-zA-Z0-9\_\']
   LowercaseIdent   -/- [a-zA-Z0-9\_\']
-
+  
 // Integer literals
 // ----------------
 
-// TODO: consider making different lexical sub-sorts
-
 sorts IntegerLiteral
+context-free syntax  
+  IntegerLiteral.DecInt = DecInt
+  IntegerLiteral.HexInt = HexInt
+  IntegerLiteral.OctInt = OctInt
+  IntegerLiteral.BinInt = BinInt
+context-free restrictions 
+  IntegerLiteral -/- [0-9A-Fa-fxXoObB]
+  "-" -/- [0-9A-Fa-fxXoObB]
+  
 lexical syntax
-  IntegerLiteral.DecInt = "-"? [0-9] [0-9\_]*
-  IntegerLiteral.HexInt = "-"? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
-  IntegerLiteral.OctInt = "-"? ("0o" | "0O") [0-7] [0-7\_]*
-  IntegerLiteral.BinInt = "-"? ("0b" | "0B") [0-1] [0-1\_]*
+  DecInt = [\-]? [0-9] [0-9\_]*
+  HexInt = [\-]? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
+  OctInt = [\-]? ("0o" | "0O") [0-7] [0-7\_]*
+  BinInt = [\-]? ("0b" | "0B") [0-1] [0-1\_]*
   
 sorts Int32Literal Int64Literal NativeintLiteral
 lexical syntax
@@ -69,13 +76,23 @@ lexical syntax
 // -----------------------
 
 sorts FloatLiteral
+context-free syntax
+  FloatLiteral.DecFloat = DecFloat
+  FloatLiteral.HexFloat = HexFloat  
+  FloatLiteral          = IntegerLiteral {reject}
 lexical syntax
-  FloatLiteral = [\-]? [0-9] [0-9\_]* 
-                 ([\.] [0-9\_]*)? ([eE] [\+\-]? [0-9] [0-9\_]*)?
+  DecFloat = 
+    [\-]? [0-9] [0-9\_]* 
+    ([\.] [0-9\_]*)? 
+    ([eE] [\+\-]? [0-9] [0-9\_]*)?
   
-  FloatLiteral = [\-]? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]* 
-                 ([\.] [0-9A-Fa-f\_]*)? ([pP] [\+\-]? [0-9] [0-9\_]*)?
-  
+  HexFloat = 
+    [\-]? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]* 
+    ([\.] [0-9A-Fa-f\_]*)? 
+    ([pP] [\+\-]? [0-9] [0-9\_]*)?
+                 
+context-free restrictions 
+  FloatLiteral -/- [0-9pPA-Fa-f\+\-]
 
 // Floating-point decimal literals consist in an integer part, a fractional part
 // and an exponent part. The integer part is a sequence of one or more digits,
@@ -104,7 +121,7 @@ lexical syntax
   
   RegularChar = ~[\ \t\n\r\\] // TODO: check
 
-  EscapeSequence = [\\] [\\\"\'\n\t\r\ ] // TODO: add \b
+  EscapeSequence = [\\] [\\\"\'ntrb\ ] 
   EscapeSequence = [\\] [0-9] [0-9] [0-9]
   EscapeSequence = "\\x" [0-9A-Fa-f] [0-9A-Fa-f]
   EscapeSequence = "\\o" [0-3] [0-7] [0-7]
@@ -233,7 +250,129 @@ lexical syntax
 // true        try         type        val         virtual     when
 // while       with
 // >>
-// 
+
+lexical syntax
+  Ident = "and" {reject}         
+  Ident = "as" {reject}          
+  Ident = "assert" {reject}      
+  Ident = "asr" {reject}         
+  Ident = "begin" {reject}       
+  Ident = "class" {reject} 
+  Ident = "constraint" {reject}  
+  Ident = "do" {reject}          
+  Ident = "done" {reject}         
+  Ident = "downto" {reject}          
+  Ident = "else" {reject}          
+  Ident = "end" {reject}          
+  Ident = "exception" {reject}          
+  Ident = "external" {reject}          
+  Ident = "false" {reject}          
+  Ident = "for" {reject}          
+  Ident = "fun" {reject}          
+  Ident = "function" {reject}         
+  Ident = "functor" {reject}          
+  Ident = "if" {reject}          
+  Ident = "in" {reject}          
+  Ident = "include" {reject}          
+  Ident = "inherit" {reject}          
+  Ident = "initializer" {reject}        
+  Ident = "land" {reject}       
+  Ident = "lazy" {reject}         
+  Ident = "let" {reject}         
+  Ident = "lor" {reject}          
+  Ident = "lsl" {reject}          
+  Ident = "lsr" {reject}         
+  Ident = "lxor" {reject}         
+  Ident = "match" {reject}         
+  Ident = "method" {reject}         
+  Ident = "mod" {reject}          
+  Ident = "module" {reject}          
+  Ident = "mutable" {reject}          
+  Ident = "new" {reject}          
+  Ident = "nonrec" {reject}          
+  Ident = "object" {reject}          
+  Ident = "of" {reject}         
+  Ident = "open" {reject}          
+  Ident = "or" {reject}          
+  Ident = "private" {reject}          
+  Ident = "rec" {reject}          
+  Ident = "sig" {reject}         
+  Ident = "struct" {reject}          
+  Ident = "then" {reject}          
+  Ident = "to" {reject}          
+  Ident = "true" {reject}          
+  Ident = "try" {reject}         
+  Ident = "type" {reject}          
+  Ident = "val" {reject}         
+  Ident = "virtual" {reject}         
+  Ident = "when" {reject}          
+  Ident = "while" {reject}
+  Ident = "with" {reject}
+  
+  Ident = "parser" {reject}   
+  Ident = "value" {reject}
+          
+lexical syntax
+  Ident = "and" {reject}         
+  LowercaseIdent = "as" {reject}          
+  LowercaseIdent = "assert" {reject}      
+  LowercaseIdent = "asr" {reject}         
+  LowercaseIdent = "begin" {reject}       
+  LowercaseIdent = "class" {reject} 
+  LowercaseIdent = "constraint" {reject}  
+  LowercaseIdent = "do" {reject}          
+  LowercaseIdent = "done" {reject}         
+  LowercaseIdent = "downto" {reject}          
+  LowercaseIdent = "else" {reject}          
+  LowercaseIdent = "end" {reject}          
+  LowercaseIdent = "exception" {reject}          
+  LowercaseIdent = "external" {reject}          
+  LowercaseIdent = "false" {reject}          
+  LowercaseIdent = "for" {reject}          
+  LowercaseIdent = "fun" {reject}          
+  LowercaseIdent = "function" {reject}         
+  LowercaseIdent = "functor" {reject}          
+  LowercaseIdent = "if" {reject}          
+  LowercaseIdent = "in" {reject}          
+  LowercaseIdent = "include" {reject}          
+  LowercaseIdent = "inherit" {reject}          
+  LowercaseIdent = "initializer" {reject}        
+  LowercaseIdent = "land" {reject}       
+  LowercaseIdent = "lazy" {reject}         
+  LowercaseIdent = "let" {reject}         
+  LowercaseIdent = "lor" {reject}          
+  LowercaseIdent = "lsl" {reject}          
+  LowercaseIdent = "lsr" {reject}         
+  LowercaseIdent = "lxor" {reject}         
+  LowercaseIdent = "match" {reject}         
+  LowercaseIdent = "method" {reject}         
+  LowercaseIdent = "mod" {reject}          
+  LowercaseIdent = "module" {reject}          
+  LowercaseIdent = "mutable" {reject}          
+  LowercaseIdent = "new" {reject}          
+  LowercaseIdent = "nonrec" {reject}          
+  LowercaseIdent = "object" {reject}          
+  LowercaseIdent = "of" {reject}         
+  LowercaseIdent = "open" {reject}          
+  LowercaseIdent = "or" {reject}          
+  LowercaseIdent = "private" {reject}          
+  LowercaseIdent = "rec" {reject}          
+  LowercaseIdent = "sig" {reject}         
+  LowercaseIdent = "struct" {reject}          
+  LowercaseIdent = "then" {reject}          
+  LowercaseIdent = "to" {reject}          
+  LowercaseIdent = "true" {reject}          
+  LowercaseIdent = "try" {reject}         
+  LowercaseIdent = "type" {reject}          
+  LowercaseIdent = "val" {reject}         
+  LowercaseIdent = "virtual" {reject}         
+  LowercaseIdent = "when" {reject}          
+  LowercaseIdent = "while" {reject}
+  LowercaseIdent = "with" {reject} 
+  
+  LowercaseIdent = "parser" {reject}   
+  LowercaseIdent = "value" {reject}
+   
 // The following character sequences are also keywords:
 // <<
 // !=    #     &     &&    '     (     )     *     +     ,     -
@@ -260,8 +399,8 @@ lexical syntax
 
 sorts LinenumDirective
 lexical syntax
-  LinenumDirective = [\#] [0-9]+
-  LinenumDirective = [\#] [0-9]+ [\"] StringCharacter* [\"]
+  LinenumDirective = [\#] [\ \t]* [0-9]+ [\ \t]* [\n]
+  LinenumDirective = [\#] [\ \t]* [0-9]+ [\ \t]* [\"] StringCharacter* [\"] [\ \t]* [\n]
   
   LAYOUT = LinenumDirective
 
