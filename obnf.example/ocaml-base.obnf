@@ -1,0 +1,3227 @@
+context-free syntax
+
+// Part: II
+// ********
+// The OCaml language
+// ******************
+// 
+// 
+// 
+// Chapter 7    The OCaml language
+// *******************************
+// 
+// 
+// 
+// Foreword
+// ========
+// 
+// This document is intended as a reference manual for the OCaml language. It
+// lists the language constructs, and gives their precise syntax and informal
+// semantics. It is by no means a tutorial introduction to the language: there is
+// not a single example. A good working knowledge of OCaml is assumed.
+// No attempt has been made at mathematical rigor: words are employed with their
+// intuitive meaning, without further definition. As a consequence, the typing
+// rules have been left out, by lack of the mathematical framework required to
+// express them, while they are definitely part of a full formal definition of the
+// language.
+// 
+// 
+// Notations
+// =========
+// 
+// The syntax of the language is given in BNF-like notation. Terminal symbols
+// are set in typewriter font (like this). Non-terminal symbols are set in italic
+// font (like  that). Square brackets [...] denote optional components. Curly
+// brackets {...} denotes zero, one or several repetitions of the enclosed
+// components. Curly brackets with a trailing plus sign {...}^+ denote one or
+// several repetitions of the enclosed components. Parentheses (...) denote
+// grouping.
+// 
+// 
+// 
+// 7.1  Lexical conventions
+// *=*=*=*=*=*=*=*=*=*=*=*=
+// 
+// 
+// 
+// Blanks
+// ------
+// 
+// The following characters are considered as blanks: space, horizontal
+// tabulation, carriage return, line feed and form feed. Blanks are ignored, but
+// they separate adjacent identifiers, literals and keywords that would otherwise
+// be confused as one single identifier, literal or keyword.
+// 
+// 
+// Comments
+// --------
+// 
+// Comments are introduced by the two characters (*, with no intervening blanks,
+// and terminated by the characters *), with no intervening blanks. Comments are
+// treated as blank characters. Comments do not occur inside string or character
+// literals. Nested comments are handled correctly.
+// 
+// 
+// Identifiers
+// -----------
+// 
+// ident ::=  ( letter |  _ ) { letter |  0 ... 9 |  _ |  ' } 
+// 
+// capitalized-ident ::=  (A ... Z) { letter |  0 ... 9 |  _ |  ' } 
+// 
+// lowercase-ident ::=  (a ... z |  _) { letter |  0 ... 9 |  _ |  ' }
+// 
+// letter ::=  A ... Z |  a ... z
+// 
+// Identifiers are sequences of letters, digits, _ (the underscore character),
+// and ' (the single quote), starting with a letter or an underscore. Letters
+// contain at least the 52 lowercase and uppercase letters from the ASCII set. The
+// current implementation also recognizes as letters some characters from the ISO
+// 8859-1 set (characters 192–214 and 216–222 as uppercase letters; characters
+// 223–246 and 248–255 as lowercase letters). This feature is deprecated and
+// should be avoided for future compatibility.
+// All characters in an identifier are meaningful. The current implementation
+// accepts identifiers up to 16000000 characters in length.
+// In many places, OCaml makes a distinction between capitalized identifiers and
+// identifiers that begin with a lowercase letter. The underscore character is
+// considered a lowercase letter for this purpose.
+// 
+// 
+// Integer literals
+// ----------------
+ 
+// integer-literal ::=  [-] (0 ... 9) { 0...9 |  _ } 
+// 
+// |   [-] ("0x"| "0X") (0...9| A...F| a...f) { 0...9| A...F|
+// a...f| _ }
+// |   [-] ("0o"| "0O") (0...7) { 0...7| _ }
+//
+// |   [-] ("0b"| "0B") (0...1) { 0...1| _ }
+// 
+// 
+// 
+// int32-literal ::=  integer-literal l
+// 
+// 
+// 
+// int64-literal ::=  integer-literal L
+// 
+// 
+// 
+// nativeint-literal ::=  integer-literal n
+// 
+// 
+// An integer literal is a sequence of one or more digits, optionally preceded
+// by a minus sign. By default, integer literals are in decimal (radix 10). The
+// following prefixes select a different radix:
+// 
+// ---------------------------------
+// |Prefix |        Radix          |
+// ---------------------------------
+// | 0x, 0X|hexadecimal (radix 16) |
+// |0o, 0O |octal (radix 8)        |
+// |0b, 0B |binary (radix 2)       |
+// ---------------------------------
+// (The initial 0 is the digit zero; the O for octal is the letter O.) An
+// integer literal can be followed by one of the letters l, L or n to indicate
+// that this integer has type int32, int64 or nativeint respectively, instead of
+// the default type int for integer literals. The interpretation of integer
+// literals that fall outside the range of representable integer values is
+// undefined.
+// For convenience and readability, underscore characters (_) are accepted (and
+// ignored) within integer literals.
+// 
+// 
+// Floating-point literals
+// -----------------------
+ 
+// float-literal ::=  [-] (0...9) { 0...9| _ } ["." { 0...9| _ }] [(e| E) ["+"| -]
+// (0...9) { 0...9| _ }]
+// |   [-] ("0x"| "0X") (0...9| A...F| a...f) { 0...9| A...F| a...f|
+// _ }  ["." { 0...9| A...F| a...f| _ }] [(p| P) ["+"| -] (0...9) { 0...9| _ }]
+ 
+// Floating-point decimal literals consist in an integer part, a fractional part
+// and an exponent part. The integer part is a sequence of one or more digits,
+// optionally preceded by a minus sign. The fractional part is a decimal point
+// followed by zero, one or more digits. The exponent part is the character e or E
+// followed by an optional + or - sign, followed by one or more digits. It is
+// interpreted as a power of 10. The fractional part or the exponent part can be
+// omitted but not both, to avoid ambiguity with integer literals. The
+// interpretation of floating-point literals that fall outside the range of
+// representable floating-point values is undefined.
+// Floating-point hexadecimal literals are denoted with the 0x or 0X prefix. The
+// syntax is similar to that of floating-point decimal literals, with the
+// following differences. The integer part and the fractional part use hexadecimal
+// digits. The exponent part starts with the character p or P. It is written in
+// decimal and interpreted as a power of 2.
+// For convenience and readability, underscore characters (_) are accepted (and
+// ignored) within floating-point literals.
+// 
+// 
+// Character literals
+// ------------------
+// 
+// char-literal ::=  ' regular-char '
+// |   ' escape-sequence '
+// 
+// escape-sequence ::=  "\" ( "\" |  "\"" |  ' |  n |  t |  b |  r |  " " )
+// |   "\" (0...9) (0...9) (0...9)
+// |   "\x" (0...9| A...F| a...f) (0...9| A...F| a...f)
+// |   "\o" (0...3) (0...7) (0...7)
+// 
+// Character literals are delimited by ' (single quote) characters. The two
+// single quotes enclose either one character different from ' and \, or one of
+// the escape sequences below:
+// 
+// -----------------------------------------------------------
+// |Sequence|               Character denoted                |
+// -----------------------------------------------------------
+// | \\     |backslash (\)                                   |
+// |\"      |double quote (")                                |
+// |\'      |single quote (')                                |
+// |\n      |linefeed (LF)                                   |
+// |\r      |carriage return (CR)                            |
+// |\t      |horizontal tabulation (TAB)                     |
+// |\b      |backspace (BS)                                  |
+// |\space  |space (SPC)                                     |
+// |\ddd    |the character with ASCII code ddd in decimal    |
+// |\xhh    |the character with ASCII code hh in hexadecimal |
+// |\oooo   |the character with ASCII code ooo in octal      |
+// -----------------------------------------------------------
+// 
+// 
+// 
+// String literals
+// ---------------
+ 
+// string-literal ::=  "\"" { string-character } "\""
+// 
+// |    "{" quoted-string-id "|"   { any-char } "|"
+// quoted-string-id "}"
+// 
+// 
+// quoted-string-id ::=  { a...z |  _ }
+// 
+// string-character ::=  regular-string-char
+// 
+// |   escape-sequence
+// 
+// |   "\u" "{" { 0...9| A...F| a...f }+  "}"
+// 
+// |   "\" "\n"  { " " |  "\t" }
+ 
+ 
+// String literals are delimited by " (double quote) characters. The two double
+// quotes enclose a sequence of either characters different from " and \, or
+// escape sequences from the table given above for character literals, or a
+// Unicode character escape sequence.
+// A Unicode character escape sequence is substituted by the UTF-8 encoding of
+// the specified Unicode scalar value. The Unicode scalar value, an integer in the
+// ranges 0x0000...0xD7FF or 0xE000...0x10FFFF, is defined using 1 to 6
+// hexadecimal digits; leading zeros are allowed.
+// To allow splitting long string literals across lines, the sequence
+// \newline spaces-or-tabs (a backslash at the end of a line followed by any
+// number of spaces and horizontal tabulations at the beginning of the next line)
+// is ignored inside string literals.
+// Quoted string literals provide an alternative lexical syntax for string
+// literals. They are useful to represent strings of arbitrary content without
+// escaping. Quoted strings are delimited by a matching pair of { quoted-string-id
+// | and | quoted-string-id } with the same quoted-string-id on both sides. Quoted
+// strings do not interpret any character in a special way but requires that the
+// sequence | quoted-string-id } does not occur in the string itself. The
+// identifier quoted-string-id is a (possibly empty) sequence of lowercase letters
+// and underscores that can be freely chosen to avoid such issue (e.g. {|hello|},
+// {ext|hello {|world|}|ext}, ...).
+// The current implementation places practically no restrictions on the length
+// of string literals.
+// 
+// 
+// Naming labels
+// -------------
+// 
+// To avoid ambiguities, naming labels in expressions cannot just be defined
+// syntactically as the sequence of the three tokens ~, ident and :, and have to
+// be defined at the lexical level.
+// label-name ::=  lowercase-ident
+// 
+// label ::=  ~ label-name :
+// 
+// optlabel ::=  ? label-name :
+// 
+// Naming labels come in two flavours: label for normal arguments and optlabel
+// for optional ones. They are simply distinguished by their first character,
+// either ~ or ?.
+// Despite label and optlabel being lexical entities in expressions, their
+// expansions ~ label-name : and ? label-name : will be used in grammars, for the
+// sake of readability. Note also that inside type expressions, this expansion can
+// be taken literally, i.e. there are really 3 tokens, with optional blanks
+// between them.
+// 
+// 
+// Prefix and infix symbols
+// ------------------------
+// 
+// infix-symbol ::=  ( core-operator-char |  % |  < ) { operator-char }
+// |   # { operator-char }+
+//
+// prefix-symbol ::=  ! { operator-char }
+// |   (? |  ~) { operator-char }+
+//
+// operator-char ::=  (~ |  ! |  ? |  core-operator-char |  % |  < |  : |  ".")
+// 
+// core-operator-char ::=  ($ |  & |  * |  "+" |  - |  / |  "=" |  > |  @ |  "^" | "|")
+
+// 
+// See also the following language extensions: extension operators, extended
+// indexing operators, and binding operators.
+// Sequences of “operator characters”, such as <=> or !!, are read as a
+// single token from the infix-symbol or prefix-symbol class. These symbols are
+// parsed as prefix and infix operators inside expressions, but otherwise behave
+// like normal identifiers.
+// 
+// 
+// Keywords
+// --------
+// 
+// The identifiers below are reserved as keywords, and cannot be employed
+// otherwise:
+// <<      and         as          assert      asr         begin       class
+// constraint  do          done        downto      else        end
+// exception   external    false       for         fun         function
+// functor     if          in          include     inherit     initializer
+// land        lazy        let         lor         lsl         lsr
+// lxor        match       method      mod         module      mutable
+// new         nonrec      object      of          open        or
+// private     rec         sig         struct      then        to
+// true        try         type        val         virtual     when
+// while       with
+// >>
+// 
+// The following character sequences are also keywords:
+// <<
+// !=    #     &     &&    '     (     )     *     +     ,     -
+// -.    ->    .     ..    .~    :     ::    :=    :>    ;     ;;
+// <     <-    "="     >     >]    >}    ?     [     [<    [>    [|
+// ]     _     `     {     {<    |     |]    ||    }     ~
+// >>
+// Note that the following identifiers are keywords of the Camlp4 extensions
+// and should be avoided for compatibility reasons.
+// <<    parser    value    $     $$    $:    <:    <<    >>    ??
+// >>
+// 
+// 
+// Ambiguities
+// -----------
+// 
+// Lexical ambiguities are resolved according to the “longest match” rule:
+// when a character sequence can be decomposed into two tokens in several
+// different ways, the decomposition retained is the one with the longest first
+// token.
+// 
+// 
+// Line number directives
+// ----------------------
+//  
+// 				
+// linenum-directive ::=  # {0 ... 9}+ 
+// |   # {0 ... 9}+  "\"" { string-character } "\""
+// 
+// Preprocessors that generate OCaml source code can insert line number
+// directives in their output so that error messages produced by the compiler
+// contain line numbers and file names referring to the source file before
+// preprocessing, instead of after preprocessing. A line number directive is
+// composed of a # (sharp sign), followed by a positive integer (the source line
+// number), optionally followed by a character string (the source file name). Line
+// number directives are treated as blanks during lexical analysis.
+// 
+// 
+// 
+// 7.2  Values
+// *=*=*=*=*=*
+// 
+// 
+// This section describes the kinds of values that are manipulated by OCaml
+// programs.
+// 
+// 
+// 7.2.1  Base values
+// ==================
+// 
+// 
+// 
+// Integer numbers
+// ---------------
+// 
+// Integer values are integer numbers from −2^30 to 2^30−1, that is
+// −1073741824 to 1073741823. The implementation may support a wider range of
+// integer values: on 64-bit platforms, the current implementation supports
+// integers ranging from −2^62 to 2^62−1.
+// 
+// 
+// Floating-point numbers
+// ----------------------
+// 
+// Floating-point values are numbers in floating-point representation. The
+// current implementation uses double-precision floating-point numbers conforming
+// to the IEEE 754 standard, with 53 bits of mantissa and an exponent ranging from
+// −1022 to 1023.
+// 
+// 
+// Characters
+// ----------
+// 
+// Character values are represented as 8-bit integers between 0 and 255.
+// Character codes between 0 and 127 are interpreted following the ASCII standard.
+// The current implementation interprets character codes between 128 and 255
+// following the ISO 8859-1 standard.
+// 
+// 
+// Character strings
+// -----------------
+// 
+// String values are finite sequences of characters. The current implementation
+// supports strings containing up to 2^24 − 5 characters (16777211 characters);
+// on 64-bit platforms, the limit is 2^57 − 9.
+// 
+// 
+// 7.2.2  Tuples
+// =============
+// 
+// Tuples of values are written (v_1, ..., v_n), standing for the n-tuple of
+// values v_1 to v_n. The current implementation supports tuple of up to 2^22 −
+// 1 elements (4194303 elements).
+// 
+// 
+// 7.2.3  Records
+// ==============
+// 
+// Record values are labeled tuples of values. The record value written {
+// field_1 = v_1; ...;  field_n = v_n } associates the value v_i to the record
+// field field_i, for i = 1 ... n. The current implementation supports records
+// with up to 2^22 − 1 fields (4194303 fields).
+// 
+// 
+// 7.2.4  Arrays
+// =============
+// 
+// Arrays are finite, variable-sized sequences of values of the same type. The
+// current implementation supports arrays containing up to 2^22 − 1 elements
+// (4194303 elements) unless the elements are floating-point numbers (2097151
+// elements in this case); on 64-bit platforms, the limit is 2^54 − 1 for all
+// arrays.
+// 
+// 
+// 7.2.5  Variant values
+// =====================
+// 
+// Variant values are either a constant constructor, or a non-constant
+// constructor applied to a number of values. The former case is written constr;
+// the latter case is written constr (v_1, ... , v_n ), where the v_i are said to
+// be the arguments of the non-constant constructor constr. The parentheses may be
+// omitted if there is only one argument.
+// The following constants are treated like built-in constant constructors:
+// 
+// --------------------------------
+// |Constant|    Constructor      |
+// --------------------------------
+// | false  |the boolean false    |
+// |true    |the boolean true     |
+// |()      |the “unit” value |
+// |[]      |the empty list       |
+// --------------------------------
+// 
+// The current implementation limits each variant type to have at most 246
+// non-constant constructors and 2^30−1 constant constructors.
+// 
+// 
+// 7.2.6  Polymorphic variants
+// ===========================
+// 
+// Polymorphic variants are an alternate form of variant values, not belonging
+// explicitly to a predefined variant type, and following specific typing rules.
+// They can be either constant, written `tag-name, or non-constant, written
+// `tag-name(v).
+// 
+// 
+// 7.2.7  Functions
+// ================
+// 
+// Functional values are mappings from values to values.
+// 
+// 
+// 7.2.8  Objects
+// ==============
+// 
+// Objects are composed of a hidden internal state which is a record of instance
+// variables, and a set of methods for accessing and modifying these variables.
+// The structure of an object is described by the toplevel class that created it.
+// 
+// 
+// 
+// 7.3  Names
+// *=*=*=*=*=
+// 
+// 
+// Identifiers are used to give names to several classes of language objects and
+// refer to these objects by name later:
+// 
+// - value names (syntactic class value-name),
+// - value constructors and exception constructors (class constr-name),
+// - labels (label-name, defined in section 7.1),
+// - polymorphic variant tags (tag-name),
+// - type constructors (typeconstr-name),
+// - record fields (field-name),
+// - class names (class-name),
+// - method names (method-name),
+// - instance variable names (inst-var-name),
+// - module names (module-name),
+// - module type names (modtype-name).
+// These eleven name spaces are distinguished both by the context and by the
+// capitalization of the identifier: whether the first letter of the identifier is
+// in lowercase (written lowercase-ident below) or in uppercase (written
+// capitalized-ident). Underscore is considered a lowercase letter for this
+// purpose.
+// 
+// 
+// Naming objects
+// --------------
+// 
+// value-name ::=  lowercase-ident
+// 
+// |   "(" operator-name ")"
+// 
+// operator-name ::=  prefix-symbol |  infix-op
+// 
+// infix-op ::=  infix-symbol
+// 
+// |   * |  "+" |  - |  "-." |  "=" |  "!=" |  < |  > |  "or" |  "||" |  &
+// |  "&&" |  ":="
+// |   "mod" |  "land" |  "lor" |  "lxor" |  "lsl" |  "lsr" |  "asr"
+// 
+// 
+// 
+// constr-name ::=  capitalized-ident
+// 
+// 
+// 
+// tag-name ::=  capitalized-ident
+// 
+// 
+// 
+// typeconstr-name ::=  lowercase-ident
+// 
+// 
+// 
+// field-name ::=  lowercase-ident
+// 
+// 
+// 
+// module-name ::=  capitalized-ident
+// 
+// 
+// 
+// modtype-name ::=  ident
+// 
+// 
+// 
+// class-name ::=  lowercase-ident
+// 
+// 
+// 
+// inst-var-name ::=  lowercase-ident
+// 
+// 
+// 
+// method-name ::=  lowercase-ident
+// 
+// See also the following language extension: extended indexing operators.
+// As shown above, prefix and infix symbols as well as some keywords can be used
+// as value names, provided they are written between parentheses. The
+// capitalization rules are summarized in the table below.
+// 
+// ------------------------------------------------
+// |       Name space       |Case of first letter |
+// ------------------------------------------------
+// | Values                 |lowercase            |
+// |Constructors            |uppercase            |
+// |Labels                  |lowercase            |
+// |Polymorphic variant tags|uppercase            |
+// |Exceptions              |uppercase            |
+// |Type constructors       |lowercase            |
+// |Record fields           |lowercase            |
+// |Classes                 |lowercase            |
+// |Instance variables      |lowercase            |
+// |Methods                 |lowercase            |
+// |Modules                 |uppercase            |
+// |Module types            |any                  |
+// ------------------------------------------------
+// 
+// Note on polymorphic variant tags: the current implementation accepts
+// lowercase variant tags in addition to capitalized variant tags, but we suggest
+// you avoid lowercase variant tags for portability and compatibility with future
+// OCaml versions.
+// 
+// 
+// Referring to named objects
+// --------------------------
+// 
+// value-path ::=  [ module-path "." ]  value-name
+// 
+// constr ::=  [ module-path "." ]  constr-name
+// 
+// typeconstr ::=  [ extended-module-path "." ]  typeconstr-name
+// 
+// field ::=  [ module-path "." ]  field-name
+// 
+// modtype-path ::=  [ extended-module-path "." ]  modtype-name
+// 
+// class-path ::=  [ module-path "." ]  class-name
+// 
+// classtype-path ::=  [ extended-module-path "." ]  class-name
+// 
+// module-path ::=  module-name  { "." module-name }
+// 
+// extended-module-path ::=  extended-module-name  { "." extended-module-name }
+// 
+// extended-module-name ::=  module-name  { "(" extended-module-path ")" }
+// 
+// A named object can be referred to either by its name (following the usual
+// static scoping rules for names) or by an access path prefix .  name, where
+// prefix designates a module and name is the name of an object defined in that
+// module. The first component of the path, prefix, is either a simple module name
+// or an access path name_1 .  name_2 ..., in case the defining module is itself
+// nested inside other modules. For referring to type constructors, module types,
+// or class types, the prefix can also contain simple functor applications (as in
+// the syntactic class extended-module-path above) in case the defining module is
+// the result of a functor application.
+// Label names, tag names, method names and instance variable names need not be
+// qualified: the former three are global labels, while the latter are local to a
+// class.
+// 
+// 
+// 7.4  Type expressions
+// *=*=*=*=*=*=*=*=*=*=*
+// 
+// 
+// typexpr ::=  ' ident
+// |   _
+// |   "(" typexpr ")"
+// |   optlabel  typexpr "->"  typexpr
+// 					 
+// |   typexpr  { * typexpr }+
+// |   typeconstr
+// |   typexpr  typeconstr
+// |   "(" typexpr  { , typexpr } ")"  typeconstr
+// |   typexpr "as" '  ident
+// |   polymorphic-variant-type
+// |   "<" [".."] ">"
+// |   "<" method-type  { ; method-type }  [; |  ; ".."] ">"
+// |   # class-path
+// |   typexpr #  class-path
+// |   "(" typexpr  { , typexpr } ")" #  class-path
+// 
+// poly-typexpr ::=  typexpr 
+// |   { ' ident }+  "."  typexpr
+//
+// method-type ::=  method-name :  poly-typexpr
+// See also the following language extensions: first-class modules, attributes
+// and extension nodes.
+// The table below shows the relative precedences and associativity of operators
+// and non-closed type constructions. The constructions with higher precedences
+// come first.
+// 
+// ----------------------------------------------
+// |          Operator           |Associativity |
+// ----------------------------------------------
+// | Type constructor application|–           |
+// |#                            |–           |
+// |*                            |–           |
+// |->                           |right         |
+// |as                           |–           |
+// ----------------------------------------------
+// 
+// Type expressions denote types in definitions of data types as well as in type
+// constraints over patterns and expressions.
+// 
+// 
+// Type variables
+// --------------
+// 
+// The type expression ' ident stands for the type variable named ident. The
+// type expression _ stands for either an anonymous type variable or anonymous
+// type parameters. In data type definitions, type variables are names for the
+// data type parameters. In type constraints, they represent unspecified types
+// that can be instantiated by any type to satisfy the type constraint. In general
+// the scope of a named type variable is the whole top-level phrase where it
+// appears, and it can only be generalized when leaving this scope. Anonymous
+// variables have no such restriction. In the following cases, the scope of named
+// type variables is restricted to the type expression where they appear: 1) for
+// universal (explicitly polymorphic) type variables; 2) for type variables that
+// only appear in public method specifications (as those variables will be made
+// universal, as described in section 7.9.1); 3) for variables used as aliases,
+// when the type they are aliased to would be invalid in the scope of the
+// enclosing definition (i.e. when it contains free universal type variables, or
+// locally defined types.)
+// 
+// 
+// Parenthesized types
+// -------------------
+// 
+// The type expression ( typexpr ) denotes the same type as typexpr.
+// 
+// 
+// Function types
+// --------------
+// 
+// The type expression typexpr_1 ->  typexpr_2 denotes the type of functions
+// mapping arguments of type typexpr_1 to results of type typexpr_2.
+// label-name :  typexpr_1 ->  typexpr_2 denotes the same function type, but the
+// argument is labeled label.
+// ? label-name :  typexpr_1 ->  typexpr_2 denotes the type of functions mapping
+// an optional labeled argument of type typexpr_1 to results of type typexpr_2.
+// That is, the physical type of the function will be typexpr_1 option ->
+// typexpr_2.
+// 
+// 
+// Tuple types
+// -----------
+// 
+// The type expression typexpr_1 * ... *  typexpr_n denotes the type of tuples
+// whose elements belong to types typexpr_1, ...  typexpr_n respectively.
+// 
+// 
+// Constructed types
+// -----------------
+// 
+// Type constructors with no parameter, as in typeconstr, are type expressions.
+// The type expression typexpr  typeconstr, where typeconstr is a type
+// constructor with one parameter, denotes the application of the unary type
+// constructor typeconstr to the type typexpr.
+// The type expression (typexpr_1,..., typexpr_n)  typeconstr, where typeconstr
+// is a type constructor with n parameters, denotes the application of the n-ary
+// type constructor typeconstr to the types typexpr_1 through typexpr_n.
+// In the type expression  _ typeconstr , the anonymous type expression  _
+// stands in for anonymous type parameters and is equivalent to  (_, ...,_)  with
+// as many repetitions of _ as the arity of typeconstr.
+// 
+// 
+// Aliased and recursive types
+// ---------------------------
+// 
+// 
+// The type expression typexpr as '  ident denotes the same type as typexpr, and
+// also binds the type variable ident to type typexpr both in typexpr and in other
+// types. In general the scope of an alias is the same as for a named type
+// variable, and covers the whole enclosing definition. If the type variable ident
+// actually occurs in typexpr, a recursive type is created. Recursive types for
+// which there exists a recursive path that does not contain an object or
+// polymorphic variant type constructor are rejected, except when the -rectypes
+// mode is selected.
+// If ' ident denotes an explicit polymorphic variable, and typexpr denotes
+// either an object or polymorphic variant type, the row variable of typexpr is
+// captured by ' ident, and quantified upon.
+// 
+// 
+// Polymorphic variant types
+// -------------------------
+// 
+// polymorphic-variant-type ::=  "[" tag-spec-first  { "|" tag-spec } "]"
+// 
+// |   "[>" [ tag-spec ]  { "|" tag-spec } "]"
+// 
+// |   "[<" ["|"] tag-spec-full  { "|" tag-spec-full }  [ ">"
+// { ` tag-name }+  ] "]"
+// 
+// 
+// tag-spec-first ::=  ` tag-name  [ "of" typexpr ]
+// |   [ typexpr ] "|"  tag-spec
+//
+// tag-spec ::=  ` tag-name  [ "of" typexpr ]
+// |   typexpr
+// 
+// 
+// 
+// tag-spec-full ::=  ` tag-name  [ "of" ["&"] typexpr  { "&" typexpr } ]
+// 
+// |   typexpr
+// 
+// 
+// Polymorphic variant types describe the values a polymorphic variant may take.
+// The first case is an exact variant type: all possible tags are known, with
+// their associated types, and they can all be present. Its structure is fully
+// known.
+// The second case is an open variant type, describing a polymorphic variant
+// value: it gives the list of all tags the value could take, with their
+// associated types. This type is still compatible with a variant type containing
+// more tags. A special case is the unknown type, which does not define any tag,
+// and is compatible with any variant type.
+// The third case is a closed variant type. It gives information about all the
+// possible tags and their associated types, and which tags are known to
+// potentially appear in values. The exact variant type (first case) is just an
+// abbreviation for a closed variant type where all possible tags are also
+// potentially present.
+// In all three cases, tags may be either specified directly in the `tag-name
+// [of typexpr] form, or indirectly through a type expression, which must expand
+// to an exact variant type, whose tag specifications are inserted in its place.
+// Full specifications of variant tags are only used for non-exact closed types.
+// They can be understood as a conjunctive type for the argument: it is intended
+// to have all the types enumerated in the specification.
+// Such conjunctive constraints may be unsatisfiable. In such a case the
+// corresponding tag may not be used in a value of this type. This does not mean
+// that the whole type is not valid: one can still use other available tags.
+// Conjunctive constraints are mainly intended as output from the type checker.
+// When they are used in source programs, unsolvable constraints may cause early
+// failures.
+// 
+// 
+// Object types
+// ------------
+// 
+// An object type < [method-type  { ; method-type }] > is a record of method
+// types.
+// Each method may have an explicit polymorphic type: { ' ident }^+ .  typexpr.
+// Explicit polymorphic variables have a local scope, and an explicit polymorphic
+// type can only be unified to an equivalent one, where only the order and names
+// of polymorphic variables may change.
+// The type < {method-type ;} .. > is the type of an object whose method names
+// and types are described by method-type_1, ...,  method-type_n, and possibly
+// some other methods represented by the ellipsis. This ellipsis actually is a
+// special kind of type variable (called row variable in the literature) that
+// stands for any number of extra method types.
+// 
+// 
+// #-types
+// -------
+// 
+// The type # class-path is a special kind of abbreviation. This abbreviation
+// unifies with the type of any object belonging to a subclass of class
+// class-path. It is handled in a special way as it usually hides a type variable
+// (an ellipsis, representing the methods that may be added in a subclass). In
+// particular, it vanishes when the ellipsis gets instantiated. Each type
+// expression # class-path defines a new type variable, so type # class-path -> #
+// class-path is usually not the same as type (# class-path as '  ident) -> '
+// ident.
+// Use of #-types to abbreviate polymorphic variant types is deprecated. If t is
+// an exact variant type then #t translates to [< t], and #t[> `tag_1 ...` tag_k]
+// translates to [< t > `tag_1 ...` tag_k]
+// 
+// 
+// Variant and record types
+// ------------------------
+// 
+// There are no type expressions describing (defined) variant types nor record
+// types, since those are always named, i.e. defined before use and referred to by
+// name. Type definitions are described in section 7.8.1.
+// 
+// 
+// 7.5  Constants
+// *=*=*=*=*=*=*=
+// 
+// 
+// 
+// constant ::=  integer-literal
+// |   int32-literal
+// |   int64-literal
+// |   nativeint-literal
+// |   float-literal
+// |   char-literal
+// |   string-literal
+// |   constr
+// |   "false"
+// |   "true"
+// |   "(" ")"
+// |   "begin" "end"
+// |   "[" "]"
+// |   "[|" "|]"
+// |   ` tag-name
+// See also the following language extension: extension literals.
+// The syntactic class of constants comprises literals from the four base types
+// (integers, floating-point numbers, characters, character strings), the integer
+// variants, and constant constructors from both normal and polymorphic variants,
+// as well as the special constants false, true, (), [], and [||], which behave
+// like constant constructors, and begin end, which is equivalent to ().
+// 
+// 
+// 7.6  Patterns
+// *=*=*=*=*=*=*
+// 
+// 
+// pattern ::=  value-name
+// 
+// |   _
+// 
+// |   constant
+// 
+// |   pattern "as"  value-name
+// 
+// |   "(" pattern ")"
+// 
+// |   "(" pattern :  typexpr ")"
+// 
+// |   pattern "|"  pattern
+// 
+// |   constr  pattern
+// 
+// |   ` tag-name  pattern
+// 
+// |   # typeconstr
+// 
+// |   pattern  { , pattern }+
+// 
+// |   "{" field  [: typexpr]  [= pattern] { ; field  [: typexpr]  [=
+// pattern] }  [; _ ] [ ; ] "}"
+// |   "[" pattern  { ; pattern }  [ ; ] "]"
+// 
+// |   pattern "::"  pattern
+// 
+// |   "[|" pattern  { ; pattern }  [ ; ] "|]"
+// 
+// |   char-literal ".."  char-literal
+// 
+// |   "lazy" pattern
+// 
+// |   "exception" pattern
+// 
+// |   module-path ".""("  pattern ")"
+// 
+// |   module-path ".""["  pattern "]"
+// 
+// |   module-path "." "[|"  pattern "|]"
+// 
+// |   module-path "." "{"  pattern "}"
+// 
+// See also the following language extensions: first-class modules, attributes
+// and extension nodes.
+// The table below shows the relative precedences and associativity of operators
+// and non-closed pattern constructions. The constructions with higher precedences
+// come first.
+// 
+// ---------------------------------------------------------
+// |                Operator                |Associativity |
+// ---------------------------------------------------------
+// | ..                                     |–           |
+// |lazy (see section 7.6)                  |–           |
+// |Constructor application, Tag application|right         |
+// |::                                      |right         |
+// |,                                       |–           |
+// ||                                       |left          |
+// |as                                      |–           |
+// ---------------------------------------------------------
+// 
+// Patterns are templates that allow selecting data structures of a given shape,
+// and binding identifiers to components of the data structure. This selection
+// operation is called pattern matching; its outcome is either “this value does
+// not match this pattern”, or “this value matches this pattern, resulting in
+// the following bindings of names to values”.
+// 
+// 
+// Variable patterns
+// -----------------
+// 
+// A pattern that consists in a value name matches any value, binding the name
+// to the value. The pattern _ also matches any value, but does not bind any name.
+// Patterns are linear: a variable cannot be bound several times by a given
+// pattern. In particular, there is no way to test for equality between two parts
+// of a data structure using only a pattern (but when guards can be used for this
+// purpose).
+// 
+// 
+// Constant patterns
+// -----------------
+// 
+// A pattern consisting in a constant matches the values that are equal to this
+// constant.
+// 
+// 
+// Alias patterns
+// --------------
+// 
+// The pattern pattern_1 as  value-name matches the same values as pattern_1. If
+// the matching against pattern_1 is successful, the name value-name is bound to
+// the matched value, in addition to the bindings performed by the matching
+// against pattern_1.
+// 
+// 
+// Parenthesized patterns
+// ----------------------
+// 
+// The pattern ( pattern_1 ) matches the same values as pattern_1. A type
+// constraint can appear in a parenthesized pattern, as in ( pattern_1 :  typexpr
+// ). This constraint forces the type of pattern_1 to be compatible with typexpr.
+// 
+// 
+// “Or” patterns
+// -----------------
+// 
+// The pattern pattern_1 |  pattern_2 represents the logical “or” of the two
+// patterns pattern_1 and pattern_2. A value matches pattern_1 |  pattern_2 if it
+// matches pattern_1 or pattern_2. The two sub-patterns pattern_1 and pattern_2
+// must bind exactly the same identifiers to values having the same types.
+// Matching is performed from left to right. More precisely, in case some value v
+// matches pattern_1 |  pattern_2, the bindings performed are those of pattern_1
+// when v matches pattern_1. Otherwise, value v matches pattern_2 whose bindings
+// are performed.
+// 
+// 
+// Variant patterns
+// ----------------
+// 
+// The pattern constr (  pattern_1 , ... ,  pattern_n ) matches all variants
+// whose constructor is equal to constr, and whose arguments match pattern_1 ...
+// pattern_n. It is a type error if n is not the number of arguments expected by
+// the constructor.
+// The pattern constr _ matches all variants whose constructor is constr.
+// The pattern pattern_1 ::  pattern_2 matches non-empty lists whose heads match
+// pattern_1, and whose tails match pattern_2.
+// The pattern [ pattern_1 ; ... ;  pattern_n ] matches lists of length n whose
+// elements match pattern_1 ...pattern_n, respectively. This pattern behaves like
+// pattern_1 :: ... ::  pattern_n :: [].
+// 
+// 
+// Polymorphic variant patterns
+// ----------------------------
+// 
+// The pattern `tag-name  pattern_1 matches all polymorphic variants whose tag
+// is equal to tag-name, and whose argument matches pattern_1.
+// 
+// 
+// Polymorphic variant abbreviation patterns
+// -----------------------------------------
+// 
+// If the type [('a,'b,...)] typeconstr = [ ` tag-name_1  typexpr_1 | ... |
+// ` tag-name_n  typexpr_n] is defined, then the pattern #typeconstr is a
+// shorthand for the following or-pattern: ( `tag-name_1(_ :  typexpr_1) | ... |
+// ` tag-name_n(_ :  typexpr_n)). It matches all values of type [< typeconstr ].
+// 
+// 
+// Tuple patterns
+// --------------
+// 
+// The pattern pattern_1 , ... ,  pattern_n matches n-tuples whose components
+// match the patterns pattern_1 through pattern_n. That is, the pattern matches
+// the tuple values (v_1, ..., v_n) such that pattern_i matches v_i for i = 1,...
+// , n.
+// 
+// 
+// Record patterns
+// ---------------
+// 
+// The pattern { field_1  [= pattern_1] ; ... ;  field_n  [= pattern_n] }
+// matches records that define at least the fields field_1 through field_n, and
+// such that the value associated to field_i matches the pattern pattern_i, for i
+// = 1,... , n. A single identifier field_k stands for field_k =  field_k , and a
+// single qualified identifier module-path .  field_k stands for module-path .
+// field_k =  field_k . The record value can define more fields than field_1
+// ...field_n; the values associated to these extra fields are not taken into
+// account for matching. Optionally, a record pattern can be terminated by ; _ to
+// convey the fact that not all fields of the record type are listed in the record
+// pattern and that it is intentional. Optional type constraints can be added
+// field by field with { field_1 :  typexpr_1 =  pattern_1 ;... ; field_n :
+// typexpr_n =  pattern_n } to force the type of field_k to be compatible with
+// typexpr_k.
+// 
+// 
+// Array patterns
+// --------------
+// 
+// The pattern [| pattern_1 ; ... ;  pattern_n |] matches arrays of length n
+// such that the i-th array element matches the pattern pattern_i, for i = 1,... ,
+// n.
+// 
+// 
+// Range patterns
+// --------------
+// 
+// The pattern ' c ' .. ' d ' is a shorthand for the pattern
+// ' c ' | ' c_1 ' | ' c_2 ' | ... | ' c_n ' | ' d '
+// where c_1, c_2, ..., c_n are the characters that occur between c and d in
+// the ASCII character set. For instance, the pattern '0'..'9' matches all
+// characters that are digits.
+// 
+// 
+// Lazy patterns
+// -------------
+// 
+// 
+// (Introduced in Objective Caml 3.11)
+// pattern ::=  ...
+// 
+// The pattern lazy pattern matches a value v of type Lazy.t, provided pattern
+// matches the result of forcing v with Lazy.force. A successful match of a
+// pattern containing lazy sub-patterns forces the corresponding parts of the
+// value being matched, even those that imply no test such as lazy value-name or
+// lazy _. Matching a value with a pattern-matching where some patterns contain
+// lazy sub-patterns may imply forcing parts of the value, even when the pattern
+// selected in the end has no lazy sub-pattern.
+// For more information, see the description of module Lazy in the standard
+// library (module Lazy).
+// 
+// 
+// Exception patterns
+// ------------------
+// (Introduced in OCaml 4.02)
+// A new form of exception pattern,  exception pattern , is allowed only as a
+// toplevel pattern or inside a toplevel or-pattern under a match...with
+// pattern-matching (other occurrences are rejected by the type-checker).
+// Cases with such a toplevel pattern are called “exception cases”, as
+// opposed to regular “value cases”. Exception cases are applied when the
+// evaluation of the matched expression raises an exception. The exception value
+// is then matched against all the exception cases and re-raised if none of them
+// accept the exception (as with a try...with block). Since the bodies of all
+// exception and value cases are outside the scope of the exception handler, they
+// are all considered to be in tail-position: if the match...with block itself is
+// in tail position in the current function, any function call in tail position in
+// one of the case bodies results in an actual tail call.
+// A pattern match must contain at least one value case. It is an error if all
+// cases are exceptions, because there would be no code to handle the return of a
+// value.
+// 
+// 
+// Local opens for patterns
+// ------------------------
+// (Introduced in OCaml 4.04)
+// For patterns, local opens are limited to the module-path.( pattern)
+// construction. This construction locally opens the module referred to by the
+// module path module-path in the scope of the pattern pattern.
+// When the body of a local open pattern is delimited by [ ], [| |], or { }, the
+// parentheses can be omitted. For example, module-path.[ pattern] is equivalent
+// to module-path.([ pattern]), and module-path.[|  pattern |] is equivalent to
+// module-path.([|  pattern |]).
+// 
+// 
+// 7.7  Expressions
+// *=*=*=*=*=*=*=*=
+// 
+// 
+// expr ::=  value-path
+// 
+// |   constant
+// 
+// |   "(" expr ")"
+// 
+// |   "begin" expr "end"
+// 
+// |   "(" expr :  typexpr ")"
+// 
+// |   expr  {, expr}+
+// 
+// |   constr  expr
+// 
+// |   ` tag-name  expr
+// 
+// |   expr "::"  expr
+// 
+// |   "[" expr  { ; expr }  [;] "]"
+// 
+// |   "[|" expr  { ; expr }  [;] "|]"
+// 
+// |   "{" field  [: typexpr]  [= expr] { ; field  [: typexpr]  [= expr] }
+// [;] "}"
+// |   "{" expr "with"  field  [: typexpr]  [= expr] { ; field  [: typexpr]
+// [= expr] }  [;] "}"
+// 
+// 
+// |   expr  { argument }+
+// 
+// |   prefix-symbol  expr
+// 
+// |   - expr
+// 
+// |   "-." expr
+// 
+// |   expr  infix-op  expr
+// 
+// |   expr "."  field
+// 
+// |   expr "."  field "<-"  expr
+// 
+// |   expr "." "("  expr ")"
+// 
+// |   expr "." "("  expr ")" "<-"  expr
+// 
+// |   expr "." "["  expr "]"
+// 
+// |   expr "." "["  expr "]" "<-"  expr
+// 
+// |   "if" expr "then"  expr  [ "else" expr ]
+// 
+// |   "while" expr "do"  expr "done"
+// 
+// |   "for" value-name "="  expr  ( "to" |  "downto" ) expr "do"  expr "done"
+// 
+// |   expr ;  expr
+// 
+// |   "match" expr "with"  pattern-matching
+// 
+// |   "function" pattern-matching
+// 
+// |   "fun" { parameter }+   [ : typexpr ] "->"  expr
+// 
+// |   "try" expr "with"  pattern-matching
+// 
+// |   "let" ["rec"] let-binding  { "and" let-binding } "in"  expr
+// 
+// |   "let" exception constr-decl "in"  expr
+// 
+// |   "new" class-path
+// 
+// |   "object" class-body "end"
+// 
+// |   expr #  method-name
+// 
+// |   inst-var-name
+// 
+// |   inst-var-name "<-"  expr
+// 
+// |   "(" expr ":>"  typexpr ")"
+// 
+// |   "(" expr :  typexpr ":>"  typexpr ")"
+// 
+// |   "{<" [ inst-var-name  [= expr]  { ; inst-var-name  [= expr] }  [;] ]
+// ">}"
+// |   "assert" expr
+// 
+// |   "lazy" expr
+// 
+// |   "let" "module" module-name  { "(" module-name :  module-type ")" }  [ :
+// module-type ]  "="  module-expr "in"  expr
+// |   "let" "open" module-path "in"  expr
+// 
+// |   module-path "." "("  expr ")"
+// 
+// |   module-path "." "["  expr "]"
+// 
+// |   module-path "." "[|"  expr "|]"
+// 
+// |   module-path "." "{"  expr "}"
+// 
+// |   module-path "." "{<"  expr ">}"
+// 
+// 
+// 
+// 
+// 
+// 
+// argument ::=  expr
+// 
+// |   ~ label-name
+// 
+// |   ~ label-name :  expr
+// 
+// |   ? label-name
+// 
+// |   ? label-name :  expr
+// 
+// 
+// 
+// pattern-matching ::=  [ "|" ] pattern  ["when" expr] "->"  expr  { "|" pattern  ["when"
+// expr] "->"  expr }
+// 
+// 
+// let-binding ::=  pattern "="  expr
+// 
+// |   value-name  { parameter }  [: typexpr]  [":>" typexpr] =
+// expr
+// |   value-name :  poly-typexpr "="  expr
+ 
+ 
+ 
+// parameter ::=  pattern
+// 
+// |   ~ label-name
+// 
+// |   ~ "(" label-name  [: typexpr] ")"
+// 
+// |   ~ label-name :  pattern
+// 
+// |   ? label-name
+// 
+// |   ? "(" label-name  [: typexpr]  [= expr] ")"
+// 
+// |   ? label-name :  pattern
+// 
+// |   ? label-name : "("  pattern  [: typexpr]  [= expr] ")"
+// 
+// See also the following language extensions: first-class modules, overriding
+// in open statements, syntax for Bigarray access, attributes, extension nodes and
+// extended indexing operators.
+// 
+// 
+// 7.7.1  Precedence and associativity
+// ===================================
+// The table below shows the relative precedences and associativity of
+// operators and non-closed constructions. The constructions with higher
+// precedence come first. For infix and prefix symbols, we write “*...” to
+// mean “any symbol starting with *”.
+// 
+// -------------------------------------------------------------------------------
+// --------------
+// |                          Construction or operator
+// |Associativity |
+// -------------------------------------------------------------------------------
+// --------------
+// | prefix-symbol
+// |–           |
+// |.   .(   .[   .{ (see section 8.11)
+// |–           |
+// |#...
+// |left          |
+// |function application, constructor application, tag application, assert,
+// lazy|left          |
+// |-   -. (prefix)
+// |–           |
+// |**...   lsl   lsr   asr
+// |right         |
+// |*...   /...   %...   mod   land   lor   lxor
+// |left          |
+// | +...   -...
+// |left          |
+// |::
+// |right         |
+// |@...   ^...
+// |right         |
+// |=...   <...   >...   |...   &...   $...   !=
+// |left          |
+// |&   &&
+// |right         |
+// |or  ||
+// |right         |
+// |,
+// |–           |
+// |<-   :=
+// |right         |
+// |if
+// |–           |
+// |;
+// |right         |
+// |let  match  fun  function  try
+// |–           |
+// -------------------------------------------------------------------------------
+// --------------
+// 
+// 
+// 
+// 7.7.2  Basic expressions
+// ========================
+// 
+// 
+// 
+// Constants
+// ---------
+// 
+// An expression consisting in a constant evaluates to this constant.
+// 
+// 
+// Value paths
+// -----------
+// 
+// An expression consisting in an access path evaluates to the value bound to
+// this path in the current evaluation environment. The path can be either a value
+// name or an access path to a value component of a module.
+// 
+// 
+// Parenthesized expressions
+// -------------------------
+// 
+// The expressions ( expr ) and begin expr end have the same value as expr. The
+// two constructs are semantically equivalent, but it is good style to use begin
+// ... end inside control structures:
+// <<
+// if ... then begin ... ; ... end else begin ... ; ... end
+// >>
+// and ( ... ) for the other grouping situations.
+// Parenthesized expressions can contain a type constraint, as in ( expr :
+// typexpr ). This constraint forces the type of expr to be compatible with
+// typexpr.
+// Parenthesized expressions can also contain coercions ( expr  [: typexpr] :>
+// typexpr) (see subsection 7.7.7 below).
+// 
+// 
+// Function application
+// --------------------
+// 
+// Function application is denoted by juxtaposition of (possibly labeled)
+// expressions. The expression expr  argument_1 ...  argument_n evaluates the
+// expression expr and those appearing in argument_1 to argument_n. The expression
+// expr must evaluate to a functional value f, which is then applied to the values
+// of argument_1, ...,  argument_n.
+// The order in which the expressions expr,  argument_1, ...,  argument_n are
+// evaluated is not specified.
+// Arguments and parameters are matched according to their respective labels.
+// Argument order is irrelevant, except among arguments with the same label, or no
+// label.
+// If a parameter is specified as optional (label prefixed by ?) in the type of
+// expr, the corresponding argument will be automatically wrapped with the
+// constructor Some, except if the argument itself is also prefixed by ?, in which
+// case it is passed as is. If a non-labeled argument is passed, and its
+// corresponding parameter is preceded by one or several optional parameters, then
+// these parameters are defaulted, i.e. the value None will be passed for them.
+// All other missing parameters (without corresponding argument), both optional
+// and non-optional, will be kept, and the result of the function will still be a
+// function of these missing parameters to the body of f.
+// As a special case, if the function has a known arity, all the arguments are
+// unlabeled, and their number matches the number of non-optional parameters, then
+// labels are ignored and non-optional parameters are matched in their definition
+// order. Optional arguments are defaulted.
+// In all cases but exact match of order and labels, without optional
+// parameters, the function type should be known at the application point. This
+// can be ensured by adding a type constraint. Principality of the derivation can
+// be checked in the -principal mode.
+// 
+// 
+// Function definition
+// -------------------
+// 
+// Two syntactic forms are provided to define functions. The first form is
+// introduced by the keyword function:
+// 
+// function pattern  -> expr
+// 			 1        1
+// | ...
+// 
+// | pattern  -> expr
+// 			 n        n
+// This expression evaluates to a functional value with one argument. When this
+// function is applied to a value v, this value is matched against each pattern
+// pattern_1 to pattern_n. If one of these matchings succeeds, that is, if the
+// value v matches the pattern pattern_i for some i, then the expression expr_i
+// associated to the selected pattern is evaluated, and its value becomes the
+// value of the function application. The evaluation of expr_i takes place in an
+// environment enriched by the bindings performed during the matching.
+// If several patterns match the argument v, the one that occurs first in the
+// function definition is selected. If none of the patterns matches the argument,
+// the exception Match_failure is raised.
+// 
+// 
+// The other form of function definition is introduced by the keyword fun:
+// fun parameter_1 ...  parameter_n ->  expr
+// This expression is equivalent to:
+// fun parameter_1 -> ... fun  parameter_n ->  expr
+// 
+// An optional type constraint typexpr can be added before -> to enforce the
+// type of the result to be compatible with the constraint typexpr:
+// fun parameter_1 ...  parameter_n :  typexpr ->  expr
+// is equivalent to
+// fun parameter_1 -> ... fun  parameter_n ->  (expr :  typexpr )
+// Beware of the small syntactic difference between a type constraint on the
+// last parameter
+// fun parameter_1 ...  (parameter_n: typexpr)->  expr
+// and one on the result
+// fun parameter_1 ...  parameter_n:  typexpr ->  expr
+// 
+// The parameter patterns ~lab and ~(lab  [: typ]) are shorthands for
+// respectively ~lab: lab and ~lab:( lab  [: typ]), and similarly for their
+// optional counterparts.
+// A function of the form fun ? lab :(  pattern =  expr_0 ) ->  expr is
+// equivalent to
+// fun ? lab :  ident -> let  pattern = match  ident with Some  ident ->  ident
+// | None ->  expr_0 in  expr
+// where ident is a fresh variable, except that it is unspecified when expr_0
+// is evaluated.
+// After these two transformations, expressions are of the form
+// fun [label_1]  pattern_1 -> ... fun  [label_n]  pattern_n ->  expr
+// If we ignore labels, which will only be meaningful at function application,
+// this is equivalent to
+// function pattern_1 -> ... function  pattern_n ->  expr
+// That is, the fun expression above evaluates to a curried function with n
+// arguments: after applying this function n times to the values v_1 ... v_n, the
+// values will be matched in parallel against the patterns pattern_1 ...
+// pattern_n. If the matching succeeds, the function returns the value of expr in
+// an environment enriched by the bindings performed during the matchings. If the
+// matching fails, the exception Match_failure is raised.
+// 
+// 
+// Guards in pattern-matchings
+// ---------------------------
+// 
+// The cases of a pattern matching (in the function, match and try constructs)
+// can include guard expressions, which are arbitrary boolean expressions that
+// must evaluate to true for the match case to be selected. Guards occur just
+// before the -> token and are introduced by the when keyword:
+// 
+// function pattern    [when   cond ]  -> expr
+// 1               1          1
+// | ...
+// 
+// | pattern     [when   cond ] -> expr
+// n                n         n
+// 
+// Matching proceeds as described before, except that if the value matches some
+// pattern pattern_i which has a guard cond_i, then the expression cond_i is
+// evaluated (in an environment enriched by the bindings performed during
+// matching). If cond_i evaluates to true, then expr_i is evaluated and its value
+// returned as the result of the matching, as usual. But if cond_i evaluates to
+// false, the matching is resumed against the patterns following pattern_i.
+// 
+// 
+// Local definitions
+// -----------------
+// 
+// 
+// The let and let rec constructs bind value names locally. The construct
+// let pattern_1 =  expr_1 and ... and  pattern_n =  expr_n in  expr
+// evaluates expr_1 ...  expr_n in some unspecified order and matches their
+// values against the patterns pattern_1 ...  pattern_n. If the matchings succeed,
+// expr is evaluated in the environment enriched by the bindings performed during
+// matching, and the value of expr is returned as the value of the whole let
+// expression. If one of the matchings fails, the exception Match_failure is
+// raised.
+// An alternate syntax is provided to bind variables to functional values:
+// instead of writing
+// let ident = fun  parameter_1 ...  parameter_m ->  expr
+// in a let expression, one may instead write
+// let ident  parameter_1 ...  parameter_m =  expr
+// 
+// 
+// Recursive definitions of names are introduced by let rec:
+// let rec pattern_1 =  expr_1 and ... and  pattern_n =  expr_n in  expr
+// The only difference with the let construct described above is that the
+// bindings of names to values performed by the pattern-matching are considered
+// already performed when the expressions expr_1 to expr_n are evaluated. That is,
+// the expressions expr_1 to expr_n can reference identifiers that are bound by
+// one of the patterns pattern_1, ...,  pattern_n, and expect them to have the
+// same value as in expr, the body of the let rec construct.
+// The recursive definition is guaranteed to behave as described above if the
+// expressions expr_1 to expr_n are function definitions (fun ... or function
+// ...), and the patterns pattern_1 ...  pattern_n are just value names, as in:
+// let rec name_1 = fun ... and ... and  name_n = fun ... in  expr
+// This defines name_1 ...  name_n as mutually recursive functions local to
+// expr.
+// The behavior of other forms of let rec definitions is
+// implementation-dependent. The current implementation also supports a certain
+// class of recursive definitions of non-functional values, as explained in
+// section 8.1.
+// 
+// Explicit polymorphic type annotations
+// -------------------------------------
+// (Introduced in OCaml 3.12)
+// Polymorphic type annotations in let-definitions behave in a way similar to
+// polymorphic methods:
+// let pattern_1 :  typ_1 ...  typ_n .  typeexpr =  expr
+// 
+// These annotations explicitly require the defined value to be polymorphic, and
+// allow one to use this polymorphism in recursive occurrences (when using let
+// rec). Note however that this is a normal polymorphic type, unifiable with any
+// instance of itself.
+// It is possible to define local exceptions in expressions:  let exception
+// constr-decl in  expr  . The syntactic scope of the exception constructor is
+// the inner expression, but nothing prevents exception values created with this
+// constructor from escaping this scope. Two executions of the definition above
+// result in two incompatible exception constructors (as for any exception
+// definition). For instance, the following assertion is true:
+// <<  let gen () = let exception A in A
+// let () = assert(gen () <> gen ())
+// >>
+// 
+// 
+// 7.7.3  Control structures
+// =========================
+// 
+// 
+// 
+// Sequence
+// --------
+// 
+// The expression expr_1 ;  expr_2 evaluates expr_1 first, then expr_2, and
+// returns the value of expr_2.
+// 
+// 
+// Conditional
+// -----------
+// 
+// The expression if expr_1 then  expr_2 else  expr_3 evaluates to the value of
+// expr_2 if expr_1 evaluates to the boolean true, and to the value of expr_3 if
+// expr_1 evaluates to the boolean false.
+// The else expr_3 part can be omitted, in which case it defaults to else ().
+// 
+// 
+// Case expression
+// ---------------
+// 
+// The expression
+// match expr
+// 
+// with pattern  -> expr
+// 		 1        1
+// | ...
+// 
+// | pattern  -> expr
+// 		 n        n
+// matches the value of expr against the patterns pattern_1 to pattern_n. If
+// the matching against pattern_i succeeds, the associated expression expr_i is
+// evaluated, and its value becomes the value of the whole match expression. The
+// evaluation of expr_i takes place in an environment enriched by the bindings
+// performed during matching. If several patterns match the value of expr, the one
+// that occurs first in the match expression is selected. If none of the patterns
+// match the value of expr, the exception Match_failure is raised.
+// 
+// 
+// Boolean operators
+// -----------------
+// 
+// The expression expr_1 &&  expr_2 evaluates to true if both expr_1 and expr_2
+// evaluate to true; otherwise, it evaluates to false. The first component,
+// expr_1, is evaluated first. The second component, expr_2, is not evaluated if
+// the first component evaluates to false. Hence, the expression expr_1 &&  expr_2
+// behaves exactly as
+// if expr_1 then  expr_2 else false.
+// 
+// The expression expr_1 ||  expr_2 evaluates to true if one of the expressions
+// expr_1 and expr_2 evaluates to true; otherwise, it evaluates to false. The
+// first component, expr_1, is evaluated first. The second component, expr_2, is
+// not evaluated if the first component evaluates to true. Hence, the expression
+// expr_1 ||  expr_2 behaves exactly as
+// if expr_1 then true else  expr_2.
+// 
+// The boolean operators & and or are deprecated synonyms for (respectively) &&
+// and ||.
+// 
+// 
+// Loops
+// -----
+// 
+// The expression while expr_1 do  expr_2 done repeatedly evaluates expr_2
+// while expr_1 evaluates to true. The loop condition expr_1 is evaluated and
+// tested at the beginning of each iteration. The whole while ... done expression
+// evaluates to the unit value ().
+// The expression for name =  expr_1 to  expr_2 do  expr_3 done first evaluates
+// the expressions expr_1 and expr_2 (the boundaries) into integer values n and p.
+// Then, the loop body expr_3 is repeatedly evaluated in an environment where name
+// is successively bound to the values n, n+1, ..., p−1, p. The loop body is
+// never evaluated if n > p.
+// The expression for name =  expr_1 downto  expr_2 do  expr_3 done evaluates
+// similarly, except that name is successively bound to the values n, n−1, ...,
+// p+1, p. The loop body is never evaluated if n < p.
+// In both cases, the whole for expression evaluates to the unit value ().
+// 
+// 
+// Exception handling
+// ------------------
+// 
+// The expression
+// try  expr
+// 
+// with pattern  -> expr
+// 		 1        1
+// | ...
+// 
+// | pattern  -> expr
+// 		 n        n
+// evaluates the expression expr and returns its value if the evaluation of
+// expr does not raise any exception. If the evaluation of expr raises an
+// exception, the exception value is matched against the patterns pattern_1 to
+// pattern_n. If the matching against pattern_i succeeds, the associated
+// expression expr_i is evaluated, and its value becomes the value of the whole
+// try expression. The evaluation of expr_i takes place in an environment enriched
+// by the bindings performed during matching. If several patterns match the value
+// of expr, the one that occurs first in the try expression is selected. If none
+// of the patterns matches the value of expr, the exception value is raised again,
+// thereby transparently “passing through” the try construct.
+// 
+// 
+// 7.7.4  Operations on data structures
+// ====================================
+// 
+// 
+// 
+// Products
+// --------
+// 
+// The expression expr_1 , ... ,  expr_n evaluates to the n-tuple of the values
+// of expressions expr_1 to expr_n. The evaluation order of the subexpressions is
+// not specified.
+// 
+// 
+// Variants
+// --------
+// 
+// The expression constr  expr evaluates to the unary variant value whose
+// constructor is constr, and whose argument is the value of expr. Similarly, the
+// expression constr (  expr_1 , ... ,  expr_n ) evaluates to the n-ary variant
+// value whose constructor is constr and whose arguments are the values of expr_1,
+// ...,  expr_n.
+// The expression constr ( expr_1, ...,  expr_n) evaluates to the variant value
+// whose constructor is constr, and whose arguments are the values of expr_1 ...
+// expr_n.
+// For lists, some syntactic sugar is provided. The expression expr_1 ::  expr_2
+// stands for the constructor ( :: )  applied to the arguments ( expr_1 ,  expr_2
+// ), and therefore evaluates to the list whose head is the value of expr_1 and
+// whose tail is the value of expr_2. The expression [ expr_1 ; ... ;  expr_n ] is
+// equivalent to expr_1 :: ... ::  expr_n :: [], and therefore evaluates to the
+// list whose elements are the values of expr_1 to expr_n.
+// 
+// 
+// Polymorphic variants
+// --------------------
+// 
+// The expression `tag-name  expr evaluates to the polymorphic variant value
+// whose tag is tag-name, and whose argument is the value of expr.
+// 
+// 
+// Records
+// -------
+// 
+// The expression { field_1  [= expr_1] ; ... ;  field_n  [= expr_n ]} evaluates
+// to the record value { field_1 = v_1; ...; field_n = v_n } where v_i is the
+// value of expr_i for i = 1,... , n. A single identifier field_k stands for
+// field_k =  field_k, and a qualified identifier module-path .  field_k stands
+// for module-path .  field_k =  field_k. The fields field_1 to field_n must all
+// belong to the same record type; each field of this record type must appear
+// exactly once in the record expression, though they can appear in any order. The
+// order in which expr_1 to expr_n are evaluated is not specified. Optional type
+// constraints can be added after each field { field_1 :  typexpr_1 =  expr_1 ;...
+// ;  field_n :  typexpr_n =  expr_n } to force the type of field_k to be
+// compatible with typexpr_k.
+// The expression { expr with  field_1  [= expr_1] ; ... ;  field_n  [= expr_n]
+// } builds a fresh record with fields field_1 ...  field_n equal to expr_1 ...
+// expr_n, and all other fields having the same value as in the record expr. In
+// other terms, it returns a shallow copy of the record expr, except for the
+// fields field_1 ...  field_n, which are initialized to expr_1 ...  expr_n. As
+// previously, single identifier field_k stands for field_k =  field_k, a
+// qualified identifier module-path .  field_k stands for module-path .  field_k =
+// field_k and it is possible to add an optional type constraint on each field
+// being updated with { expr with  field_1 :  typexpr_1 =  expr_1 ; ... ;  field_n
+// :  typexpr_n =  expr_n }.
+// The expression expr_1 .  field evaluates expr_1 to a record value, and
+// returns the value associated to field in this record value.
+// The expression expr_1 .  field <-  expr_2 evaluates expr_1 to a record value,
+// which is then modified in-place by replacing the value associated to field in
+// this record by the value of expr_2. This operation is permitted only if field
+// has been declared mutable in the definition of the record type. The whole
+// expression expr_1 .  field <-  expr_2 evaluates to the unit value ().
+// 
+// 
+// Arrays
+// ------
+// 
+// The expression [| expr_1 ; ... ;  expr_n |] evaluates to a n-element array,
+// whose elements are initialized with the values of expr_1 to expr_n
+// respectively. The order in which these expressions are evaluated is
+// unspecified.
+// The expression expr_1 .(  expr_2 ) returns the value of element number expr_2
+// in the array denoted by expr_1. The first element has number 0; the last
+// element has number n−1, where n is the size of the array. The exception
+// Invalid_argument is raised if the access is out of bounds.
+// The expression expr_1 .(  expr_2 ) <-  expr_3 modifies in-place the array
+// denoted by expr_1, replacing element number expr_2 by the value of expr_3. The
+// exception Invalid_argument is raised if the access is out of bounds. The value
+// of the whole expression is ().
+// 
+// 
+// Strings
+// -------
+// 
+// The expression expr_1 .[  expr_2 ] returns the value of character number
+// expr_2 in the string denoted by expr_1. The first character has number 0; the
+// last character has number n−1, where n is the length of the string. The
+// exception Invalid_argument is raised if the access is out of bounds.
+// The expression expr_1 .[  expr_2 ] <-  expr_3 modifies in-place the string
+// denoted by expr_1, replacing character number expr_2 by the value of expr_3.
+// The exception Invalid_argument is raised if the access is out of bounds. The
+// value of the whole expression is ().
+// Note: this possibility is offered only for backward compatibility with older
+// versions of OCaml and will be removed in a future version. New code should use
+// byte sequences and the Bytes.set function.
+// 
+// 
+// 7.7.5  Operators
+// ================
+// 
+// Symbols from the class infix-symbol, as well as the keywords *, +, -, -., =,
+// !=, <, >, or, ||, &, &&, :=, mod, land, lor, lxor, lsl, lsr, and asr can appear
+// in infix position (between two expressions). Symbols from the class
+// prefix-symbol, as well as the keywords - and -. can appear in prefix position
+// (in front of an expression).
+// Infix and prefix symbols do not have a fixed meaning: they are simply
+// interpreted as applications of functions bound to the names corresponding to
+// the symbols. The expression prefix-symbol  expr is interpreted as the
+// application ( prefix-symbol )  expr. Similarly, the expression expr_1
+// infix-symbol  expr_2 is interpreted as the application ( infix-symbol )
+// expr_1  expr_2.
+// The table below lists the symbols defined in the initial environment and
+// their initial meaning. (See the description of the core library module Stdlib
+// in chapter 24 for more details). Their meaning may be changed at any time using
+// let ( infix-op )  name_1  name_2 = ...
+// Note: the operators &&, ||, and ~- are handled specially and it is not
+// advisable to change their meaning.
+// The keywords - and -. can appear both as infix and prefix operators. When
+// they appear as prefix operators, they are interpreted respectively as the
+// functions (~-) and (~-.).
+// 
+// ------------------------------------------------------
+// |    Operator     |         Initial meaning          |
+// ------------------------------------------------------
+// | +               |Integer addition.                 |
+// |- (infix)        |Integer subtraction.              |
+// |~-   - (prefix)  |Integer negation.                 |
+// |*                |Integer multiplication.           |
+// |/                |Integer division. Raise           |
+// |                 |Division_by_zero if second        |
+// |                 |argument is zero.                 |
+// |mod              |Integer modulus. Raise            |
+// |                 |Division_by_zero if second        |
+// |                 |argument is zero.                 |
+// |land             |Bitwise logical “and” on      |
+// |                 |integers.                         |
+// |lor              |Bitwise logical “or” on       |
+// |                 |integers.                         |
+// |lxor             |Bitwise logical “exclusive or”|
+// |                 |on integers.                      |
+// |lsl              |Bitwise logical shift left on     |
+// |                 |integers.                         |
+// |lsr              |Bitwise logical shift right on    |
+// |                 |integers.                         |
+// |asr              |Bitwise arithmetic shift right on |
+// |                 |integers.                         |
+// |+.               |Floating-point addition.          |
+// |-. (infix)       |Floating-point subtraction.       |
+// |~-.   -. (prefix)|Floating-point negation.          |
+// |*.               |Floating-point multiplication.    |
+// |/.               |Floating-point division.          |
+// |**               |Floating-point exponentiation.    |
+// |@                |List concatenation.               |
+// |^                |String concatenation.             |
+// |!                |Dereferencing (return the current |
+// |                 |contents of a reference).         |
+// |:=               |Reference assignment (update the  |
+// |                 |reference given as first argument |
+// |                 |with the value of the second      |
+// |                 |argument).                        |
+// |=                |Structural equality test.         |
+// |<>               |Structural inequality test.       |
+// |==               |Physical equality test.           |
+// |!=               |Physical inequality test.         |
+// |<                |Test “less than”.             |
+// |<=               |Test “less than or equal”.    |
+// |>                |Test “greater than”.          |
+// |>=               |Test “greater than or equal”. |
+// |&&   &           |Boolean conjunction.              |
+// |||   or          |Boolean disjunction.              |
+// ------------------------------------------------------
+// 
+// 
+// 
+// 7.7.6  Objects
+// ==============
+// 
+// 
+// 
+// Object creation
+// ---------------
+// 
+// 
+// When class-path evaluates to a class body, new class-path evaluates to a new
+// object containing the instance variables and methods of this class.
+// When class-path evaluates to a class function, new class-path evaluates to a
+// function expecting the same number of arguments and returning a new object of
+// this class.
+// 
+// 
+// Immediate object creation
+// -------------------------
+// 
+// 
+// Creating directly an object through the object class-body end construct is
+// operationally equivalent to defining locally a class class-name = object
+// class-body end —see sections 7.9.2 and following for the syntax of
+// class-body— and immediately creating a single object from it by new
+// class-name.
+// The typing of immediate objects is slightly different from explicitly
+// defining a class in two respects. First, the inferred object type may contain
+// free type variables. Second, since the class body of an immediate object will
+// never be extended, its self type can be unified with a closed object type.
+// 
+// 
+// Method invocation
+// -----------------
+// 
+// The expression expr #  method-name invokes the method method-name of the
+// object denoted by expr.
+// If method-name is a polymorphic method, its type should be known at the
+// invocation site. This is true for instance if expr is the name of a fresh
+// object (let ident = new  class-path ... ) or if there is a type constraint.
+// Principality of the derivation can be checked in the -principal mode.
+// 
+// 
+// Accessing and modifying instance variables
+// ------------------------------------------
+// 
+// The instance variables of a class are visible only in the body of the methods
+// defined in the same class or a class that inherits from the class defining the
+// instance variables. The expression inst-var-name evaluates to the value of the
+// given instance variable. The expression inst-var-name <-  expr assigns the
+// value of expr to the instance variable inst-var-name, which must be mutable.
+// The whole expression inst-var-name <-  expr evaluates to ().
+// 
+// 
+// Object duplication
+// ------------------
+// 
+// An object can be duplicated using the library function Oo.copy (see module
+// Oo). Inside a method, the expression  {< [inst-var-name  [= expr]  { ;
+// inst-var-name  [= expr] }] >} returns a copy of self with the given instance
+// variables replaced by the values of the associated expressions. A single
+// instance variable name id stands for id =  id. Other instance variables have
+// the same value in the returned object as in self.
+// 
+// 
+// 7.7.7  Coercions
+// ================
+// 
+// Expressions whose type contains object or polymorphic variant types can be
+// explicitly coerced (weakened) to a supertype. The expression (expr :>  typexpr)
+// coerces the expression expr to type typexpr. The expression (expr :  typexpr_1
+// :>  typexpr_2) coerces the expression expr from type typexpr_1 to type
+// typexpr_2.
+// The former operator will sometimes fail to coerce an expression expr from a
+// type typ_1 to a type typ_2 even if type typ_1 is a subtype of type typ_2: in
+// the current implementation it only expands two levels of type abbreviations
+// containing objects and/or polymorphic variants, keeping only recursion when it
+// is explicit in the class type (for objects). As an exception to the above
+// algorithm, if both the inferred type of expr and typ are ground (i.e. do not
+// contain type variables), the former operator behaves as the latter one, taking
+// the inferred type of expr as typ_1. In case of failure with the former
+// operator, the latter one should be used.
+// It is only possible to coerce an expression expr from type typ_1 to type
+// typ_2, if the type of expr is an instance of typ_1 (like for a type
+// annotation), and typ_1 is a subtype of typ_2. The type of the coerced
+// expression is an instance of typ_2. If the types contain variables, they may be
+// instantiated by the subtyping algorithm, but this is only done after
+// determining whether typ_1 is a potential subtype of typ_2. This means that
+// typing may fail during this latter unification step, even if some instance of
+// typ_1 is a subtype of some instance of typ_2. In the following paragraphs we
+// describe the subtyping relation used.
+// 
+// 
+// Object types
+// ------------
+// 
+// A fixed object type admits as subtype any object type that includes all its
+// methods. The types of the methods shall be subtypes of those in the supertype.
+// Namely,
+// < met_1 :  typ_1 ; ... ;  met_n :  typ_n >
+// is a supertype of
+// < met_1 :  typ′_1 ; ... ; met_n :  typ′_n ; met_n+1 : typ′_n+1 ; ...
+// ; met_n+m : typ′_n+m  [; ..] >
+// which may contain an ellipsis .. if every typ_i is a supertype of the
+// corresponding typ′_i.
+// A monomorphic method type can be a supertype of a polymorphic method type.
+// Namely, if typ is an instance of typ′, then  'a_1 ... 'a_n . typ′ is a
+// subtype of typ.
+// Inside a class definition, newly defined types are not available for
+// subtyping, as the type abbreviations are not yet completely defined. There is
+// an exception for coercing self to the (exact) type of its class: this is
+// allowed if the type of self does not appear in a contravariant position in the
+// class type, i.e. if there are no binary methods.
+// 
+// 
+// Polymorphic variant types
+// -------------------------
+// 
+// A polymorphic variant type typ is a subtype of another polymorphic variant
+// type typ′ if the upper bound of typ (i.e. the maximum set of constructors
+// that may appear in an instance of typ) is included in the lower bound of
+// typ′, and the types of arguments for the constructors of typ are subtypes of
+// those in typ′. Namely,
+// [[<] `C_1 of  typ_1 | ... | ` C_n of  typ_n ]
+// which may be a shrinkable type, is a subtype of
+// [[>] `C_1 of  typ′_1 | ... | `C_n of  typ′_n | `C_n+1 of typ′_n+1 |
+// ... | `C_n+m of typ′_n+m ]
+// which may be an extensible type, if every typ_i is a subtype of typ′_i.
+// 
+// 
+// Variance
+// --------
+// 
+// Other types do not introduce new subtyping, but they may propagate the
+// subtyping of their arguments. For instance, typ_1 *  typ_2 is a subtype of
+// typ′_1 * typ′_2 when typ_1 and typ_2 are respectively subtypes of typ′_1
+// and typ′_2. For function types, the relation is more subtle: typ_1 ->  typ_2
+// is a subtype of typ′_1 -> typ′_2 if typ_1 is a supertype of typ′_1 and
+// typ_2 is a subtype of typ′_2. For this reason, function types are covariant
+// in their second argument (like tuples), but contravariant in their first
+// argument. Mutable types, like array or ref are neither covariant nor
+// contravariant, they are nonvariant, that is they do not propagate subtyping.
+// For user-defined types, the variance is automatically inferred: a parameter
+// is covariant if it has only covariant occurrences, contravariant if it has only
+// contravariant occurrences, variance-free if it has no occurrences, and
+// nonvariant otherwise. A variance-free parameter may change freely through
+// subtyping, it does not have to be a subtype or a supertype. For abstract and
+// private types, the variance must be given explicitly (see section 7.8.1),
+// otherwise the default is nonvariant. This is also the case for constrained
+// arguments in type definitions.
+// 
+// 
+// 7.7.8  Other
+// ============
+// 
+// 
+// 
+// Assertion checking
+// ------------------
+// 
+// 
+// OCaml supports the assert construct to check debugging assertions. The
+// expression assert expr evaluates the expression expr and returns () if expr
+// evaluates to true. If it evaluates to false the exception Assert_failure is
+// raised with the source file name and the location of expr as arguments.
+// Assertion checking can be turned off with the -noassert compiler option. In
+// this case, expr is not evaluated at all.
+// As a special case, assert false is reduced to raise (Assert_failure ...),
+// which gives it a polymorphic type. This means that it can be used in place of
+// any expression (for example as a branch of any pattern-matching). It also means
+// that the assert false “assertions” cannot be turned off by the -noassert
+// option.
+// 
+// 
+// Lazy expressions
+// ----------------
+// 
+// The expression lazy expr returns a value v of type Lazy.t that encapsulates
+// the computation of expr. The argument expr is not evaluated at this point in
+// the program. Instead, its evaluation will be performed the first time the
+// function Lazy.force is applied to the value v, returning the actual value of
+// expr. Subsequent applications of Lazy.force to v do not evaluate expr again.
+// Applications of Lazy.force may be implicit through pattern matching (see 7.6).
+// 
+// 
+// Local modules
+// -------------
+// 
+// The expression let module module-name =  module-expr in  expr locally binds
+// the module expression module-expr to the identifier module-name during the
+// evaluation of the expression expr. It then returns the value of expr. For
+// example:
+// <<
+// 
+// #let remove_duplicates comparison_fun string_list =
+// #  let module StringSet =
+// #    Set.Make(struct type t = string
+// #                    let compare = comparison_fun end) in
+// #  StringSet.elements
+// #    (List.fold_right StringSet.add string_list StringSet.empty)
+// 
+// val remove_duplicates :
+// (string -> string -> int) -> string list -> string list = <fun>
+// 
+// >>
+// 
+// 
+// 
+// Local opens
+// -----------
+// 
+// The expressions let open module-path in  expr and module-path.( expr) are
+// strictly equivalent. These constructions locally open the module referred to by
+// the module path module-path in the respective scope of the expression expr.
+// When the body of a local open expression is delimited by [ ], [| |], or { },
+// the parentheses can be omitted. For expression, parentheses can also be omitted
+// for {< >}. For example, module-path.[ expr] is equivalent to
+// module-path.([ expr]), and module-path.[|  expr |] is equivalent to
+// module-path.([|  expr |]).
+// 
+// 
+// 
+// 7.8  Type and exception definitions
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// 
+// 
+// 
+// 
+// 7.8.1  Type definitions
+// =======================
+// 
+// Type definitions bind type constructors to data types: either variant types,
+// record types, type abbreviations, or abstract data types. They also bind the
+// value constructors and record fields associated with the definition.
+// 
+// type-definition ::=  "type" ["nonrec"] typedef  { "and" typedef }
+// 
+// 
+// 
+// typedef ::=  [type-params]  typeconstr-name  type-information
+// 
+// 
+// 
+// type-information ::=  [type-equation]  [type-representation]  {
+// type-constraint }
+// 
+// 
+// type-equation ::=  "=" typexpr
+// 
+// 
+// 
+// type-representation ::=  "=" ["|"] constr-decl  { "|" constr-decl }
+// 
+// |   "=" record-decl
+// 
+// |   "=" "|"
+// 
+// 
+// 
+// type-params ::=  type-param
+// 
+// |   "(" type-param  { , type-param } ")"
+// 
+// 
+// 
+// type-param ::=  [variance] '  ident
+// 
+// 
+// 
+// variance ::=  "+"
+// 
+// |   -
+// 
+// 
+// 
+// record-decl ::=  "{" field-decl  { ; field-decl }  [;] "}"
+// 
+// 
+// 
+// constr-decl ::=  (constr-name |  "[]" |  "(::)") [ "of" constr-args ]
+//
+// 
+// 
+// 
+// constr-args ::=  typexpr  { "*" typexpr }
+// 
+// 
+// 
+// field-decl ::=  ["mutable"] field-name :  poly-typexpr
+// 
+// 
+// 
+// type-constraint ::=  "constraint" ' ident "="  typexpr
+// 
+// See also the following language extensions: private types, generalized
+// algebraic datatypes, attributes, extension nodes, extensible variant types and
+// inline records.
+// Type definitions are introduced by the type keyword, and consist in one or
+// several simple definitions, possibly mutually recursive, separated by the and
+// keyword. Each simple definition defines one type constructor.
+// A simple definition consists in a lowercase identifier, possibly preceded by
+// one or several type parameters, and followed by an optional type equation, then
+// an optional type representation, and then a constraint clause. The identifier
+// is the name of the type constructor being defined.
+// In the right-hand side of type definitions, references to one of the type
+// constructor name being defined are considered as recursive, unless type is
+// followed by nonrec. The nonrec keyword was introduced in OCaml 4.02.2.
+// The optional type parameters are either one type variable ' ident, for type
+// constructors with one parameter, or a list of type variables
+// ('ident_1,...,' ident_n), for type constructors with several parameters. Each
+// type parameter may be prefixed by a variance constraint + (resp. -) indicating
+// that the parameter is covariant (resp. contravariant). These type parameters
+// can appear in the type expressions of the right-hand side of the definition,
+// optionally restricted by a variance constraint ; i.e. a covariant parameter may
+// only appear on the right side of a functional arrow (more precisely, follow the
+// left branch of an even number of arrows), and a contravariant parameter only
+// the left side (left branch of an odd number of arrows). If the type has a
+// representation or an equation, and the parameter is free (i.e. not bound via a
+// type constraint to a constructed type), its variance constraint is checked but
+// subtyping etc. will use the inferred variance of the parameter, which may be
+// less restrictive; otherwise (i.e. for abstract types or non-free parameters),
+// the variance must be given explicitly, and the parameter is invariant if no
+// variance is given.
+// The optional type equation = typexpr makes the defined type equivalent to the
+// type expression typexpr: one can be substituted for the other during typing. If
+// no type equation is given, a new type is generated: the defined type is
+// incompatible with any other type.
+// The optional type representation describes the data structure representing
+// the defined type, by giving the list of associated constructors (if it is a
+// variant type) or associated fields (if it is a record type). If no type
+// representation is given, nothing is assumed on the structure of the type
+// besides what is stated in the optional type equation.
+// The type representation = [|] constr-decl  { | constr-decl } describes a
+// variant type. The constructor declarations constr-decl_1, ...,  constr-decl_n
+// describe the constructors associated to this variant type. The constructor
+// declaration constr-name of  typexpr_1 * ... *  typexpr_n declares the name
+// constr-name as a non-constant constructor, whose arguments have types typexpr_1
+// ...typexpr_n. The constructor declaration constr-name declares the name
+// constr-name as a constant constructor. Constructor names must be capitalized.
+// The type representation = { field-decl  { ; field-decl }  [;] } describes a
+// record type. The field declarations field-decl_1, ...,  field-decl_n describe
+// the fields associated to this record type. The field declaration field-name :
+// poly-typexpr declares field-name as a field whose argument has type
+// poly-typexpr. The field declaration mutable field-name :  poly-typexpr  behaves
+// similarly; in addition, it allows physical modification of this field.
+// Immutable fields are covariant, mutable fields are non-variant. Both mutable
+// and immutable fields may have explicitly polymorphic types. The polymorphism of
+// the contents is statically checked whenever a record value is created or
+// modified. Extracted values may have their types instantiated.
+// The two components of a type definition, the optional equation and the
+// optional representation, can be combined independently, giving rise to four
+// typical situations:
+// 
+// 
+// Abstract type: no equation, no representation.
+// When appearing in a module signature, this definition specifies nothing on the
+// type constructor, besides its number of parameters: its representation is
+// hidden and it is assumed incompatible with any other type.
+// 
+// Type abbreviation: an equation, no representation.
+// This defines the type constructor as an abbreviation for the type expression
+// on the right of the = sign.
+// 
+// New variant type or record type: no equation, a representation.
+// This generates a new type constructor and defines associated constructors or
+// fields, through which values of that type can be directly built or
+// inspected.
+// 
+// Re-exported variant type or record type: an equation, a representation.
+// In this case, the type constructor is defined as an abbreviation for the type
+// expression given in the equation, but in addition the constructors or fields
+// given in the representation remain attached to the defined type constructor.
+// The type expression in the equation part must agree with the representation:
+// it must be of the same kind (record or variant) and have exactly the same
+// constructors or fields, in the same order, with the same arguments.
+// Moreover, the new type constructor must have the same arity and the same
+// type constraints as the original type constructor.
+// 
+// The type variables appearing as type parameters can optionally be prefixed by
+// + or - to indicate that the type constructor is covariant or contravariant with
+// respect to this parameter. This variance information is used to decide
+// subtyping relations when checking the validity of :> coercions (see section
+// 7.7.7).
+// For instance, type +'a t declares t as an abstract type that is covariant in
+// its parameter; this means that if the type tau is a subtype of the type sigma,
+// then tau  t is a subtype of sigma  t. Similarly, type -'a t declares that the
+// abstract type t is contravariant in its parameter: if tau is a subtype of
+// sigma, then sigma  t is a subtype of tau  t. If no + or - variance annotation
+// is given, the type constructor is assumed non-variant in the corresponding
+// parameter. For instance, the abstract type declaration type 'a t means that tau
+// t is neither a subtype nor a supertype of sigma  t if tau is subtype of sigma.
+// The variance indicated by the + and - annotations on parameters is enforced
+// only for abstract and private types, or when there are type constraints.
+// Otherwise, for abbreviations, variant and record types without type
+// constraints, the variance properties of the type constructor are inferred from
+// its definition, and the variance annotations are only checked for conformance
+// with the definition.
+// The construct  constraint ' ident =  typexpr  allows the specification of
+// type parameters. Any actual type argument corresponding to the type parameter
+// ident has to be an instance of typexpr (more precisely, ident and typexpr are
+// unified). Type variables of typexpr can appear in the type equation and the
+// type declaration.
+// 
+// 
+// 7.8.2  Exception definitions
+// ============================
+// 
+// exception-definition ::=  "exception" constr-decl
+// |   "exception" constr-name "="  constr
+// 
+// Exception definitions add new constructors to the built-in variant type exn
+// of exception values. The constructors are declared as for a definition of a
+// variant type.
+// The form exception constr-decl generates a new exception, distinct from all
+// other exceptions in the system. The form exception constr-name =  constr gives
+// an alternate name to an existing exception.
+// 
+// 
+// 7.9  Classes
+// *=*=*=*=*=*=
+// 
+// Classes are defined using a small language, similar to the module language.
+// 
+// 
+// 7.9.1  Class types
+// ==================
+// 
+// Class types are the class-level equivalent of type expressions: they specify
+// the general shape and type properties of classes.
+// 
+// class-type ::=  [["?"]label-name:]  typexpr "->"  class-type
+// 
+// |     class-body-type
+// 
+// 
+// 
+// class-body-type ::=  "object" ["(" typexpr ")"]  {class-field-spec} "end"
+// 
+// |    ["[" typexpr  {, typexpr} "]"]  classtype-path
+// 
+// |    "let" "open" module-path "in"  class-body-type
+// 
+// 
+// 
+// class-field-spec ::=  "inherit" class-body-type
+// 
+// |    "val" ["mutable"] ["virtual"] inst-var-name :  typexpr
+// 
+// |    "val" "virtual" "mutable" inst-var-name :  typexpr
+// 
+// |    "method" ["private"] ["virtual"] method-name :  poly-typexpr
+// 
+// |    "method" "virtual" "private" method-name :  poly-typexpr
+// 
+// |    "constraint" typexpr"=" typexpr
+// 
+// See also the following language extensions: attributes and extension nodes.
+// 
+// 
+// Simple class expressions
+// ------------------------
+// 
+// The expression classtype-path is equivalent to the class type bound to the
+// name classtype-path. Similarly, the expression [ typexpr_1 , ...  typexpr_n ]
+// classtype-path is equivalent to the parametric class type bound to the name
+// classtype-path, in which type parameters have been instantiated to respectively
+// typexpr_1, ...typexpr_n.
+// 
+// 
+// Class function type
+// -------------------
+// 
+// The class type expression typexpr ->  class-type is the type of class
+// functions (functions from values to classes) that take as argument a value of
+// type typexpr and return as result a class of type class-type.
+// 
+// 
+// Class body type
+// ---------------
+// 
+// The class type expression object [( typexpr )]  {class-field-spec} end is the
+// type of a class body. It specifies its instance variables and methods. In this
+// type, typexpr is matched against the self type, therefore providing a name for
+// the self type.
+// A class body will match a class body type if it provides definitions for all
+// the components specified in the class body type, and these definitions meet the
+// type requirements given in the class body type. Furthermore, all methods either
+// virtual or public present in the class body must also be present in the class
+// body type (on the other hand, some instance variables and concrete private
+// methods may be omitted). A virtual method will match a concrete method, which
+// makes it possible to forget its implementation. An immutable instance variable
+// will match a mutable instance variable.
+// 
+// 
+// Local opens
+// -----------
+// 
+// Local opens are supported in class types since OCaml 4.06.
+// 
+// 
+// Inheritance
+// -----------
+// 
+// 
+// The inheritance construct inherit class-body-type provides for inclusion of
+// methods and instance variables from other class types. The instance variable
+// and method types from class-body-type are added into the current class type.
+// 
+// 
+// Instance variable specification
+// -------------------------------
+// 
+// 
+// A specification of an instance variable is written val [mutable] [virtual]
+// inst-var-name :  typexpr, where inst-var-name is the name of the instance
+// variable and typexpr its expected type. The flag mutable indicates whether this
+// instance variable can be physically modified. The flag virtual indicates that
+// this instance variable is not initialized. It can be initialized later through
+// inheritance.
+// An instance variable specification will hide any previous specification of an
+// instance variable of the same name.
+// 
+// 
+// Method specification
+// --------------------
+// 
+// 
+// The specification of a method is written method [private] method-name :
+// poly-typexpr, where method-name is the name of the method and poly-typexpr its
+// expected type, possibly polymorphic. The flag private indicates that the method
+// cannot be accessed from outside the object.
+// The polymorphism may be left implicit in public method specifications: any
+// type variable which is not bound to a class parameter and does not appear
+// elsewhere inside the class specification will be assumed to be universal, and
+// made polymorphic in the resulting method type. Writing an explicit polymorphic
+// type will disable this behaviour.
+// If several specifications are present for the same method, they must have
+// compatible types. Any non-private specification of a method forces it to be
+// public.
+// 
+// 
+// Virtual method specification
+// ----------------------------
+// 
+// 
+// A virtual method specification is written method [private] virtual
+// method-name :  poly-typexpr, where method-name is the name of the method and
+// poly-typexpr its expected type.
+// 
+// 
+// Constraints on type parameters
+// ------------------------------
+// 
+// 
+// The construct constraint typexpr_1 =  typexpr_2 forces the two type
+// expressions to be equal. This is typically used to specify type parameters: in
+// this way, they can be bound to specific type expressions.
+// 
+// 
+// 7.9.2  Class expressions
+// ========================
+// 
+// Class expressions are the class-level equivalent of value expressions: they
+// evaluate to classes, thus providing implementations for the specifications
+// expressed in class types.
+// 
+// class-expr ::=  class-path
+// |    "[" typexpr  {, typexpr} "]"  class-path
+// |    "(" class-expr ")"
+// |    "(" class-expr :  class-type ")"
+// |    class-expr  {argument}+
+// |    "fun" {parameter}+  "->"  class-expr
+// |    "let" ["rec"] let-binding  {"and" let-binding} "in"  class-expr
+// |    "object" class-body "end"
+// |    "let" "open" module-path "in"  class-expr
+// 
+// 
+// 
+// class-field ::=  "inherit" class-expr  ["as" lowercase-ident]
+// 
+// |    "inherit!" class-expr  ["as" lowercase-ident]
+// 
+// |    "val" ["mutable"] inst-var-name  [: typexpr]"=" expr
+// 
+// |    "val!" ["mutable"] inst-var-name  [: typexpr]"=" expr
+// 
+// |    "val" ["mutable"] "virtual" inst-var-name :  typexpr
+// 
+// |    "val" "virtual" "mutable" inst-var-name :  typexpr
+// 
+// |    "method" ["private"] method-name  {parameter}  [: typexpr] =
+// expr
+// |    "method!" ["private"] method-name  {parameter}  [: typexpr] =
+//  expr
+// |    "method" ["private"] method-name :  poly-typexpr "="  expr
+// 
+// |    "method!" ["private"] method-name :  poly-typexpr "="  expr
+// 
+// |    "method" ["private"] "virtual" method-name :  poly-typexpr
+// 
+// |    "method" "virtual" "private" method-name :  poly-typexpr
+// 
+// |    "constraint" typexpr "="  typexpr
+// 
+// |    "initializer" expr
+// 
+// See also the following language extensions: locally abstract types,
+// attributes and extension nodes.
+// 
+// 
+// Simple class expressions
+// ------------------------
+// 
+// The expression class-path evaluates to the class bound to the name
+// class-path. Similarly, the expression [ typexpr_1 , ...  typexpr_n ]
+// class-path evaluates to the parametric class bound to the name class-path, in
+// which type parameters have been instantiated respectively to typexpr_1,
+// ...typexpr_n.
+// The expression ( class-expr ) evaluates to the same module as class-expr.
+// The expression ( class-expr :  class-type ) checks that class-type matches
+// the type of class-expr (that is, that the implementation class-expr meets the
+// type specification class-type). The whole expression evaluates to the same
+// class as class-expr, except that all components not specified in class-type are
+// hidden and can no longer be accessed.
+// 
+// 
+// Class application
+// -----------------
+// 
+// Class application is denoted by juxtaposition of (possibly labeled)
+// expressions. It denotes the class whose constructor is the first expression
+// applied to the given arguments. The arguments are evaluated as for expression
+// application, but the constructor itself will only be evaluated when objects are
+// created. In particular, side-effects caused by the application of the
+// constructor will only occur at object creation time.
+// 
+// 
+// Class function
+// --------------
+// 
+// The expression fun [[?]label-name:] pattern ->  class-expr evaluates to a
+// function from values to classes. When this function is applied to a value v,
+// this value is matched against the pattern pattern and the result is the result
+// of the evaluation of class-expr in the extended environment.
+// Conversion from functions with default values to functions with patterns only
+// works identically for class functions as for normal functions.
+// The expression
+// fun parameter_1 ...  parameter_n ->  class-expr
+// is a short form for
+// fun parameter_1 -> ... fun  parameter_n ->  expr
+// 
+// 
+// 
+// Local definitions
+// -----------------
+// 
+// The let and let rec constructs bind value names locally, as for the core
+// language expressions.
+// If a local definition occurs at the very beginning of a class definition, it
+// will be evaluated when the class is created (just as if the definition was
+// outside of the class). Otherwise, it will be evaluated when the object
+// constructor is called.
+// 
+// 
+// Local opens
+// -----------
+// 
+// Local opens are supported in class expressions since OCaml 4.06.
+// 
+// 
+// Class body
+// ----------
+// 
+// class-body ::=   ["(" pattern  [: typexpr] ")"]  { class-field }
+// The expression object class-body end denotes a class body. This is the
+// prototype for an object : it lists the instance variables and methods of an
+// object of this class.
+// A class body is a class value: it is not evaluated at once. Rather, its
+// components are evaluated each time an object is created.
+// In a class body, the pattern ( pattern  [: typexpr] ) is matched against
+// self, therefore providing a binding for self and self type. Self can only be
+// used in method and initializers.
+// Self type cannot be a closed object type, so that the class remains
+// extensible.
+// Since OCaml 4.01, it is an error if the same method or instance variable name
+// is defined several times in the same class body.
+// 
+// 
+// Inheritance
+// -----------
+// 
+// 
+// The inheritance construct inherit class-expr allows reusing methods and
+// instance variables from other classes. The class expression class-expr must
+// evaluate to a class body. The instance variables, methods and initializers from
+// this class body are added into the current class. The addition of a method will
+// override any previously defined method of the same name.
+// An ancestor can be bound by appending as lowercase-ident to the inheritance
+// construct. lowercase-ident is not a true variable and can only be used to
+// select a method, i.e. in an expression lowercase-ident #  method-name. This
+// gives access to the method method-name as it was defined in the parent class
+// even if it is redefined in the current class. The scope of this ancestor
+// binding is limited to the current class. The ancestor method may be called from
+// a subclass but only indirectly.
+// 
+// 
+// Instance variable definition
+// ----------------------------
+// 
+// 
+// The definition val [mutable] inst-var-name =  expr adds an instance variable
+// inst-var-name whose initial value is the value of expression expr. The flag
+// mutable allows physical modification of this variable by methods.
+// An instance variable can only be used in the methods and initializers that
+// follow its definition.
+// Since version 3.10, redefinitions of a visible instance variable with the
+// same name do not create a new variable, but are merged, using the last value
+// for initialization. They must have identical types and mutability. However, if
+// an instance variable is hidden by omitting it from an interface, it will be
+// kept distinct from other instance variables with the same name.
+// 
+// 
+// Virtual instance variable definition
+// ------------------------------------
+// 
+// 
+// A variable specification is written val [mutable] virtual inst-var-name :
+// typexpr. It specifies whether the variable is modifiable, and gives its type.
+// Virtual instance variables were added in version 3.10.
+// 
+// 
+// Method definition
+// -----------------
+// 
+// 
+// A method definition is written method method-name =  expr. The definition of
+// a method overrides any previous definition of this method. The method will be
+// public (that is, not private) if any of the definition states so.
+// A private method, method private method-name =  expr, is a method that can
+// only be invoked on self (from other methods of the same object, defined in this
+// class or one of its subclasses). This invocation is performed using the
+// expression value-name #  method-name, where value-name is directly bound to
+// self at the beginning of the class definition. Private methods do not appear in
+// object types. A method may have both public and private definitions, but as
+// soon as there is a public one, all subsequent definitions will be made public.
+// Methods may have an explicitly polymorphic type, allowing them to be used
+// polymorphically in programs (even for the same object). The explicit
+// declaration may be done in one of three ways: (1) by giving an explicit
+// polymorphic type in the method definition, immediately after the method name,
+// i.e. method [private] method-name :  {' ident}^+ .  typexpr =  expr; (2) by a
+// forward declaration of the explicit polymorphic type through a virtual method
+// definition; (3) by importing such a declaration through inheritance and/or
+// constraining the type of self.
+// Some special expressions are available in method bodies for manipulating
+// instance variables and duplicating self:
+// expr ::=  //... |   
+//   inst-var-name "<-"  expr
+// |   "{<" [ inst-var-name "="  expr  { ; inst-var-name "="  expr }  [;] ] ">}"
+// 
+// The expression inst-var-name <-  expr modifies in-place the current object by
+// replacing the value associated to inst-var-name by the value of expr. Of
+// course, this instance variable must have been declared mutable.
+// The expression {< inst-var-name_1 =  expr_1 ; ... ;  inst-var-name_n =
+// expr_n >} evaluates to a copy of the current object in which the values of
+// instance variables inst-var-name_1, ...,  inst-var-name_n have been replaced by
+// the values of the corresponding expressions expr_1, ...,  expr_n.
+// 
+// 
+// Virtual method definition
+// -------------------------
+// 
+// 
+// A method specification is written method [private] virtual method-name :
+// poly-typexpr. It specifies whether the method is public or private, and gives
+// its type. If the method is intended to be polymorphic, the type must be
+// explicitly polymorphic.
+// 
+// 
+// Explicit overriding
+// -------------------
+// 
+// Since Ocaml 3.12, the keywords inherit!, val! and method! have the same
+// semantics as inherit, val and method, but they additionally require the
+// definition they introduce to be overriding. Namely, method! requires
+// method-name to be already defined in this class, val! requires inst-var-name to
+// be already defined in this class, and inherit! requires class-expr to override
+// some definitions. If no such overriding occurs, an error is signaled.
+// As a side-effect, these 3 keywords avoid the warnings 7 (method override)
+// and 13 (instance variable override). Note that warning 7 is disabled by
+// default.
+// 
+// 
+// Constraints on type parameters
+// ------------------------------
+// 
+// The construct constraint typexpr_1 =  typexpr_2 forces the two type
+// expressions to be equals. This is typically used to specify type parameters: in
+// that way they can be bound to specific type expressions.
+// 
+// 
+// Initializers
+// ------------
+// 
+// 
+// A class initializer initializer expr specifies an expression that will be
+// evaluated whenever an object is created from the class, once all its instance
+// variables have been initialized.
+// 
+// 
+// 7.9.3  Class definitions
+// ========================
+// 
+// 
+// class-definition ::=  "class" class-binding  { "and" class-binding }
+// 
+// 
+// 
+// class-binding ::=  ["virtual"] ["[" type-parameters "]"]  class-name
+// {parameter}  [: class-type]  "="  class-expr // NOTE: was class-exps
+// 
+// 
+// type-parameters ::=  ' ident  { , ' ident }
+// 
+// 
+// A class definition class class-binding  { and class-binding } is recursive.
+// Each class-binding defines a class-name that can be used in the whole
+// expression except for inheritance. It can also be used for inheritance, but
+// only in the definitions that follow its own.
+// A class binding binds the class name class-name to the value of expression
+// class-expr. It also binds the class type class-name to the type of the class,
+// and defines two type abbreviations : class-name and # class-name. The first one
+// is the type of objects of this class, while the second is more general as it
+// unifies with the type of any object belonging to a subclass (see section 7.4).
+// 
+// 
+// Virtual class
+// -------------
+// 
+// A class must be flagged virtual if one of its methods is virtual (that is,
+// appears in the class type, but is not actually defined). Objects cannot be
+// created from a virtual class.
+// 
+// 
+// Type parameters
+// ---------------
+// 
+// The class type parameters correspond to the ones of the class type and of the
+// two type abbreviations defined by the class binding. They must be bound to
+// actual types in the class definition using type constraints. So that the
+// abbreviations are well-formed, type variables of the inferred type of the class
+// must either be type parameters or be bound in the constraint clause.
+// 
+// 
+// 7.9.4  Class specifications
+// ===========================
+// 
+// 
+// class-specification ::=  "class" class-spec  { "and" class-spec }
+// 
+// 
+// 
+// class-spec ::=  ["virtual"] ["[" type-parameters "]"]  class-name :
+// class-type
+// 
+// This is the counterpart in signatures of class definitions. A class
+// specification matches a class definition if they have the same type parameters
+// and their types match.
+// 
+// 
+// 7.9.5  Class type definitions
+// =============================
+// 
+// 
+// classtype-definition ::=  "class" type classtype-def  { "and" classtype-def }
+// 
+// 
+// 
+// classtype-def ::=  ["virtual"] ["[" type-parameters "]"]  class-name =
+// class-body-type
+// 
+// A class type definition class class-name =  class-body-type defines an
+// abbreviation class-name for the class body type class-body-type. As for class
+// definitions, two type abbreviations class-name and # class-name are also
+// defined. The definition can be parameterized by some type parameters. If any
+// method in the class type body is virtual, the definition must be flagged
+// virtual.
+// Two class type definitions match if they have the same type parameters and
+// they expand to matching types.
+// 
+// 
+// 7.10  Module types (module specifications)
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
+// 
+// 
+// Module types are the module-level equivalent of type expressions: they
+// specify the general shape and type properties of modules.
+// 
+// module-type ::=  modtype-path
+// 
+// |   "sig" { specification  [";;"] } "end"
+// 
+// |   "functor" "(" module-name :  module-type ")" "->"  module-type
+// 
+// |   module-type "->"  module-type
+// 
+// |   module-type "with"  mod-constraint  { "and" mod-constraint }
+// 
+// |   "(" module-type ")"
+// 
+// 
+// 
+// mod-constraint ::=  "type" [type-params]  typeconstr  type-equation  {
+// type-constraint }
+// |   "module" module-path "="  extended-module-path
+// 
+// 
+// 
+// 
+// 
+// 
+// specification ::=  "val" value-name :  typexpr
+// 
+// |   "external" value-name :  typexpr "="  external-declaration
+// 
+// |   type-definition
+// 
+// |   "exception" constr-decl
+// 
+// |   class-specification
+// 
+// |   classtype-definition
+// 
+// |   "module" module-name :  module-type
+// 
+// |   "module" module-name  { "(" module-name :  module-type ")" } :
+// module-type
+// |   "module" "type" modtype-name
+// 
+// |   "module" "type" modtype-name "="  module-type
+// 
+// |   "open" module-path
+// 
+// |   "include" module-type
+// 
+// See also the following language extensions: recovering the type of a module,
+// substitution inside a signature, type-level module aliases, attributes,
+// extension nodes and generative functors.
+// 
+// 
+// 7.10.1  Simple module types
+// ===========================
+// 
+// The expression modtype-path is equivalent to the module type bound to the
+// name modtype-path. The expression ( module-type ) denotes the same type as
+// module-type.
+// 
+// 
+// 7.10.2  Signatures
+// ==================
+// 
+// 
+// Signatures are type specifications for structures. Signatures sig ... end are
+// collections of type specifications for value names, type names, exceptions,
+// module names and module type names. A structure will match a signature if the
+// structure provides definitions (implementations) for all the names specified in
+// the signature (and possibly more), and these definitions meet the type
+// requirements given in the signature.
+// An optional ;; is allowed after each specification in a signature. It serves
+// as a syntactic separator with no semantic meaning.
+// 
+// 
+// Value specifications
+// --------------------
+// 
+// 
+// A specification of a value component in a signature is written val value-name
+// :  typexpr, where value-name is the name of the value and typexpr its expected
+// type.
+// 
+// The form external value-name :  typexpr =  external-declaration is similar,
+// except that it requires in addition the name to be implemented as the external
+// function specified in external-declaration (see chapter 20).
+// 
+// 
+// Type specifications
+// -------------------
+// 
+// 
+// A specification of one or several type components in a signature is written
+// type typedef  { and typedef } and consists of a sequence of mutually recursive
+// definitions of type names.
+// Each type definition in the signature specifies an optional type equation =
+// typexpr and an optional type representation = constr-decl ... or = { field-decl
+// ... }. The implementation of the type name in a matching structure must be
+// compatible with the type expression specified in the equation (if given), and
+// have the specified representation (if given). Conversely, users of that
+// signature will be able to rely on the type equation or type representation, if
+// given. More precisely, we have the following four situations:
+// 
+// 
+// Abstract type: no equation, no representation.
+// Names that are defined as abstract types in a signature can be implemented in
+// a matching structure by any kind of type definition (provided it has the
+// same number of type parameters). The exact implementation of the type will
+// be hidden to the users of the structure. In particular, if the type is
+// implemented as a variant type or record type, the associated constructors
+// and fields will not be accessible to the users; if the type is implemented
+// as an abbreviation, the type equality between the type name and the
+// right-hand side of the abbreviation will be hidden from the users of the
+// structure. Users of the structure consider that type as incompatible with
+// any other type: a fresh type has been generated.
+// 
+// Type abbreviation: an equation = typexpr, no representation.
+// The type name must be implemented by a type compatible with typexpr. All users
+// of the structure know that the type name is compatible with typexpr.
+// 
+// New variant type or record type: no equation, a representation.
+// The type name must be implemented by a variant type or record type with
+// exactly the constructors or fields specified. All users of the structure
+// have access to the constructors or fields, and can use them to create or
+// inspect values of that type. However, users of the structure consider that
+// type as incompatible with any other type: a fresh type has been generated.
+// 
+// Re-exported variant type or record type: an equation, a representation.
+// This case combines the previous two: the representation of the type is made
+// visible to all users, and no fresh type is generated.
+// 
+// 
+// 
+// Exception specification
+// -----------------------
+// 
+// 
+// The specification exception constr-decl in a signature requires the matching
+// structure to provide an exception with the name and arguments specified in the
+// definition, and makes the exception available to all users of the structure.
+// 
+// 
+// Class specifications
+// --------------------
+// 
+// 
+// A specification of one or several classes in a signature is written class
+// class-spec  { and class-spec } and consists of a sequence of mutually recursive
+// definitions of class names.
+// Class specifications are described more precisely in section 7.9.4.
+// 
+// 
+// Class type specifications
+// -------------------------
+// 
+// 
+// A specification of one or several classe types in a signature is written
+// class type classtype-def { and classtype-def } and consists of a sequence of
+// mutually recursive definitions of class type names. Class type specifications
+// are described more precisely in section 7.9.5.
+// 
+// 
+// Module specifications
+// ---------------------
+// 
+// 
+// A specification of a module component in a signature is written module
+// module-name :  module-type, where module-name is the name of the module
+// component and module-type its expected type. Modules can be nested arbitrarily;
+// in particular, functors can appear as components of structures and functor
+// types as components of signatures.
+// For specifying a module component that is a functor, one may write
+// module module-name (  name_1 :  module-type_1 ) ... (  name_n :
+// module-type_n ) :  module-type
+// instead of
+// module module-name : functor (  name_1 :  module-type_1 ) -> ... ->
+// module-type
+// 
+// 
+// 
+// Module type specifications
+// --------------------------
+// 
+// 
+// A module type component of a signature can be specified either as a manifest
+// module type or as an abstract module type.
+// An abstract module type specification module type modtype-name allows the
+// name modtype-name to be implemented by any module type in a matching signature,
+// but hides the implementation of the module type to all users of the signature.
+// A manifest module type specification module type modtype-name =  module-type
+// requires the name modtype-name to be implemented by the module type module-type
+// in a matching signature, but makes the equality between modtype-name and
+// module-type apparent to all users of the signature.
+// 
+// 
+// Opening a module path
+// ---------------------
+// 
+// 
+// The expression open module-path in a signature does not specify any
+// components. It simply affects the parsing of the following items of the
+// signature, allowing components of the module denoted by module-path to be
+// referred to by their simple names name instead of path accesses module-path .
+// name. The scope of the open stops at the end of the signature expression.
+// 
+// 
+// Including a signature
+// ---------------------
+// 
+// 
+// The expression include module-type in a signature performs textual inclusion
+// of the components of the signature denoted by module-type. It behaves as if the
+// components of the included signature were copied at the location of the
+// include. The module-type argument must refer to a module type that is a
+// signature, not a functor type.
+// 
+// 
+// 7.10.3  Functor types
+// =====================
+// 
+// 
+// The module type expression functor ( module-name :  module-type_1 ) ->
+// module-type_2 is the type of functors (functions from modules to modules) that
+// take as argument a module of type module-type_1 and return as result a module
+// of type module-type_2. The module type module-type_2 can use the name
+// module-name to refer to type components of the actual argument of the functor.
+// If the type module-type_2 does not depend on type components of module-name,
+// the module type expression can be simplified with the alternative short syntax
+// module-type_1 ->  module-type_2 . No restrictions are placed on the type of the
+// functor argument; in particular, a functor may take another functor as argument
+// (“higher-order” functor).
+// 
+// 
+// 7.10.4  The with operator
+// =========================
+// 
+// 
+// Assuming module-type denotes a signature, the expression module-type with
+// mod-constraint { and mod-constraint } denotes the same signature where type
+// equations have been added to some of the type specifications, as described by
+// the constraints following the with keyword. The constraint type
+// [type-parameters]  typeconstr =  typexpr adds the type equation = typexpr to
+// the specification of the type component named typeconstr of the constrained
+// signature. The constraint module module-path =  extended-module-path adds type
+// equations to all type components of the sub-structure denoted by module-path,
+// making them equivalent to the corresponding type components of the structure
+// denoted by extended-module-path.
+// For instance, if the module type name S is bound to the signature
+// <<        sig type t module M: (sig type u end) end
+// >>
+// then S with type t=int denotes the signature
+// <<        sig type t=int module M: (sig type u end) end
+// >>
+// and S with module M = N denotes the signature
+// <<        sig type t module M: (sig type u=N.u end) end
+// >>
+// A functor taking two arguments of type S that share their t component is
+// written
+// <<        functor (A: S) (B: S with type t = A.t) ...
+// >>
+// Constraints are added left to right. After each constraint has been applied,
+// the resulting signature must be a subtype of the signature before the
+// constraint was applied. Thus, the with operator can only add information on the
+// type components of a signature, but never remove information.
+// 
+// 
+// 7.11  Module expressions (module implementations)
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// 
+// 
+// Module expressions are the module-level equivalent of value expressions: they
+// evaluate to modules, thus providing implementations for the specifications
+// expressed in module types.
+// 
+// module-expr ::=  module-path
+// 
+// |   "struct" [ module-items ] "end"
+// 
+// |   "functor" "(" module-name :  module-type ")" "->"  module-expr
+// 
+// |   module-expr "("  module-expr ")"
+// 
+// |   "(" module-expr ")"
+// 
+// |   "(" module-expr :  module-type ")"
+// 
+// 
+// 
+// module-items ::=  {";;"} ( definition |  expr )  { {";;"} ( definition |  ";;"
+// expr) }  {";;"}
+// 
+// 
+// definition ::=  "let" ["rec"] let-binding  { "and" let-binding }
+// 
+// |   "external" value-name :  typexpr "="  external-declaration
+// 
+// |   type-definition
+// 
+// |   exception-definition
+// 
+// |   class-definition
+// 
+// |   classtype-definition
+// 
+// |   "module" module-name  { "(" module-name :  module-type ")" }  [ :
+// module-type ]  "="  module-expr
+// |   "module" "type" modtype-name "="  module-type
+// 
+// |   "open" module-path
+// 
+// |   "include" module-expr
+// 
+// See also the following language extensions: recursive modules, first-class
+// modules, overriding in open statements, attributes, extension nodes and
+// generative functors.
+// 
+// 
+// 7.11.1  Simple module expressions
+// =================================
+// 
+// The expression module-path evaluates to the module bound to the name
+// module-path.
+// The expression ( module-expr ) evaluates to the same module as module-expr.
+// The expression ( module-expr :  module-type ) checks that the type of
+// module-expr is a subtype of module-type, that is, that all components specified
+// in module-type are implemented in module-expr, and their implementation meets
+// the requirements given in module-type. In other terms, it checks that the
+// implementation module-expr meets the type specification module-type. The whole
+// expression evaluates to the same module as module-expr, except that all
+// components not specified in module-type are hidden and can no longer be
+// accessed.
+// 
+// 
+// 7.11.2  Structures
+// ==================
+// 
+// 
+// Structures struct ... end are collections of definitions for value names,
+// type names, exceptions, module names and module type names. The definitions are
+// evaluated in the order in which they appear in the structure. The scopes of the
+// bindings performed by the definitions extend to the end of the structure. As a
+// consequence, a definition may refer to names bound by earlier definitions in
+// the same structure.
+// For compatibility with toplevel phrases (chapter 10), optional ;; are allowed
+// after and before each definition in a structure. These ;; have no semantic
+// meanings. Similarly, an expr preceded by ;; is allowed as a component of a
+// structure. It is equivalent to let _ = expr, i.e. expr is evaluated for its
+// side-effects but is not bound to any identifier. If expr is the first component
+// of a structure, the preceding ;; can be omitted.
+// 
+// 
+// Value definitions
+// -----------------
+// 
+// 
+// A value definition let [rec] let-binding  { and let-binding } bind value
+// names in the same way as a let ... in ... expression (see section 7.7.2). The
+// value names appearing in the left-hand sides of the bindings are bound to the
+// corresponding values in the right-hand sides.
+// 
+// A value definition external value-name :  typexpr =  external-declaration
+// implements value-name as the external function specified in
+// external-declaration (see chapter 20).
+// 
+// 
+// Type definitions
+// ----------------
+// 
+// 
+// A definition of one or several type components is written type typedef  { and
+// typedef } and consists of a sequence of mutually recursive definitions of type
+// names.
+// 
+// 
+// Exception definitions
+// ---------------------
+// 
+// 
+// Exceptions are defined with the syntax exception constr-decl or exception
+// constr-name =  constr.
+// 
+// 
+// Class definitions
+// -----------------
+// 
+// 
+// A definition of one or several classes is written class class-binding  { and
+// class-binding } and consists of a sequence of mutually recursive definitions of
+// class names. Class definitions are described more precisely in section 7.9.3.
+// 
+// 
+// Class type definitions
+// ----------------------
+// 
+// 
+// A definition of one or several classes is written class type classtype-def  {
+// and classtype-def } and consists of a sequence of mutually recursive
+// definitions of class type names. Class type definitions are described more
+// precisely in section 7.9.5.
+// 
+// 
+// Module definitions
+// ------------------
+// 
+// 
+// The basic form for defining a module component is module module-name =
+// module-expr, which evaluates module-expr and binds the result to the name
+// module-name.
+// One can write
+// module module-name :  module-type =  module-expr
+// instead of
+// module module-name = (  module-expr :  module-type ).
+// Another derived form is
+// module module-name (  name_1 :  module-type_1 ) ... (  name_n :
+// module-type_n ) =  module-expr
+// which is equivalent to
+// module module-name = functor (  name_1 :  module-type_1 ) -> ... ->
+// module-expr
+// 
+// 
+// 
+// Module type definitions
+// -----------------------
+// 
+// 
+// A definition for a module type is written module type modtype-name =
+// module-type. It binds the name modtype-name to the module type denoted by the
+// expression module-type.
+// 
+// 
+// Opening a module path
+// ---------------------
+// 
+// 
+// The expression open module-path in a structure does not define any components
+// nor perform any bindings. It simply affects the parsing of the following items
+// of the structure, allowing components of the module denoted by module-path to
+// be referred to by their simple names name instead of path accesses module-path
+// .  name. The scope of the open stops at the end of the structure expression.
+// 
+// 
+// Including the components of another structure
+// ---------------------------------------------
+// 
+// 
+// The expression include module-expr in a structure re-exports in the current
+// structure all definitions of the structure denoted by module-expr. For
+// instance, if you define a module S as below
+// <<
+// 
+// #module S = struct type t = int  let x = 2 end
+// 
+// >>
+// defining the module B as
+// <<
+// 
+// #module B = struct include S  let y = (x + 1 : t) end
+// 
+// >>
+// is equivalent to defining it as
+// <<
+// 
+// #module B = struct type t = S.t  let x = S.x  let y = (x + 1 : t) end
+// 
+// >>
+// The difference between open and include is that open simply provides short
+// names for the components of the opened structure, without defining any
+// components of the current structure, while include also adds definitions for
+// the components of the included structure.
+// 
+// 
+// 7.11.3  Functors
+// ================
+// 
+// 
+// 
+// Functor definition
+// ------------------
+// 
+// 
+// The expression functor ( module-name :  module-type ) ->  module-expr
+// evaluates to a functor that takes as argument modules of the type
+// module-type_1, binds module-name to these modules, evaluates module-expr in the
+// extended environment, and returns the resulting modules as results. No
+// restrictions are placed on the type of the functor argument; in particular, a
+// functor may take another functor as argument (“higher-order” functor).
+// 
+// 
+// Functor application
+// -------------------
+// 
+// The expression module-expr_1 (  module-expr_2 ) evaluates module-expr_1 to a
+// functor and module-expr_2 to a module, and applies the former to the latter.
+// The type of module-expr_2 must match the type expected for the arguments of the
+// functor module-expr_1.
+// 
+// 
+// 
+// 7.12  Compilation units
+// *=*=*=*=*=*=*=*=*=*=*=*
+// 
+// 
+ unit-interface ::=  { specification  [";;"] }
+ 
+ unit-implementation ::=  [ module-items ]
+
+// Compilation units bridge the module system and the separate compilation
+// system. A compilation unit is composed of two parts: an interface and an
+// implementation. The interface contains a sequence of specifications, just as
+// the inside of a sig ... end signature expression. The implementation contains a
+// sequence of definitions and expressions, just as the inside of a struct ... end
+// module expression. A compilation unit also has a name unit-name, derived from
+// the names of the files containing the interface and the implementation (see
+// chapter 9 for more details). A compilation unit behaves roughly as the module
+// definition
+// module unit-name : sig  unit-interface end = struct  unit-implementation end
+// 
+// A compilation unit can refer to other compilation units by their names, as if
+// they were regular modules. For instance, if U is a compilation unit that
+// defines a type t, other compilation units can refer to that type under the name
+// U.t; they can also refer to U as a whole structure. Except for names of other
+// compilation units, a unit interface or unit implementation must not have any
+// other free variables. In other terms, the type-checking and compilation of an
+// interface or implementation proceeds in the initial environment
+// name_1 : sig  specification_1 end ...  name_n : sig  specification_n end
+// where name_1 ...  name_n are the names of the other compilation units
+// available in the search path (see chapter 9 for more details) and
+// specification_1 ...  specification_n are their respective interfaces.
+// 

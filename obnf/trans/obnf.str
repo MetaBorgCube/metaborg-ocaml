@@ -1,0 +1,200 @@
+module obnf
+
+imports
+  
+  completion/completion
+  pp
+  outline
+  signatures/obnf-sig
+
+rules // Debugging
+  
+  debug-show-aterm:
+    (node, _, _, path, project-path) -> (filename, result)
+    with
+      filename := <guarantee-extension(|"aterm")> path
+    ; result   := node
+
+  
+  normalize-obnf-builder:
+    (node, _, _, path, project-path) -> (filename, result)
+    with
+      filename := <guarantee-extension(|"norm.obnf")> path
+    ; result   := <normalize; pp-obnf-string>node
+    
+    
+rules
+
+  normalize = 
+    alltd(normalize-char <+ camel-case-nt)
+    ; normalize-prods 
+    
+    
+  normalize-char :
+    CC(x, y) -> CC(<normalize-char>x, <normalize-char>y)
+    
+//  normalize-char :
+//    CC(x, y) -> CC(<normalize-char>x, <normalize-char>y)
+  
+  normalize-char :
+    Trm(str) -> STrm(<concat-strings>["\"", str, "\""])
+    
+    
+  camel-case-nt :
+    NT(str) -> NT(str')
+    where <mk-camel-case> str => str'
+      
+   mk-camel-case :
+     str -> str'
+     where string-tokenize(|['-'])
+         ; map(first-to-upper)
+         ; concat-strings => str'
+         
+   first-to-upper =
+     explode-string
+     ; [ to-upper | id]
+     ; implode-string
+     
+rules 
+
+  normalize-prods :
+    Grammar([Group(ps)]) -> Grammar(groups)
+    where <mapconcat(normalize-top-level-alt)> ps => groups 
+
+  normalize-top-level-alt :
+    Prod(nt, p) -> [Sorts([nt]), Group(prods)]
+    where <alt-to-list> p 
+        ; map(\ p' -> Prod(nt, p')\; to-sdf-prod) => prods
+    
+  alt-to-list :
+    Alt(p1, p2) -> [p1 | <alt-to-list>p2]
+  alt-to-list :
+    p -> [p]
+    
+  to-sdf-prod :
+    Prod(nt, p) -> SdfProd(nt, c, syms)
+    where <phrase-to-syms; innermost(normalize-sdf-sym)> p => syms
+        ; <?NT(<id>); newname>nt => c
+
+rules // phrase to symbols
+
+  phrase-to-syms :
+    Seq(NT(x), IterP(Seq(STrm(sep), NT(x)))) -> 
+    [NT(x), StrSym(sep), SdfIterSepP(NT(x), sep)]
+    
+  phrase-to-syms : 
+    Seq(NT(x), Seq(IterP(Seq(STrm(sep), NT(x))), p)) -> 
+    [NT(x), StrSym(sep), SdfIterSepP(NT(x), sep) | <phrase-to-syms>p]
+    
+  phrase-to-syms :
+    Seq(NT(x), Seq(Iter(Seq(STrm(sep), NT(x))), p)) -> 
+    [SdfIterSepP(NT(x), sep) | <phrase-to-syms>p]
+    
+  phrase-to-syms :
+    Seq(NT(x), Seq(Iter(Seq(STrm(sep), NT(x))), p)) -> 
+    [SdfIterSepP(NT(x), sep) | <phrase-to-syms>p]
+    
+  phrase-to-syms :
+    Seq(NT(x), Iter(Seq(STrm(sep), NT(x)))) -> 
+    [SdfIterSepP(NT(x), sep)]
+    
+  phrase-to-syms :
+    Seq(Opt(NT(x)), Seq(Iter(Seq(STrm(sep), NT(x))), p)) -> 
+    [SdfIterSep(NT(x), sep) | <phrase-to-syms>p]
+    
+  phrase-to-syms :
+    Seq(Opt(NT(x)), Iter(Seq(STrm(sep), NT(x)))) -> 
+    [SdfIterSep(NT(x), sep)]
+    
+  phrase-to-syms :
+    Iter(p) -> [SdfIter(<phrase-to-sym>p)]
+    
+  phrase-to-syms :
+    IterP(p) -> [SdfIterP(<phrase-to-sym>p)]
+    
+  phrase-to-syms :
+    Seq(p1, p2) -> <conc>(syms1, syms2)
+    where <phrase-to-syms> p1 => syms1
+        ; <phrase-to-syms> p2 => syms2
+        
+  phrase-to-syms :
+    CC(STrm(x), STrm(y)) -> 
+    [CharClass([Range(<un-double-quote>x,<un-double-quote>y)])]
+        
+  phrase-to-syms :
+    NT(x) -> [NT(x)]
+    
+  phrase-to-syms :
+    STrm(str) -> [StrSym(str)]
+    
+  phrase-to-syms :
+    STrm(str) -> [StrSym(str)]
+    
+  phrase-to-syms :
+    Opt(p) -> [SdfOpt(<phrase-to-sym>p)] 
+    
+  phrase-to-syms :
+    Alt(p1, p2) -> [SdfSeq([SdfAlt(<phrase-to-sym>p1, <phrase-to-sym>p2)])]
+    
+  phrase-to-syms :
+    Grp(p) -> [SdfSeq(<phrase-to-syms>p)]
+    
+  phrase-to-syms =
+    debug(!"phrase-to-syms fails at: "); fail
+    
+  phrase-to-sym =
+    phrase-to-syms; (?[<id>] <+ !SdfSeq(<id>))
+    
+    
+rules 
+ 
+ 
+  normalize-sdf-sym :
+    SdfSeq([SdfSeq([sym])]) -> SdfSeq([sym])
+
+  normalize-sdf-sym :
+    SdfSeq([sym@CharClass(_)]) -> sym
+    
+  normalize-sdf-sym :
+    SdfAlt(CharClass(ranges1), CharClass(ranges2)) -> CharClass(<conc>(ranges1, ranges2))
+    
+//  normalize-sdf-sym :
+//    SdfAlt(CharClass(ranges1), StrSym(c)) -> CharClass(<conc>(ranges1, [Char(c'')]))
+//    where <un-double-quote>c => c' 
+//        ; debug(!"undouble-qouted: ")
+//        ; strlen 
+//        ; debug(!"strlen:")
+//        => 1
+//        ; <concat-strings>["\\", c'] => c''
+        
+  
+  normalize-sdf-sym :
+    StrSym("\"\\\"\"") -> CharClass([Char("\\\"")])
+    
+//  normalize-sdf-sym :
+//    StrSym(c) -> CharClass([Char(c'')])
+//    where <un-double-quote>c => c' 
+//        ; debug(!"undouble-qouted: ")
+//        ; strlen 
+//        ; debug(!"strlen:")
+//        => 1
+//        ;
+//        if <implode-string; is-alphanum> c' then
+//          !c' => c''
+//        else 
+//          <concat-strings>["\\", c'] => c''
+//        end
+
+//  normalize-sdf-sym :
+//    SdfAlt(StrSym(c1), StrSym(c2)) -> CharClass(<conc>(ranges1, [Char(c'')]))
+//    where <un-double-quote>c => c' 
+//        ; debug(!"undouble-qouted: ")
+//        ; strlen 
+//        ; debug(!"strlen:")
+//        => 1
+//        ; <concat-strings>["\\", c'] => c''
+    
+    
+    
+    
+    

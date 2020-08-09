@@ -1,0 +1,6 @@
+sorts UnitInterface
+context-free syntax
+  UnitInterface.UnitInterface0 = (Specification ";;"?)*
+sorts UnitImplementation
+context-free syntax
+  UnitImplementation.UnitImplementation0 = ModuleItems?

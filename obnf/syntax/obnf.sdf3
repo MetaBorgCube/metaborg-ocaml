@@ -1,0 +1,93 @@
+module obnf
+
+imports Common
+
+context-free start-symbols Start
+
+context-free sorts Start
+
+context-free syntax
+  
+  Start.Grammar = <<{Group "\n"}*>> 
+     // {longest-match}
+  
+  Group.Sorts = <
+    sorts <NT*>
+  >
+  
+  Group.Group = <
+    context-free syntax 
+      <{Production "\n"}*>  
+  > 
+  
+  Production.Prod = <
+    <NT> ::= <Phrase>
+  >
+  
+  
+  NT.NT = <<ID>>
+  
+  Phrase = NT
+  
+  CharCF.Trm = <<Char>> 
+  CharCF.STrm = <<STRING>>
+  
+  Phrase = CharCF
+  
+  Phrase.CC = <<CharCF> ... <CharCF>>
+  
+  Phrase.Grp = <( <Phrase> )>
+  
+  Phrase.Iter = <{ <Phrase> }>
+  
+  Phrase.IterP = <{ <Phrase> }+> 
+  
+  Phrase.Alt  = <<Phrase> | <Phrase>> {right}
+  
+  Phrase.Seq  = <<Phrase> <Phrase>> {right}
+  
+  Phrase.Opt  = <[<Phrase>]>
+  
+context-free priorities
+
+  Phrase.Seq > Phrase.Alt 
+  
+lexical syntax
+
+  CcChar = [a-zA-Z0-9] | ([\\] ~[\n])
+  
+context-free syntax
+
+  Production.SdfProd = <
+   <NT>.<ID> = <SdfSym*>
+  >
+
+  SdfSym = CharClass
+
+  CharClass.CharClass = <[<{CcRange ""}+>]>
+  
+  CcRange.Range = <<CcChar>-<CcChar>>
+  CcRange.Char = CcChar
+  
+  SdfSym = <<NT>>
+  
+  SdfSym.StrSym = <<STRING>>
+  
+  SdfSym.SdfOpt = <<SdfSym>?>
+  
+  SdfSym.SdfSeq = <(<SdfSym+>)>
+  SdfSym.SdfAlt = <<SdfSym> | <SdfSym>> {right}
+  
+  SdfSym.SdfIter     = <<SdfSym>*>
+  SdfSym.SdfIterP    = <<SdfSym>+>
+  SdfSym.SdfIterSep  = <{<SdfSym> <STRING>}*>
+  SdfSym.SdfIterSepP = <{<SdfSym> <STRING>}+>
+  
+context-free priorities
+  
+  
+
+  
+template options
+  ID = keyword {reject}
+  
