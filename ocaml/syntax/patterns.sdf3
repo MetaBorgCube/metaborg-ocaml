@@ -14,18 +14,18 @@ context-free syntax
   Pattern.ConstPat   = Constant
   Pattern.AliasPat   = Pattern "as" ValueName
   Pattern.AscrPat    = "(" Pattern ":" Typexpr ")"
-  Pattern.OrPat      = Pattern "|" Pattern {right}
+  Pattern.OrPat      = Pattern "|" Pattern {left}
   Pattern.ConstrPat  = Constr Pattern
   Pattern.PolyPat    = TagNameQ Pattern
   Pattern.TConstrPat = "#" Typeconstr
-  Pattern.VariantPat = Pattern "," {Pattern ","}+
+  Pattern.TuplePat   = {Pattern ","}+
   
   Pattern.RecPat1    = "{" {FieldPat ";"}+ ";" "_" ";" "}"
   Pattern.RecPat2    = "{" {FieldPat ";"}+         ";" "}"
   Pattern.RecPat3    = "{" {FieldPat ";"}+ ";" "_"     "}"
   Pattern.RecPat     = "{" {FieldPat ";"}+             "}"
                        
-  FieldPat.FieldPat1 = Field ":" Typexpr "=" Pattern
+  FieldPat.FieldPat1 = Field ":" Typexpr "=" Pattern 
   FieldPat.FieldPat2 = Field             "=" Pattern
   FieldPat.FieldPat3 = Field ":" Typexpr
   FieldPat.FieldPat4 = Field 
@@ -50,10 +50,31 @@ context-free priorities
   Pattern.RangePat
   > Pattern.LazyPat
   > {Pattern.ConstrPat Pattern.PolyPat}
-  > Pattern.VariantPat
+  > {Pattern ","}+ = Pattern 
+  > {Pattern ","}+ = {Pattern ","}+ "," Pattern
+  > Pattern.TuplePat 
   > Pattern.OrPat
-  > Pattern.AliasPat
+  > Pattern.AliasPat,
   
+  Pattern.TuplePat <0> .> {Pattern ","}+ = Pattern//,
+  
+//  {Pattern ","}+ = Pattern > {
+//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
+//  },
+//  
+//  {Pattern ","}+ = {Pattern ","}+ "," Pattern > {
+//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
+//  }
+  
+//  {Pattern ","}+ = Pattern > {Pattern ","}+ = {Pattern ","}+ "," Pattern > {
+//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
+//  },
+//  
+//  {Pattern ","}+ = {Pattern ","}+ "," Pattern > {
+//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
+//  }
+  
+  // TODO: more concise formulation of these rules (non-assoc?)
 
   
 // See also the following language extensions: first-class modules, attributes
