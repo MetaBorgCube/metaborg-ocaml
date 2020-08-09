@@ -1,8 +1,30 @@
-module compilation-units
+module constants
 
 language ocaml
 
-test foo [[
+start symbol Expr
 
+test false [[
+  false
+]] parse succeeds
+
+test true [[
+  true
+]] parse succeeds
+
+test unit [[
+  ()
+]] parse succeeds
+
+test begin end [[
+  begin end
+]] parse succeeds
+
+test empty [[
+  []
+]] parse succeeds
+
+test brackets [[
+  [| |]
 ]] parse succeeds
 
