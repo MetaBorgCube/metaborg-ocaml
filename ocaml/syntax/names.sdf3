@@ -1,9 +1,6 @@
-module values
+module names
 
 imports lex module-expressions
-
-// 7.2  Values
-// *=*=*=*=*=*
 
 // 7.3  Names
 // *=*=*=*=*=

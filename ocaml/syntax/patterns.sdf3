@@ -1,6 +1,6 @@
 module patterns
 
-imports lex values type-expressions constants
+imports lex names type-expressions constants
 
 // 7.6  Patterns
 // *=*=*=*=*=*=*

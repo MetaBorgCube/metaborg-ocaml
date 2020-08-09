@@ -11,8 +11,8 @@ imports module-types
 imports patterns
 imports type-definitions
 imports type-expressions
-imports values 
+imports names 
 
-context-free start-symbols CompilationUnit
+context-free start-symbols CompilationUnit Expr
 
 

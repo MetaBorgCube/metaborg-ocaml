@@ -1,6 +1,6 @@
 module classes
 
-imports lex values type-expressions expressions type-definitions patterns
+imports lex names type-expressions expressions type-definitions patterns
 
 // 7.9  Classes
 // *=*=*=*=*=*=

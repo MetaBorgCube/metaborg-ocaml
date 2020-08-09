@@ -1,6 +1,7 @@
 module module-expressions
 
-imports lex module-types expressions type-expressions values type-definitions exception-definitions classes
+imports lex module-types expressions type-expressions 
+names type-definitions exception-definitions classes
 
 // 7.11  Module expressions (module implementations)
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*

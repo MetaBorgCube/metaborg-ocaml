@@ -1,6 +1,6 @@
 module constants
 
-imports lex values
+imports lex names
 
 // 7.5  Constants
 // *=*=*=*=*=*=*=

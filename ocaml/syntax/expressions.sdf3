@@ -1,6 +1,6 @@
 module expressions
 
-imports lex values constants type-expressions patterns type-definitions module-expressions module-types exception-definitions classes
+imports lex names constants type-expressions patterns type-definitions module-expressions module-types exception-definitions classes
 
 // 7.7  Expressions
 // *=*=*=*=*=*=*=*=
