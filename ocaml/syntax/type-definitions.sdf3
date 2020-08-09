@@ -1,6 +1,6 @@
 module type-definitions
 
-imports lex names patterns expressions type-expressions
+imports lex names expressions type-expressions aux
 
 // 7.8  Type and exception definitions
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*

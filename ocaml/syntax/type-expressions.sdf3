@@ -1,6 +1,6 @@
 module type-expressions 
 
-imports lex names patterns
+imports lex names aux
 
 // 7.4  Type expressions
 // *=*=*=*=*=*=*=*=*=*=*
