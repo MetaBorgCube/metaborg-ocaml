@@ -21,16 +21,20 @@ context-free syntax
   
 sorts Typedef
 context-free syntax
-  Typedef.Typedef0 = TypeParams? TypeconstrName TypeInformation
+  Typedef.Typedef = TypeParams? TypeconstrName TypeEquation? TypeRepresentation? TypeConstraint*
   
-sorts TypeInformation
-context-free syntax
-  TypeInformation.TypeInfo = TypeEquation? TypeRepresentation? TypeConstraint*
+//sorts Typedef
+//context-free syntax
+//  Typedef.Typedef = TypeParams? TypeconstrName TypeInformation
+//  
+//sorts TypeInformation
+//context-free syntax
+//  TypeInformation.TypeInfo = TypeEquation? TypeRepresentation? TypeConstraint*
   
   
 sorts TypeEquation
 context-free syntax
-  TypeEquation.TypeEquation0 = "=" Typexpr
+  TypeEquation.TypeEquation = "=" Typexpr
   
 sorts TypeRepresentation
 context-free syntax
