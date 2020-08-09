@@ -1,0 +1,133 @@
+module type-expressions
+
+language ocaml
+
+start symbol TypeDefinition
+
+test foo [[
+  type x = int
+]] parse succeeds
+
+test type variable [[
+  type x = 'a
+]] parse succeeds
+
+
+// function types
+
+test function type [[
+  type x = int -> int
+]] parse succeeds
+
+test function type [[
+  type x = int -> int -> int
+]] parse to [[
+  type x = int -> (int -> int)
+]]
+
+test function type [[
+  type x = ?a: int -> ?b: int -> int
+]] parse to [[
+  type x = ?a: int -> (?b: int -> int)
+]]
+
+
+// tuple types
+
+test function type [[ 
+  type x = int * (int * int)
+]] parse succeeds
+
+// function types and tuple types
+
+test function type [[ 
+  type x = int -> int * int
+]] parse to [[
+  type x = int -> (int * int)
+]]
+
+test function type [[
+  type x = int -> int * 'a * 'b
+]] parse to [[
+  type x = int -> (int * 'a * 'b)
+]]
+
+
+// type constructor application
+
+test function type [[
+  type x = int list list
+]] parse to [[
+  type x = (int list) list
+]]
+
+test function type [[
+  type x = 'a * 'b list
+]] parse to [[
+  type x = 'a * ('b list)
+]]
+
+test function type [[
+  type x = 'a list
+]] parse succeeds
+
+test function type [[
+  type x = ('a) list
+]] parse succeeds
+
+test function type [[
+  type x = ('a, 'b) list
+]] parse succeeds
+
+test function type [[ 
+  type x = ('a * 'b) list
+]] parse succeeds
+
+
+test function type [[
+  type map = ('a -> 'b) -> 'a list -> 'b list
+]] parse to [[
+  type map = ('a -> 'b) -> (('a list) -> ('b list))
+]]
+
+test function type [[
+  type notmap = 'a -> 'b -> 'a list -> 'b list
+]] parse to [[
+  type notmap = 'a -> ('b -> (('a list) -> ('b list)))
+]]
+
+
+
+// object types
+
+test object type [[ 
+  type x = < >
+]] parse succeeds
+
+test object type [[ 
+  type x = < .. >
+]] parse succeeds
+
+test object type [[ 
+  type x = < ; >
+]] parse fails
+
+test object type [[ 
+  type x = < hd : int; tl : int list >
+]] parse succeeds
+
+test object type [[ 
+  type x = < hd : int; tl : int list; .. >
+]] parse succeeds
+
+
+
+test alias type [[ 
+  type x = int as 'number
+]] parse succeeds
+
+test alias type [[ 
+  type x = int list as 'intList
+]] parse succeeds
+
+
