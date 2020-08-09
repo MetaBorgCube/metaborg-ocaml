@@ -1,6 +1,6 @@
 module patterns
 
-imports lex names type-expressions constants
+imports lex names type-expressions constants aux
 
 // 7.6  Patterns
 // *=*=*=*=*=*=*
@@ -8,7 +8,6 @@ imports lex names type-expressions constants
 sorts Pattern
 context-free syntax
   Pattern            = "(" Pattern ")" {bracket}
-  
   Pattern.VarPat     = ValueName
   Pattern.WldPat     = "_"
   Pattern.ConstPat   = Constant
@@ -19,32 +18,33 @@ context-free syntax
   Pattern.PolyPat    = TagNameQ Pattern
   Pattern.TConstrPat = "#" Typeconstr
   Pattern.TuplePat   = {Pattern ","}+
-  
-  Pattern.RecPat1    = "{" {FieldPat ";"}+ ";" "_" ";" "}"
-  Pattern.RecPat2    = "{" {FieldPat ";"}+         ";" "}"
-  Pattern.RecPat3    = "{" {FieldPat ";"}+ ";" "_"     "}"
-  Pattern.RecPat     = "{" {FieldPat ";"}+             "}"
-                       
-  FieldPat.FieldPat1 = Field ":" Typexpr "=" Pattern 
-  FieldPat.FieldPat2 = Field             "=" Pattern
-  FieldPat.FieldPat3 = Field ":" Typexpr
-  FieldPat.FieldPat4 = Field 
-                       
-  Pattern.ListPat    = "[" {Pattern ";"}+ OptSemicolon "]" // TODO: list pattern?
-  
+  Pattern.ListPat    = "[" {Pattern ";"}+ OptSemicolon "]" 
   Pattern.ConsPat    = Pattern "::" Pattern
   Pattern.ArrayPat   = "[|" {Pattern ";"}+ OptSemicolon "|]"
   Pattern.RangePat   = CharLiteral ".." CharLiteral
   Pattern.LazyPat    = "lazy" Pattern
   Pattern.ExcPat     = "exception" Pattern
+   
+context-free syntax // record patterns
+
+  Pattern.RecPat         = "{" {FieldPat ";"}+             "}"
+  Pattern.RecPatSugar    = "{" {FieldPat ";"}+ ";"         "}"
+  Pattern.RecPatWld      = "{" {FieldPat ";"}+ ";" "_"     "}"
+  Pattern.RecPatWldSugar = "{" {FieldPat ";"}+ ";" "_" ";" "}"
+                       
+  FieldPat.FieldPat      = Field ":" Typexpr "=" Pattern 
+  FieldPat.FieldPatInit  = Field             "=" Pattern
+  FieldPat.FieldPatTyped = Field ":" Typexpr
+  FieldPat.FieldPat      = Field  
   
+  Field = "_" {reject}
+  
+context-free syntax // local open patterns
+
   Pattern.LocalOpenPat      = ModulePath "." "(" Pattern ")"
   Pattern.LocalOpenPatList  = ModulePath "." "[" Pattern "]"
   Pattern.LocalOpenPatArray = ModulePath "." "[|" Pattern "|]"
   Pattern.LocalOpenPatRec   = ModulePath "." "{" Pattern "}"
-  
-lexical syntax
-  OptSemicolon = ";"?
   
 context-free priorities 
   Pattern.RangePat
@@ -56,23 +56,7 @@ context-free priorities
   > Pattern.OrPat
   > Pattern.AliasPat,
   
-  Pattern.TuplePat <0> .> {Pattern ","}+ = Pattern//,
-  
-//  {Pattern ","}+ = Pattern > {
-//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
-//  },
-//  
-//  {Pattern ","}+ = {Pattern ","}+ "," Pattern > {
-//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
-//  }
-  
-//  {Pattern ","}+ = Pattern > {Pattern ","}+ = {Pattern ","}+ "," Pattern > {
-//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
-//  },
-//  
-//  {Pattern ","}+ = {Pattern ","}+ "," Pattern > {
-//    Pattern.TuplePat Pattern.OrPat Pattern.AliasPat
-//  }
+  Pattern.TuplePat <0> .> {Pattern ","}+ = Pattern
   
   // TODO: more concise formulation of these rules (non-assoc?)
 

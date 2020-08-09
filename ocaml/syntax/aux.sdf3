@@ -1,0 +1,5 @@
+module aux
+
+lexical syntax
+  OptSemicolon = ";"?
+  

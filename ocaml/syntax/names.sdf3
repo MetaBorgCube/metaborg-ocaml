@@ -121,7 +121,8 @@ context-free syntax
   
 sorts Field
 context-free syntax
-  Field.Field0 = ModulePathPref? FieldName
+  Field.Field  = FieldName
+  Field.FieldQ = ModulePathPref FieldName
   
 sorts ModtypePath
 context-free syntax

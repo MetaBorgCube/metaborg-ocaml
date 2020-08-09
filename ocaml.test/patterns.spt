@@ -45,30 +45,76 @@ test or pattern [[
 ]] parse succeeds
 
 
-test or pattern [[ 
+test or / tuple pattern [[ 
   let a, b | c, d, e 
   = 1
-]] parse succeeds
+]] parse to [[
+  let (a, b) | (c, d, e) 
+  = 1
+]]
+
+test or / constructor pattern [[ 
+  let A b | C d, e 
+  = 1
+]] parse to [[
+  let (A b) | ((C d), e) 
+  = 1
+]]
+
+test or / as pattern [[ 
+  let a as b | c as d 
+  = 1
+]] parse to [[
+  let ((a as b) | c) as d 
+  = 1
+]] 
+
+test as / as pattern [[ 
+  let a as b as c
+  = 1
+]] parse to [[
+  let (a as b) as c
+  = 1
+]] 
 
 test as / tuple pattern [[    
   let a, b as c
   = 1
-]] parse succeeds
+]] parse to [[
+  let (a, b) as c
+  = 1
+]]
+
+test as / tuple pattern [[    
+  let a as c, d
+  = 1
+]] parse to [[
+  let ((a as c), d)
+  = 1
+]]
 
 test as / tuple pattern [[    
   let a as c, d, e 
   = 1
-]] parse succeeds  
-
-
-test constructor pattern [[  
-  let Cons a, b, c
-  = 1
-]] parse to [[ 
-  let (Cons a), b, c
+]] parse to [[
+  let ((a as c), d, e)
   = 1
 ]]
 
+test constructor pattern [[  
+  let Cons a
+  = 1
+]] parse succeeds
+
+test constructor pattern [[  
+  let Cons a
+  = 1
+]] parse succeeds
+
+test constructor is uppercase identifier [[  
+  let cons a, b, c
+  = 1
+]] parse fails
 
 test constructor pattern [[ 
   let Cons(x, xs)
@@ -77,6 +123,62 @@ test constructor pattern [[
 
 test tuple pattern [[   
   let a, b, c
+  = 1
+]] parse succeeds
+
+test list pattern [[   
+  let []
+  = 1
+]] parse succeeds
+
+test list pattern [[   
+  let [a, b, c; d, e, f; g; 1; 2]
+  = 1
+]] parse to [[   
+  let [(a, b, c); (d, e, f); g; 1; 2]
+  = 1
+]]
+
+test array pattern [[   
+  let [|a, b, c; d, e, f; g; 1; 2|]
+  = 1
+]] parse to  [[   
+  let [|(a, b, c); (d, e, f); g; 1; 2|]
+  = 1
+]]
+
+test range pattern [[   
+  let '1' .. '5'
+  = 1
+]] parse succeeds
+
+test range pattern [[   
+  let Cons 'a' .. 'z', xs
+  = 1
+]] parse to [[
+  let (Cons ('a' .. 'z')), xs 
+  = 1
+]]
+
+test lazy pattern (this is safe; correct in OCaml?) [[    
+  let lazy Cons a
+  = 1
+]] parse succeeds
+
+test lazy pattern  [[    
+  let lazy x | exception y
+  = 1
+]] parse succeeds
+
+
+test record pattern [[   
+  let { hd : int = 1; tl : int list = nil }
+  = 1
+]] parse succeeds
+
+
+test record pattern [[   
+  let { hd : int = 1; tl : int list = nil; _ } 
   = 1
 ]] parse succeeds
 
