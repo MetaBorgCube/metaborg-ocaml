@@ -13,6 +13,6 @@ imports type-definitions
 imports type-expressions
 imports names 
 
-context-free start-symbols CompilationUnit Expr
+context-free start-symbols CompilationUnit Expr TypeDefinition Definition
 
 
