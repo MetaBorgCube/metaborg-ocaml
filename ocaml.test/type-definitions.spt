@@ -1,0 +1,8 @@
+module compilation-units
+
+language ocaml
+
+test foo [[
+
+]] parse succeeds
+

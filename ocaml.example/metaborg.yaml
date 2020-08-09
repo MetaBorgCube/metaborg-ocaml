@@ -1,0 +1,8 @@
+---
+id: org.metaborg:ocaml.example:0.1.0-SNAPSHOT
+name: ocaml
+dependencies:
+  compile:
+  - org.metaborg:ocaml:0.1.0-SNAPSHOT
+build:
+  useBuildSystemSpec: true

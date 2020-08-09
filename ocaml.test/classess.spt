@@ -1,0 +1,8 @@
+module classes
+
+language ocaml
+
+test foo [[
+
+]] parse succeeds
+

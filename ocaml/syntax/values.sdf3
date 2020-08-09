@@ -1,0 +1,145 @@
+module values
+
+imports lex module-expressions
+
+// 7.2  Values
+// *=*=*=*=*=*
+
+// 7.3  Names
+// *=*=*=*=*=
+// 
+// 
+// Identifiers are used to give names to several classes of language objects and
+// refer to these objects by name later:
+// 
+// - value names (syntactic class value-name),
+// - value constructors and exception constructors (class constr-name),
+// - labels (label-name, defined in section 7.1),
+// - polymorphic variant tags (tag-name),
+// - type constructors (typeconstr-name),
+// - record fields (field-name),
+// - class names (class-name),
+// - method names (method-name),
+// - instance variable names (inst-var-name),
+// - module names (module-name),
+// - module type names (modtype-name).
+// These eleven name spaces are distinguished both by the context and by the
+// capitalization of the identifier: whether the first letter of the identifier is
+// in lowercase (written lowercase-ident below) or in uppercase (written
+// capitalized-ident). Underscore is considered a lowercase letter for this
+// purpose.
+
+// Naming objects
+// --------------
+
+sorts ValueName
+context-free syntax
+  ValueName.Id     = LowercaseIdent
+  ValueName.OpName = "(" OperatorName ")"
+sorts OperatorName
+context-free syntax
+  OperatorName.OperatorName8 = PrefixSymbol
+  OperatorName.OperatorName9 = InfixOp
+sorts InfixOp
+context-free syntax
+  InfixOp.InfixOp84 = InfixSymbol
+  InfixOp.InfixOp85 = "*"
+  InfixOp.InfixOp86 = "+"
+  InfixOp.InfixOp87 = "-"
+  InfixOp.InfixOp88 = "-."
+  InfixOp.InfixOp89 = "="
+  InfixOp.InfixOp90 = "!="
+  InfixOp.InfixOp91 = "<"
+  InfixOp.InfixOp92 = ">"
+  InfixOp.InfixOp93 = "or"
+  InfixOp.InfixOp94 = "||"
+  InfixOp.InfixOp95 = "&"
+  InfixOp.InfixOp96 = "&&"
+  InfixOp.InfixOp97 = ":="
+  InfixOp.InfixOp98 = "mod"
+  InfixOp.InfixOp99 = "land"
+  InfixOp.InfixOp100 = "lor"
+  InfixOp.InfixOp101 = "lxor"
+  InfixOp.InfixOp102 = "lsl"
+  InfixOp.InfixOp103 = "lsr"
+  InfixOp.InfixOp104 = "asr"
+sorts ConstrName
+context-free syntax
+  ConstrName.ConstrName3 = CapitalizedIdent
+sorts TagName TagNameQ
+context-free syntax
+  TagName = CapitalizedIdent
+  TagNameQ.TagName = "'" TagName
+sorts TypeconstrName
+context-free syntax
+  TypeconstrName.TypeconstrName3 = LowercaseIdent
+sorts FieldName
+context-free syntax
+  FieldName.FieldName3 = LowercaseIdent
+sorts ModuleName
+context-free syntax
+  ModuleName.ModuleName3 = CapitalizedIdent
+sorts ModtypeName
+context-free syntax
+  ModtypeName.ModtypeName3 = Ident
+sorts ClassName
+context-free syntax
+  ClassName.ClassName3 = LowercaseIdent
+sorts InstVarName
+context-free syntax
+  InstVarName.InstVarName3 = LowercaseIdent
+sorts MethodName
+context-free syntax
+  MethodName.MethodName3 = LowercaseIdent
+  
+ 
+// Referring to named objects
+// --------------------------
+
+sorts ValuePath
+context-free syntax
+  ValuePath.ValuePath0 = ModulePathPref? ValueName
+  
+sorts Constr
+context-free syntax
+  Constr.Constr2 = ModulePathPref? ConstrName
+  
+sorts Typeconstr
+context-free syntax
+  Typeconstr.Typeconstr0 = ExtendedModulePathPref? TypeconstrName
+  
+sorts Field
+context-free syntax
+  Field.Field0 = ModulePathPref? FieldName
+  
+sorts ModtypePath
+context-free syntax
+  ModtypePath.ModtypePath0 = ExtendedModulePathPref? ModtypeName
+  
+sorts ClassPath
+context-free syntax
+  ClassPath.ClassPath0 = ModulePathPref? ClassName
+  
+sorts ClasstypePath
+context-free syntax
+  ClasstypePath.ClasstypePath0 = ExtendedModulePathPref? ClassName
+  
+sorts ModulePath
+context-free syntax
+  ModulePath.ModulePath0 = {ModuleName "."}+
+  ModulePathPref.ModulePathPref = ModulePath "."
+  
+sorts ExtendedModulePath ExtendedModulePathPref ExtendedModulePathArg
+context-free syntax
+  ExtendedModulePath.ExtendedModulePath = {ExtendedModuleName "."}+
+  ExtendedModulePathPref.ExtendedModulePathPref = ExtendedModulePath "."
+  
+  ExtendedModulePathArg.ExtendedModulePathArg = "(" ExtendedModulePath ")"
+  
+sorts ExtendedModuleName
+context-free syntax
+  ExtendedModuleName.ExtendedModuleName = ModuleName ExtendedModulePathArg*
+  
+  
+  
+  

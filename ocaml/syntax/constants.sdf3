@@ -1,0 +1,32 @@
+module constants
+
+imports lex values
+
+// 7.5  Constants
+// *=*=*=*=*=*=*=
+
+sorts Constant
+context-free syntax
+  Constant.Int       = IntegerLiteral
+  Constant.Int32     = Int32Literal
+  Constant.Int64     = Int64Literal
+  Constant.Nativeint = NativeintLiteral
+  Constant.Float     = FloatLiteral
+  Constant.Char      = CharLiteral
+  Constant.String    = StringLiteral
+  Constant.Constr    = Constr
+  Constant.False     = "false"
+  Constant.True      = "true"
+  Constant.Unit      = "(" ")"
+  Constant.BE        = "begin" "end"
+  Constant.NilConst  = "[" "]"
+  Constant.Brackets  = "[|" "|]"
+  Constant.TagName   = TagNameQ
+
+// See also the following language extension: extension literals.
+// The syntactic class of constants comprises literals from the four base types
+// (integers, floating-point numbers, characters, character strings), the integer
+// variants, and constant constructors from both normal and polymorphic variants,
+// as well as the special constants false, true, (), [], and [||], which behave
+// like constant constructors, and begin end, which is equivalent to ().
+

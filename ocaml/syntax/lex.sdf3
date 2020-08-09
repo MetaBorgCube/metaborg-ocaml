@@ -1,0 +1,274 @@
+module lex
+
+// 7.1  Lexical conventions
+// *=*=*=*=*=*=*=*=*=*=*=*=
+
+// Blanks
+// ------
+// 
+// The following characters are considered as blanks: space, horizontal
+// tabulation, carriage return, line feed and form feed. Blanks are ignored, but
+// they separate adjacent identifiers, literals and keywords that would otherwise
+// be confused as one single identifier, literal or keyword.
+
+lexical syntax
+  LAYOUT = [\ \t\n\r]
+context-free restrictions
+  LAYOUT? -/- [\ \t\n\r]
+  
+// Comments
+// --------
+// 
+// Comments are introduced by the two characters (*, with no intervening blanks,
+// and terminated by the characters *), with no intervening blanks. Comments are
+// treated as blank characters. Comments do not occur inside string or character
+// literals. Nested comments are handled correctly.
+
+lexical sorts AST EOF
+lexical syntax
+  LAYOUT = Com
+  Com    = "(*" (~[\*] | AST | Com)* "*)"
+  AST    = [\*]
+lexical restrictions
+  AST -/- [\/]
+context-free restrictions
+  LAYOUT? -/- [\(].[\*]
+  
+// Identifiers
+// -----------
+  
+lexical sorts Ident CapitalizedIdent LowercaseIdent
+lexical syntax
+  Ident            = [a-zA-Z\_] [a-zA-Z0-9\_\']*
+  CapitalizedIdent = [A-Z]      [a-zA-Z0-9\_\']*
+  LowercaseIdent   = [a-z\_]    [a-zA-Z0-9\_\']* 
+lexical restrictions
+  Ident            -/- [a-zA-Z0-9\_\']
+  CapitalizedIdent -/- [a-zA-Z0-9\_\']
+  LowercaseIdent   -/- [a-zA-Z0-9\_\']
+
+// Integer literals
+// ----------------
+
+// TODO: consider making different lexical sub-sorts
+
+sorts IntegerLiteral
+lexical syntax
+  IntegerLiteral.DecInt = "-"? [0-9] [0-9\_]*
+  IntegerLiteral.HexInt = "-"? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
+  IntegerLiteral.OctInt = "-"? ("0o" | "0O") [0-7] [0-7\_]*
+  IntegerLiteral.BinInt = "-"? ("0b" | "0B") [0-1] [0-1\_]*
+  
+sorts Int32Literal Int64Literal NativeintLiteral
+lexical syntax
+  Int32Literal.Int32Literal         = IntegerLiteral "l"
+  Int64Literal.Int64Literal         = IntegerLiteral "L"
+  NativeintLiteral.NativeintLiteral = IntegerLiteral "n"
+  
+// Floating-point literals
+// -----------------------
+
+sorts FloatLiteral
+lexical syntax
+  FloatLiteral = [\-]? [0-9] [0-9\_]* 
+                 ([\.] [0-9\_]*)? ([eE] [\+\-]? [0-9] [0-9\_]*)?
+  
+  FloatLiteral = [\-]? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]* 
+                 ([\.] [0-9A-Fa-f\_]*)? ([pP] [\+\-]? [0-9] [0-9\_]*)?
+  
+
+// Floating-point decimal literals consist in an integer part, a fractional part
+// and an exponent part. The integer part is a sequence of one or more digits,
+// optionally preceded by a minus sign. The fractional part is a decimal point
+// followed by zero, one or more digits. The exponent part is the character e or E
+// followed by an optional + or - sign, followed by one or more digits. It is
+// interpreted as a power of 10. The fractional part or the exponent part can be
+// omitted but not both, to avoid ambiguity with integer literals. The
+// interpretation of floating-point literals that fall outside the range of
+// representable floating-point values is undefined.
+// Floating-point hexadecimal literals are denoted with the 0x or 0X prefix. The
+// syntax is similar to that of floating-point decimal literals, with the
+// following differences. The integer part and the fractional part use hexadecimal
+// digits. The exponent part starts with the character p or P. It is written in
+// decimal and interpreted as a power of 2.
+// For convenience and readability, underscore characters (_) are accepted (and
+// ignored) within floating-point literals.
+
+// Character literals
+// ------------------
+
+lexical sorts CharLiteral EscapeSequence
+lexical syntax
+  CharLiteral = [\'] RegularChar [\']
+  CharLiteral = [\'] EscapeSequence [\']
+  
+  RegularChar = ~[\ \t\n\r\\] // TODO: check
+
+  EscapeSequence = [\\] [\\\"\'\n\t\r\ ] // TODO: add \b
+  EscapeSequence = [\\] [0-9] [0-9] [0-9]
+  EscapeSequence = "\\x" [0-9A-Fa-f] [0-9A-Fa-f]
+  EscapeSequence = "\\o" [0-3] [0-7] [0-7]
+  
+// Character literals are delimited by ' (single quote) characters. The two
+// single quotes enclose either one character different from ' and \, or one of
+// the escape sequences below:
+// 
+// -----------------------------------------------------------
+// |Sequence|               Character denoted                |
+// -----------------------------------------------------------
+// | \\     |backslash (\)                                   |
+// |\"      |double quote (")                                |
+// |\'      |single quote (')                                |
+// |\n      |linefeed (LF)                                   |
+// |\r      |carriage return (CR)                            |
+// |\t      |horizontal tabulation (TAB)                     |
+// |\b      |backspace (BS)                                  |
+// |\space  |space (SPC)                                     |
+// |\ddd    |the character with ASCII code ddd in decimal    |
+// |\xhh    |the character with ASCII code hh in hexadecimal |
+// |\oooo   |the character with ASCII code ooo in octal      |
+// ----------------------------------------------------------- 
+  
+// String literals
+// ---------------
+
+sorts StringLiteral QuotedStringId StringCharacter
+lexical syntax
+  StringLiteral = [\"] StringCharacter* [\"]
+  StringLiteral = [\{] QuotedStringId [\|] AnyChar* [\|] QuotedStringId [\}]
+  
+  AnyChar = ~[\}] // TODO: proper implementation
+
+  QuotedStringId = [a-z\_]*
+  
+  StringCharacter = RegularStringChar
+  StringCharacter = EscapeSequence
+  StringCharacter = "\\u" [\{] [0-9A-Fa-f]+ [\}]
+  StringCharacter = [\\] [\n] [\ \t]*
+  
+  RegularStringChar = ~[\"\\\n]
+  
+// String literals are delimited by " (double quote) characters. The two double
+// quotes enclose a sequence of either characters different from " and \, or
+// escape sequences from the table given above for character literals, or a
+// Unicode character escape sequence.
+// A Unicode character escape sequence is substituted by the UTF-8 encoding of
+// the specified Unicode scalar value. The Unicode scalar value, an integer in the
+// ranges 0x0000...0xD7FF or 0xE000...0x10FFFF, is defined using 1 to 6
+// hexadecimal digits; leading zeros are allowed.
+// To allow splitting long string literals across lines, the sequence
+// \newline spaces-or-tabs (a backslash at the end of a line followed by any
+// number of spaces and horizontal tabulations at the beginning of the next line)
+// is ignored inside string literals.
+// Quoted string literals provide an alternative lexical syntax for string
+// literals. They are useful to represent strings of arbitrary content without
+// escaping. Quoted strings are delimited by a matching pair of { quoted-string-id
+// | and | quoted-string-id } with the same quoted-string-id on both sides. Quoted
+// strings do not interpret any character in a special way but requires that the
+// sequence | quoted-string-id } does not occur in the string itself. The
+// identifier quoted-string-id is a (possibly empty) sequence of lowercase letters
+// and underscores that can be freely chosen to avoid such issue (e.g. {|hello|},
+// {ext|hello {|world|}|ext}, ...).
+// The current implementation places practically no restrictions on the length
+// of string literals.
+
+
+// Naming labels
+// -------------
+// 
+// To avoid ambiguities, naming labels in expressions cannot just be defined
+// syntactically as the sequence of the three tokens ~, ident and :, and have to
+// be defined at the lexical level.
+
+sorts Label Optlabel
+lexical syntax
+  LabelName = LowercaseIdent
+  Label     = [\~] LabelName [\:]
+  Optlabel  = [\?] LabelName [\:]
+  
+// Naming labels come in two flavours: label for normal arguments and optlabel
+// for optional ones. They are simply distinguished by their first character,
+// either ~ or ?.
+// Despite label and optlabel being lexical entities in expressions, their
+// expansions ~ label-name : and ? label-name : will be used in grammars, for the
+// sake of readability. Note also that inside type expressions, this expansion can
+// be taken literally, i.e. there are really 3 tokens, with optional blanks
+// between them.
+
+// Prefix and infix symbols
+// ------------------------
+
+sorts InfixSymbol PrefixSymbol OperatorChar CoreOperatorChar
+lexical syntax
+  InfixSymbol      = (CoreOperatorChar | [\%\<]) OperatorChar*
+  InfixSymbol      = [\#] OperatorChar+
+
+  PrefixSymbol     = [\!] OperatorChar*
+  PrefixSymbol     = [\?\~] OperatorChar+
+
+  OperatorChar     = CoreOperatorChar | [\~\!\?\%\<\:\.]
+
+  CoreOperatorChar = [\$\&\*\+\-\/\=\>\@\^\|]
+  
+// See also the following language extensions: extension operators, extended
+// indexing operators, and binding operators.
+// Sequences of operator characters, such as <=> or !!, are read as a
+// single token from the infix-symbol or prefix-symbol class. These symbols are
+// parsed as prefix and infix operators inside expressions, but otherwise behave
+// like normal identifiers.
+
+// Keywords
+// --------
+// 
+// The identifiers below are reserved as keywords, and cannot be employed
+// otherwise:
+// <<      and         as          assert      asr         begin       class
+// constraint  do          done        downto      else        end
+// exception   external    false       for         fun         function
+// functor     if          in          include     inherit     initializer
+// land        lazy        let         lor         lsl         lsr
+// lxor        match       method      mod         module      mutable
+// new         nonrec      object      of          open        or
+// private     rec         sig         struct      then        to
+// true        try         type        val         virtual     when
+// while       with
+// >>
+// 
+// The following character sequences are also keywords:
+// <<
+// !=    #     &     &&    '     (     )     *     +     ,     -
+// -.    ->    .     ..    .~    :     ::    :=    :>    ;     ;;
+// <     <-    "="     >     >]    >}    ?     [     [<    [>    [|
+// ]     _     `     {     {<    |     |]    ||    }     ~
+// >>
+// Note that the following identifiers are keywords of the Camlp4 extensions
+// and should be avoided for compatibility reasons.
+// <<    parser    value    $     $$    $:    <:    <<    >>    ??
+// >>
+
+// Ambiguities
+// -----------
+// 
+// Lexical ambiguities are resolved according to the longest match rule:
+// when a character sequence can be decomposed into two tokens in several
+// different ways, the decomposition retained is the one with the longest first
+// token.
+// 
+// 
+// Line number directives
+// ----------------------
+
+sorts LinenumDirective
+lexical syntax
+  LinenumDirective = [\#] [0-9]+
+  LinenumDirective = [\#] [0-9]+ [\"] StringCharacter* [\"]
+  
+  LAYOUT = LinenumDirective
+
+// Preprocessors that generate OCaml source code can insert line number
+// directives in their output so that error messages produced by the compiler
+// contain line numbers and file names referring to the source file before
+// preprocessing, instead of after preprocessing. A line number directive is
+// composed of a # (sharp sign), followed by a positive integer (the source line
+// number), optionally followed by a character string (the source file name). Line
+// number directives are treated as blanks during lexical analysis.

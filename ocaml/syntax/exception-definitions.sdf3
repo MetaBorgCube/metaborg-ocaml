@@ -1,0 +1,18 @@
+module exception-definitions
+
+imports lex values type-definitions
+
+// 7.8.2  Exception definitions
+// ============================
+
+sorts ExceptionDefinition
+context-free syntax
+  ExceptionDefinition.ExceptionDefinition0 = "exception" ConstrDecl
+  ExceptionDefinition.ExceptionDefinition1 = "exception" ConstrName "=" Constr
+  
+// Exception definitions add new constructors to the built-in variant type exn
+// of exception values. The constructors are declared as for a definition of a
+// variant type.
+// The form exception constr-decl generates a new exception, distinct from all
+// other exceptions in the system. The form exception constr-name =  constr gives
+// an alternate name to an existing exception.
