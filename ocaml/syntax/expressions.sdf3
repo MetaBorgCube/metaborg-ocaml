@@ -130,7 +130,7 @@ context-free syntax // let bindings
   Expr.LetRec    = "let" "rec" {LetBinding "and"}+ "in" Expr
   Expr.LetExc    = "let" "exception" ConstrDecl "in" Expr
   
-  LetBinding.LetBinding3 = Pattern "=" Expr
+  LetBinding.LetBinding = Pattern "=" Expr
   
   LetBinding.LetBinding4 = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
   LetBinding.LetBinding5 = ValueName Parameter*              ":>" Typexpr "=" Expr
