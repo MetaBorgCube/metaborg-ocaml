@@ -30,13 +30,16 @@ imports lex module-expressions
 // --------------
 
 sorts ValueName
-context-free syntax
-  ValueName.Id     = LowercaseIdent
-  ValueName.OpName = "(" OperatorName ")"
+lexical syntax
+  ValueName = LowercaseIdent
+  ValueName = "(" OperatorName ")"
+  ValueName = "_" {reject} // overlap with patterns (TODO: check)
+  
 sorts OperatorName
 context-free syntax
   OperatorName.OperatorName8 = PrefixSymbol
   OperatorName.OperatorName9 = InfixOp
+  
 sorts InfixOp
 context-free syntax
   InfixOp.InfixOp84 = InfixSymbol
@@ -60,34 +63,43 @@ context-free syntax
   InfixOp.InfixOp102 = "lsl"
   InfixOp.InfixOp103 = "lsr"
   InfixOp.InfixOp104 = "asr"
+  
 sorts ConstrName
 context-free syntax
-  ConstrName.ConstrName3 = CapitalizedIdent
+  ConstrName = CapitalizedIdent
+  
 sorts TagName TagNameQ
-context-free syntax
+lexical syntax
   TagName = CapitalizedIdent
   TagNameQ.TagName = "'" TagName
+  
 sorts TypeconstrName
-context-free syntax
-  TypeconstrName.TypeconstrName3 = LowercaseIdent
+lexical syntax
+  TypeconstrName = LowercaseIdent
+  
 sorts FieldName
-context-free syntax
-  FieldName.FieldName3 = LowercaseIdent
+lexical syntax
+  FieldName = LowercaseIdent
+  
 sorts ModuleName
-context-free syntax
-  ModuleName.ModuleName3 = CapitalizedIdent
+lexical syntax
+  ModuleName = CapitalizedIdent
+  
 sorts ModtypeName
-context-free syntax
-  ModtypeName.ModtypeName3 = Ident
+lexical syntax
+  ModtypeName = Ident
+  
 sorts ClassName
-context-free syntax
-  ClassName.ClassName3 = LowercaseIdent
+lexical syntax
+  ClassName = LowercaseIdent
+  
 sorts InstVarName
-context-free syntax
-  InstVarName.InstVarName3 = LowercaseIdent
+lexical syntax
+  InstVarName = LowercaseIdent
+  
 sorts MethodName
-context-free syntax
-  MethodName.MethodName3 = LowercaseIdent
+lexical syntax
+  MethodName = LowercaseIdent
   
  
 // Referring to named objects
@@ -99,11 +111,13 @@ context-free syntax
   
 sorts Constr
 context-free syntax
-  Constr.Constr2 = ModulePathPref? ConstrName
+  Constr.Constr  = ConstrName
+  Constr.ConstrQ = ModulePathPref ConstrName
   
 sorts Typeconstr
 context-free syntax
-  Typeconstr.Typeconstr0 = ExtendedModulePathPref? TypeconstrName
+  Typeconstr.TypeConstr  =                        TypeconstrName
+  Typeconstr.TypeConstrQ = ExtendedModulePathPref TypeconstrName
   
 sorts Field
 context-free syntax
