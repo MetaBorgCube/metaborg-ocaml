@@ -1,8 +1,109 @@
-module compilation-units
+module lex
 
 language ocaml
 
-test foo [[
+start symbol Expr
 
+// layout
+
+test comment [[  
+  1 (* this is a (* nested *) comment *) 
+]] parse succeeds
+
+
+// identifiers
+
+test identifier [[  
+  abc
+]] parse succeeds
+
+test keyword [[  
+  for + 3
+]] parse fails
+
+// integer literals
+
+test integer constant [[  
+  1
+]] parse succeeds
+
+test integer constant [[  
+  134526
+]] parse succeeds
+
+test integer constant [[  
+  1345asd
+]] parse fails
+
+
+// floating point numbers
+
+test dec float constant [[  
+  -1.03e34
+]] parse succeeds
+
+test hex float constant [[  
+  -0x134.7e3A 
+]] parse succeeds
+
+test hex float constant [[  
+  -0x134.7e3A 
+]] parse succeeds
+
+test hex float constant [[  
+  -0x134.7Ap3
+]] parse succeeds
+
+test wrong hex float constant [[  
+  -0x134.7p3A 
+]] parse fails
+
+
+// character literals
+
+test character literal [[  
+  'a'
+]] parse succeeds
+
+test character literal [[  
+  '\n'
+]] parse succeeds
+
+test character literal [[  
+  '\\'
+]] parse succeeds
+
+test character literal [[  
+  '\127'
+]] parse succeeds
+
+test character literal [[  
+  'aa'
+]] parse fails
+
+
+// string literals
+
+test string literal [[  
+  "-0x134.7p3A" 
+]] parse succeeds
+
+test string literal [[  
+  "abc\ndef gh" 
+]] parse succeeds
+
+test multi-line string literal [[  
+  "abc\
+  def" 
+]] parse succeeds
+
+
+// line number directives
+
+
+
+test line number directives [[  
+  #501 "foo bar"
+  1
 ]] parse succeeds
 
