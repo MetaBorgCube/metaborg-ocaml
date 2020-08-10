@@ -36,17 +36,26 @@ test tuple [[
   (1, (2, (3, 4), 5)), 6
 ]]
 
+
 // function application
 
 test function application [[ 
   expr  argument_1 argument_2  argument_n
 ]] parse succeeds
 
+test function application [[  
+  f Blue 10
+]] parse succeeds
+
+test constructor / function application [[ 
+  Blue f 10
+]] parse succeeds
+
 test function application [[ 
   f 1 a b
 ]] parse succeeds
 
-test function application [[ 
+test function application [[  
   (f 1 a) b
 ]] parse succeeds
 
@@ -63,9 +72,13 @@ test argument labels [[
 ]] parse succeeds
 
 test argument labels [[ 
-  mkcoord ?y: ~x: ?color:Blue 
+  mkcoord ?y ~x ?color:Blue   
 ]] parse succeeds
 
+test argument labels [[ 
+  mkcoord ?color:Blue 10   
+]] parse succeeds
+ 
 test labels are lexical [[ 
   mkcoord ? y:3 ?x :1 
 ]] parse fails
@@ -73,7 +86,7 @@ test labels are lexical [[
 
 // function definition
 
-test function definition [[  
+test function definition [[   
   function x -> x
          | y -> y
 ]] parse succeeds
@@ -131,7 +144,7 @@ test tuple [[
   (1, (2, (3, 4), 5)), 6
 ]]
 
-test ascription [[ 
+test ascription [[  
   (1, 2, true : int * int * int)
 ]] parse succeeds
 

@@ -1,0 +1,67 @@
+module operators
+
+language ocaml
+
+start symbol Expr
+
+test operators [[ 
+  x + y + z
+]] parse to [[
+  (x + y) + z
+]]
+
+test operators [[  
+  x + y * z
+]] parse to [[
+  x + (y * z)
+]] 
+
+test operators [[ 
+  x + y * z ** a
+]] parse to [[
+  x + (y * (z ** a))
+]] 
+
+test operators [[  
+  x + y * z ** a
+]] parse to [[
+  x + (y * (z ** a))
+]] 
+
+test operators [[ 
+  x + - y * -.z ** a
+]] parse to [[
+  x + ((-y) * ((-.z) ** a))
+]]  
+
+test operators [[ 
+  g x y := f x ++ map f xs
+]] parse to [[
+  (g x y) := ((f x) ++ (map f xs))
+]]  
+
+test operators [[  
+  2 / 0 ** 1
+]] parse to [[ 
+  2 / (0 ** 1)
+]]  
+
+
+test operators [[ 
+  x / 7 mod 3 + z % 3 - 4 
+]] parse to [[
+  ((((x / 7) mod 3) + (z % 3)) - 4)
+]] 
+
+test operators [[  
+  x / 7 mod 3 + z % 3 - 4 != 5 && false
+]] parse to [[
+  (((((x / 7) mod 3) + (z % 3)) - 4) != 5) && false
+]] 
+
+test operators [[  
+  true && false or false & true || false
+]] parse to [[ 
+  (true && false) or ((false & true) || false)
+]]  
+
