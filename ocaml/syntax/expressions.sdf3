@@ -8,206 +8,47 @@ aux
 // 7.7  Expressions
 // *=*=*=*=*=*=*=*=
 
-sorts Expr
-context-free syntax
-  Expr        = "(" Expr ")"       {bracket}
-  Expr        = "begin" Expr "end" {bracket}
- 
+// 7.7.1  Precedence and associativity
+// ========================
 
-context-free syntax // basic expressions 
-
-  Expr.Var    = ValuePath
-  Expr.Const  = Constant
-  Expr.Ascr   = "(" Expr ":" Typexpr ")"
-  
-  Expr.Tup    = Expr "," {Expr ","}+
-  
-  Expr.CApp   = Constr Expr 
-  
-  Expr.Expr58 = TagNameQ Expr
-  
-context-free syntax // list expressions 
-
-  Expr.Cns    = Expr "::" Expr
-  
-  Expr.List   = "[" {Expr ";"}+ OptSemicolon "]"
-  
-  Expr.Array  = "[|" {Expr ";"}+ OptSemicolon "|]"
-  
-
-context-free syntax // record expressions 
-
-  Expr.Record  = "{"             {FieldInit ";"}+ OptSemicolon "}"
-  Expr.RecordW = "{" Expr "with" {FieldInit ";"}+ OptSemicolon "}"
-                
-  FieldInit.FieldInit1 = Field ":" Typexpr "=" Expr 
-  FieldInit.FieldInit2 = Field             "=" Expr
-  FieldInit.FieldInit3 = Field ":" Typexpr 
-  FieldInit.FieldInit4 = Field  
-  
-  Expr.Proj      = Expr "." Field 
-  Expr.Expr70    = Expr "." Field "<-" Expr
-  Expr.Expr71    = Expr "." "(" Expr ")"
-  Expr.Expr72    = Expr "." "(" Expr ")" "<-" Expr
-  Expr.Expr73    = Expr "." "[" Expr "]"
-  Expr.Expr74    = Expr "." "[" Expr "]" "<-" Expr
-  
-context-free syntax // record expressions 
-
-
-  Expr.PrefixApp = PrefixSymbol Expr
-  Expr.Expr66    = "-" Expr
-  Expr.Expr67    = "-." Expr
-  Expr.Expr68    = Expr InfixOp Expr
-  
-  
-context-free syntax // control-flow expressions 
-
-  Expr.IfT       = "if" Expr "then" Expr 
-  Expr.IfE       = "if" Expr "then" Expr "else" Expr
-  
-  Expr.While     = "while" Expr "do" Expr "done"
-  
-  Expr.For       = "for" ValueName "=" Expr Dir Expr "do" Expr "done"
-  Dir.To         = "to"
-  Dir.DownTo     = "downto"
-  
-  Expr.Seq       = Expr ";" Expr
-
-  Expr.Assert    = "assert" Expr
-  Expr.Lazy      = "lazy" Expr
- 
-context-free syntax // pattern matching expressions
-
-  Expr.Function  = "function" PatternMatching
-  Expr.Match     = "match" Expr "with" PatternMatching
-  Expr.TryWith   = "try" Expr "with" PatternMatching
-  
-sorts PatternMatching
-context-free syntax
-  PatternMatching.PatMatch = OptBar {MatchCase "|"}+
-  
-  MatchCase.MatchCase      = Pattern             "->" Expr 
-  MatchCase.MatchCaseGuard = Pattern "when" Expr "->" Expr
-lexical syntax
-  OptBar = "|"?
-  
-sorts Argument 
-context-free syntax // function application
-  Expr.App             = Expr Argument+
-  
-  Argument.Arg         = Expr
-  Argument.LabeledArg1 = "~" LabelName
-  Argument.LabeledArg2 = "~" LabelName ":" Expr
-  Argument.LabeledArg3 = "?" LabelName
-  Argument.LabeledArg4 = "?" LabelName ":" Expr
- 
-context-free syntax // function literals 
-
-  Expr.FunTyped  = "fun" Parameter+ ":" Typexpr "->" Expr
-  Expr.Fun       = "fun" Parameter+             "->" Expr
-  
-sorts Parameter
-context-free syntax
-  Parameter.Parameter32 = Pattern
-  
-  Parameter.Parameter33 = "~" LabelName
-  Parameter.Parameter34 = "~" "(" LabelName ":" Typexpr ")"
-  Parameter.Parameter34 = "~" "(" LabelName             ")"
-  Parameter.Parameter35 = "~" LabelName ":" Pattern
-  
-  Parameter.Parameter36 = "?" LabelName
-  Parameter.Parameter37 = "?" "(" LabelName ":" Typexpr "=" Expr ")"
-  Parameter.Parameter37 = "?" "(" LabelName             "=" Expr ")"
-  Parameter.Parameter37 = "?" "(" LabelName ":" Typexpr          ")"
-  
-  Parameter.Parameter38 = "?" LabelName ":" Pattern
-  Parameter.Parameter39 = "?" LabelName ":" "(" Pattern ":" Typexpr "=" Expr ")"
-  Parameter.Parameter39 = "?" LabelName ":" "(" Pattern             "=" Expr ")"
-  Parameter.Parameter39 = "?" LabelName ":" "(" Pattern ":" Typexpr          ")"
-  
-sorts LetBinding
-context-free syntax // let bindings
-  
-  Expr.Let       = "let"       {LetBinding "and"}+ "in" Expr
-  Expr.LetRec    = "let" "rec" {LetBinding "and"}+ "in" Expr
-  Expr.LetExc    = "let" "exception" ConstrDecl "in" Expr
-  
-  LetBinding.LetBinding = Pattern "=" Expr
-  
-  LetBinding.LetBinding4 = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
-  LetBinding.LetBinding5 = ValueName Parameter*              ":>" Typexpr "=" Expr
-  LetBinding.LetBinding6 = ValueName Parameter* ":" Typexpr               "=" Expr
-  
-  LetBinding.LetBinding5 = ValueName ":" PolyTypexpr "=" Expr
-  
-context-free syntax // object expressions
-
-  Expr.New       = "new" ClassPath
-  Expr.Object    = "object" ClassBody "end"
-  Expr.Expr87    = Expr "#" MethodName
-  
-  Expr.Expr88    = InstVarName
-  Expr.Expr89    = InstVarName "<-" Expr
-  
-  Expr.Expr90    = "(" Expr ":>" Typexpr ")"
-  Expr.Expr91    = "(" Expr ":" Typexpr ":>" Typexpr ")"
-  
-  
-  Expr.Expr92    = "{<" {InstVar ";"}* OptSemicolon ">}"
-                 
-  InstVar.InstVarInit = InstVarName "=" Expr
-  InstVar.InstVar     = InstVarName  
- 
- 
-context-free syntax // module expressions 
-  
-  Expr.LetModule = "let" "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr "in" Expr
-  Expr.LetModule = "let" "module" ModuleName ModParam*                "=" ModuleExpr "in" Expr
-  
-  ModParam.ModParam = "(" ModuleName ":" ModuleType ")"
-  
-  Expr.LetOpen   = "let" "open" ModulePath "in" Expr
-  
-  
-  Expr.Expr97 = ModulePath "." "(" Expr ")"
-  Expr.Expr98 = ModulePath "." "[" Expr "]"
-  Expr.Expr99 = ModulePath "." "[|" Expr "|]"
-  Expr.Expr100 = ModulePath "." "{" Expr "}"
-  Expr.Expr101 = ModulePath "." "{<" Expr ">}"
-  
-context-free priorities 
-
-
-
-
-  
-  
-
-  
+context-free priorities
+  Expr.PrefixApp
+  > {Argument.Arg Argument.LabeledArg Argument.OptArg}
+  > {left: Expr.App Expr.ConApp Expr.Assert Expr.Lazy}
+  > {Expr ","}+ = Expr 
+  > {Expr ","}+ = {Expr ","}+ "," Expr
+  > Expr.Tuple 
+  > {Expr.Let Expr.LetRec Expr.Match Expr.Fun Expr.Function Expr.Try}
 
 // 7.7.2  Basic expressions
 // ========================
-// 
-// 
-// 
+
 // Constants
 // ---------
-// 
+
+context-free syntax 
+  Expr.Const = Constant
+  
 // An expression consisting in a constant evaluates to this constant.
-// 
-// 
+
 // Value paths
 // -----------
-// 
+
+context-free syntax
+  Expr.Var = ValuePath
+  
 // An expression consisting in an access path evaluates to the value bound to
 // this path in the current evaluation environment. The path can be either a value
 // name or an access path to a value component of a module.
-// 
-// 
+
 // Parenthesized expressions
 // -------------------------
-// 
+
+sorts Expr
+context-free syntax
+  Expr = "(" Expr ")"       {bracket}
+  Expr = "begin" Expr "end" {bracket}
+  
 // The expressions ( expr ) and begin expr end have the same value as expr. The
 // two constructs are semantically equivalent, but it is good style to use begin
 // ... end inside control structures:
@@ -220,11 +61,28 @@ context-free priorities
 // typexpr.
 // Parenthesized expressions can also contain coercions ( expr  [: typexpr] :>
 // typexpr) (see subsection 7.7.7 below).
-// 
-// 
+
+
 // Function application
 // --------------------
-// 
+
+sorts Argument 
+lexical syntax
+context-free syntax 
+  Expr.App             = Expr Argument+ {longest-match}
+  Argument.Arg         =           Expr
+  Argument.LabeledArgE = LabelE 
+  Argument.LabeledArg  = Label     Expr  
+  Argument.OptArgE     = OptLabelE  
+  Argument.OptArg      = OptLabel  Expr 
+  // TODO: check if : is required when Expr is left out in labeled argument
+context-free priorities  
+  // nested applications require parentheses
+  Expr.App             <0> .> {Expr.App Expr.Const}, // TODO: check ambiguity between argument and constructor app
+  Argument.Arg         <0> .> {Expr.App Expr.ConApp},  
+  {Argument.LabeledArg 
+   Argument.OptArg }   <1> .> {Expr.App Expr.ConApp}
+  
 // Function application is denoted by juxtaposition of (possibly labeled)
 // expressions. The expression expr  argument_1 ...  argument_n evaluates the
 // expression expr and those appearing in argument_1 to argument_n. The expression
@@ -252,20 +110,40 @@ context-free priorities
 // parameters, the function type should be known at the application point. This
 // can be ensured by adding a type constraint. Principality of the derivation can
 // be checked in the -principal mode.
-// 
-// 
+
 // Function definition
 // -------------------
-// 
+
+sorts Parameter 
+context-free syntax 
+  Expr.Function  = "function" PatternMatching
+  Expr.FunTyped  = "fun" Parameter+ ":" Typexpr "->" Expr
+  Expr.Fun       = "fun" Parameter+             "->" Expr
+  
+  Parameter.ParamPat = Pattern
+  
+  Parameter.Param1  = "~" LabelName
+  Parameter.Param2  = "~" "(" LabelName ":" Typexpr ")"
+  Parameter.Param3  = "~" "(" LabelName             ")"
+  Parameter.Param4  = "~" LabelName ":" Pattern
+  
+  Parameter.Param5  = "?" LabelName
+  Parameter.Param6  = "?" "(" LabelName ":" Typexpr "=" Expr ")"
+  Parameter.Param7  = "?" "(" LabelName             "=" Expr ")"
+  Parameter.Param8  = "?" "(" LabelName ":" Typexpr          ")"
+  
+  Parameter.Param9  = "?" LabelName ":" Pattern
+  Parameter.Param10 = "?" LabelName ":" "(" Pattern ":" Typexpr "=" Expr ")"
+  Parameter.Param11 = "?" LabelName ":" "(" Pattern             "=" Expr ")"
+  Parameter.Param12 = "?" LabelName ":" "(" Pattern ":" Typexpr          ")"
+  
 // Two syntactic forms are provided to define functions. The first form is
 // introduced by the keyword function:
 // 
-// function pattern  -> expr
-// 			 1        1
+// function pattern_1  -> expr_1
 // | ...
-// 
-// | pattern  -> expr
-// 			 n        n
+// | pattern_n  -> expr_n
+//
 // This expression evaluates to a functional value with one argument. When this
 // function is applied to a value v, this value is matched against each pattern
 // pattern_1 to pattern_n. If one of these matchings succeeds, that is, if the
@@ -276,7 +154,6 @@ context-free priorities
 // If several patterns match the argument v, the one that occurs first in the
 // function definition is selected. If none of the patterns matches the argument,
 // the exception Match_failure is raised.
-// 
 // 
 // The other form of function definition is introduced by the keyword fun:
 // fun parameter_1 ...  parameter_n ->  expr
@@ -314,22 +191,25 @@ context-free priorities
 // pattern_n. If the matching succeeds, the function returns the value of expr in
 // an environment enriched by the bindings performed during the matchings. If the
 // matching fails, the exception Match_failure is raised.
-// 
-// 
+
 // Guards in pattern-matchings
 // ---------------------------
-// 
+
+sorts PatternMatching 
+context-free syntax 
+  PatternMatching.PatMatch = OptBar {MatchCase "|"}+ {longest-match}
+  
+  MatchCase.MatchCase      = Pattern             "->" Expr 
+  MatchCase.MatchCaseGuard = Pattern "when" Expr "->" Expr
+  
 // The cases of a pattern matching (in the function, match and try constructs)
 // can include guard expressions, which are arbitrary boolean expressions that
 // must evaluate to true for the match case to be selected. Guards occur just
 // before the -> token and are introduced by the when keyword:
 // 
-// function pattern    [when   cond ]  -> expr
-// 1               1          1
+// function pattern    [when   cond1 ]  -> expr1
 // | ...
-// 
-// | pattern     [when   cond ] -> expr
-// n                n         n
+// | patternn     [when   condn ] -> exprn
 // 
 // Matching proceeds as described before, except that if the value matches some
 // pattern pattern_i which has a guard cond_i, then the expression cond_i is
@@ -337,12 +217,25 @@ context-free priorities
 // matching). If cond_i evaluates to true, then expr_i is evaluated and its value
 // returned as the result of the matching, as usual. But if cond_i evaluates to
 // false, the matching is resumed against the patterns following pattern_i.
-// 
-// 
+
+
 // Local definitions
 // -----------------
-// 
-// 
+
+sorts LetBinding
+context-free syntax // let bindings
+  Expr.Let       = "let"       {LetBinding "and"}+ "in" Expr
+  Expr.LetRec    = "let" "rec" {LetBinding "and"}+ "in" Expr
+  Expr.LetExc    = "let" "exception" ConstrDecl "in" Expr
+  
+  LetBinding.LetBinding = Pattern "=" Expr
+  
+  LetBinding.LetBinding4 = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
+  LetBinding.LetBinding5 = ValueName Parameter*              ":>" Typexpr "=" Expr
+  LetBinding.LetBinding6 = ValueName Parameter* ":" Typexpr               "=" Expr
+  
+  LetBinding.LetBinding5 = ValueName ":" PolyTypexpr "=" Expr
+  
 // The let and let rec constructs bind value names locally. The construct
 // let pattern_1 =  expr_1 and ... and  pattern_n =  expr_n in  expr
 // evaluates expr_1 ...  expr_n in some unspecified order and matches their
@@ -351,6 +244,7 @@ context-free priorities
 // matching, and the value of expr is returned as the value of the whole let
 // expression. If one of the matchings fails, the exception Match_failure is
 // raised.
+//
 // An alternate syntax is provided to bind variables to functional values:
 // instead of writing
 // let ident = fun  parameter_1 ...  parameter_m ->  expr
@@ -388,6 +282,7 @@ context-free priorities
 // allow one to use this polymorphism in recursive occurrences (when using let
 // rec). Note however that this is a normal polymorphic type, unifiable with any
 // instance of itself.
+//
 // It is possible to define local exceptions in expressions:  let exception
 // constr-decl in  expr  . The syntactic scope of the exception constructor is
 // the inner expression, but nothing prevents exception values created with this
@@ -397,32 +292,42 @@ context-free priorities
 // <<  let gen () = let exception A in A
 // let () = assert(gen () <> gen ())
 // >>
-// 
-// 
+
+
 // 7.7.3  Control structures
 // =========================
-// 
-// 
-// 
+
 // Sequence
 // --------
-// 
+
+context-free syntax
+  Expr.Seq       = Expr ";" Expr
+  
 // The expression expr_1 ;  expr_2 evaluates expr_1 first, then expr_2, and
 // returns the value of expr_2.
-// 
-// 
+
+
 // Conditional
 // -----------
-// 
+
+context-free syntax
+  Expr.IfT       = "if" Expr "then" Expr 
+  Expr.IfE       = "if" Expr "then" Expr "else" Expr
+   
 // The expression if expr_1 then  expr_2 else  expr_3 evaluates to the value of
 // expr_2 if expr_1 evaluates to the boolean true, and to the value of expr_3 if
 // expr_1 evaluates to the boolean false.
 // The else expr_3 part can be omitted, in which case it defaults to else ().
-// 
-// 
+
+
 // Case expression
 // ---------------
-// 
+
+context-free syntax 
+  Expr.Match = "match" Expr "with" PatternMatching
+  
+
+  
 // The expression
 // match expr
 // 
@@ -439,8 +344,7 @@ context-free priorities
 // performed during matching. If several patterns match the value of expr, the one
 // that occurs first in the match expression is selected. If none of the patterns
 // match the value of expr, the exception Match_failure is raised.
-// 
-// 
+
 // Boolean operators
 // -----------------
 // 
@@ -460,11 +364,23 @@ context-free priorities
 // 
 // The boolean operators & and or are deprecated synonyms for (respectively) &&
 // and ||.
-// 
-// 
+
+context-free syntax
+  Expr.And = Expr "&&" Expr {right} 
+  Expr.Or  = Expr "||" Expr {right} 
+  Expr.And = Expr "&"  Expr {right, deprecated}
+  Expr.Or  = Expr "or" Expr {right, deprecated}
+
 // Loops
 // -----
-// 
+
+context-free syntax
+  Expr.While     = "while" Expr "do" Expr "done"
+  
+  Expr.For       = "for" ValueName "=" Expr Dir Expr "do" Expr "done"
+  Dir.To         = "to"
+  Dir.DownTo     = "downto"
+  
 // The expression while expr_1 do  expr_2 done repeatedly evaluates expr_2
 // while expr_1 evaluates to true. The loop condition expr_1 is evaluated and
 // tested at the beginning of each iteration. The whole while ... done expression
@@ -482,6 +398,9 @@ context-free priorities
 // Exception handling
 // ------------------
 
+context-free syntax 
+  Expr.Try = "try" Expr "with" PatternMatching
+  
 // The expression
 // try  expr
 // 
@@ -501,8 +420,7 @@ context-free priorities
 // of expr, the one that occurs first in the try expression is selected. If none
 // of the patterns matches the value of expr, the exception value is raised again,
 // thereby transparently passing through the try construct.
-// 
-// 
+
 // 7.7.4  Operations on data structures
 // ====================================
 // 
@@ -510,15 +428,24 @@ context-free priorities
 // 
 // Products
 // --------
-// 
+
+context-free syntax 
+  Expr.Tuple = {Expr ","}+
+context-free priorities
+  Expr.Tuple <0> .> {Expr ","}+ = Expr
+  
 // The expression expr_1 , ... ,  expr_n evaluates to the n-tuple of the values
 // of expressions expr_1 to expr_n. The evaluation order of the subexpressions is
 // not specified.
-// 
-// 
+
+
+  
 // Variants
 // --------
-// 
+
+context-free syntax
+  Expr.ConApp = Constr Expr  
+  
 // The expression constr  expr evaluates to the unary variant value whose
 // constructor is constr, and whose argument is the value of expr. Similarly, the
 // expression constr (  expr_1 , ... ,  expr_n ) evaluates to the n-ary variant
@@ -527,24 +454,47 @@ context-free priorities
 // The expression constr ( expr_1, ...,  expr_n) evaluates to the variant value
 // whose constructor is constr, and whose arguments are the values of expr_1 ...
 // expr_n.
+
+context-free syntax
+  Expr.Cns  = Expr "::" Expr  
+  Expr.List = "[" {Expr ";"}+ OptSemicolon "]" 
+  
 // For lists, some syntactic sugar is provided. The expression expr_1 ::  expr_2
 // stands for the constructor ( :: )  applied to the arguments ( expr_1 ,  expr_2
 // ), and therefore evaluates to the list whose head is the value of expr_1 and
 // whose tail is the value of expr_2. The expression [ expr_1 ; ... ;  expr_n ] is
 // equivalent to expr_1 :: ... ::  expr_n :: [], and therefore evaluates to the
 // list whose elements are the values of expr_1 to expr_n.
-// 
-// 
+ 
 // Polymorphic variants
 // --------------------
-// 
+
+context-free syntax 
+  Expr.TagApp = TagNameQ Expr
+  
 // The expression `tag-name  expr evaluates to the polymorphic variant value
 // whose tag is tag-name, and whose argument is the value of expr.
-// 
-// 
+ 
 // Records
 // -------
-// 
+
+context-free syntax // record expressions 
+
+  Expr.Record  = "{"             {FieldInit ";"}+ OptSemicolon "}"
+  Expr.RecordW = "{" Expr "with" {FieldInit ";"}+ OptSemicolon "}"
+                
+  FieldInit.FieldInit1 = Field ":" Typexpr "=" Expr 
+  FieldInit.FieldInit2 = Field             "=" Expr
+  FieldInit.FieldInit3 = Field ":" Typexpr 
+  FieldInit.FieldInit4 = Field  
+  
+  Expr.Proj      = Expr "." Field 
+  Expr.Expr70    = Expr "." Field "<-" Expr
+  Expr.Expr71    = Expr "." "(" Expr ")"
+  Expr.Expr72    = Expr "." "(" Expr ")" "<-" Expr
+  Expr.Expr73    = Expr "." "[" Expr "]"
+  Expr.Expr74    = Expr "." "[" Expr "]" "<-" Expr
+  
 // The expression { field_1  [= expr_1] ; ... ;  field_n  [= expr_n ]} evaluates
 // to the record value { field_1 = v_1; ...; field_n = v_n } where v_i is the
 // value of expr_i for i = 1,... , n. A single identifier field_k stands for
@@ -573,11 +523,14 @@ context-free priorities
 // this record by the value of expr_2. This operation is permitted only if field
 // has been declared mutable in the definition of the record type. The whole
 // expression expr_1 .  field <-  expr_2 evaluates to the unit value ().
-// 
-// 
+
 // Arrays
 // ------
-// 
+
+
+context-free syntax
+  Expr.Array  = "[|" {Expr ";"}+ OptSemicolon "|]"
+   
 // The expression [| expr_1 ; ... ;  expr_n |] evaluates to a n-element array,
 // whose elements are initialized with the values of expr_1 to expr_n
 // respectively. The order in which these expressions are evaluated is
@@ -590,8 +543,7 @@ context-free priorities
 // denoted by expr_1, replacing element number expr_2 by the value of expr_3. The
 // exception Invalid_argument is raised if the access is out of bounds. The value
 // of the whole expression is ().
-// 
-// 
+
 // Strings
 // -------
 // 
@@ -606,22 +558,29 @@ context-free priorities
 // Note: this possibility is offered only for backward compatibility with older
 // versions of OCaml and will be removed in a future version. New code should use
 // byte sequences and the Bytes.set function.
-// 
-// 
+
 // 7.7.5  Operators
 // ================
-// 
+
+context-free syntax 
+  Expr.PrefixApp = PrefixSymbol Expr
+  Expr.Expr66    = "-" Expr
+  Expr.Expr67    = "-." Expr
+  Expr.Expr68    = Expr InfixOp Expr
+  
 // Symbols from the class infix-symbol, as well as the keywords *, +, -, -., =,
 // !=, <, >, or, ||, &, &&, :=, mod, land, lor, lxor, lsl, lsr, and asr can appear
 // in infix position (between two expressions). Symbols from the class
 // prefix-symbol, as well as the keywords - and -. can appear in prefix position
 // (in front of an expression).
+//
 // Infix and prefix symbols do not have a fixed meaning: they are simply
 // interpreted as applications of functions bound to the names corresponding to
 // the symbols. The expression prefix-symbol  expr is interpreted as the
 // application ( prefix-symbol )  expr. Similarly, the expression expr_1
 // infix-symbol  expr_2 is interpreted as the application ( infix-symbol )
 // expr_1  expr_2.
+//
 // The table below lists the symbols defined in the initial environment and
 // their initial meaning. (See the description of the core library module Stdlib
 // in chapter 24 for more details). Their meaning may be changed at any time using
@@ -687,23 +646,30 @@ context-free priorities
 // 
 // 7.7.6  Objects
 // ==============
-// 
-// 
-// 
+
+context-free syntax 
+  Expr.New    = "new" ClassPath
+  Expr.Object = "object" ClassBody "end"
+  Expr.Invoke = Expr "#" MethodName
+  Expr.Assign = InstVarName "<-" Expr  
+  Expr.Clone  = "{<" {InstVar ";"}* OptSemicolon ">}"
+
+  InstVar.InstVarInit = InstVarName "=" Expr
+  InstVar.InstVar     = InstVarName  
+  
+//Expr.Var    = InstVarName // overlaps with ValuePath // TODO: check 
+  
 // Object creation
 // ---------------
-// 
 // 
 // When class-path evaluates to a class body, new class-path evaluates to a new
 // object containing the instance variables and methods of this class.
 // When class-path evaluates to a class function, new class-path evaluates to a
 // function expecting the same number of arguments and returning a new object of
 // this class.
-// 
-// 
+//  
 // Immediate object creation
 // -------------------------
-// 
 // 
 // Creating directly an object through the object class-body end construct is
 // operationally equivalent to defining locally a class class-name = object
@@ -714,7 +680,6 @@ context-free priorities
 // defining a class in two respects. First, the inferred object type may contain
 // free type variables. Second, since the class body of an immediate object will
 // never be extended, its self type can be unified with a closed object type.
-// 
 // 
 // Method invocation
 // -----------------
@@ -737,7 +702,6 @@ context-free priorities
 // value of expr to the instance variable inst-var-name, which must be mutable.
 // The whole expression inst-var-name <-  expr evaluates to ().
 // 
-// 
 // Object duplication
 // ------------------
 // 
@@ -747,11 +711,14 @@ context-free priorities
 // variables replaced by the values of the associated expressions. A single
 // instance variable name id stands for id =  id. Other instance variables have
 // the same value in the returned object as in self.
-// 
-// 
+
 // 7.7.7  Coercions
 // ================
-// 
+
+context-free syntax 
+  Expr.CoerceTo     = "(" Expr ":>" Typexpr ")"
+  Expr.CoerceFromTo = "(" Expr ":" Typexpr ":>" Typexpr ")"
+  
 // Expressions whose type contains object or polymorphic variant types can be
 // explicitly coerced (weakened) to a supertype. The expression (expr :>  typexpr)
 // coerces the expression expr to type typexpr. The expression (expr :  typexpr_1
@@ -775,11 +742,9 @@ context-free priorities
 // typing may fail during this latter unification step, even if some instance of
 // typ_1 is a subtype of some instance of typ_2. In the following paragraphs we
 // describe the subtyping relation used.
-// 
-// 
+ 
 // Object types
 // ------------
-// 
 // A fixed object type admits as subtype any object type that includes all its
 // methods. The types of the methods shall be subtypes of those in the supertype.
 // Namely,
@@ -797,11 +762,11 @@ context-free priorities
 // an exception for coercing self to the (exact) type of its class: this is
 // allowed if the type of self does not appear in a contravariant position in the
 // class type, i.e. if there are no binary methods.
-// 
-// 
+
+
 // Polymorphic variant types
 // -------------------------
-// 
+
 // A polymorphic variant type typ is a subtype of another polymorphic variant
 // type typ if the upper bound of typ (i.e. the maximum set of constructors
 // that may appear in an instance of typ) is included in the lower bound of
@@ -812,11 +777,10 @@ context-free priorities
 // [[>] `C_1 of  typ_1 | ... | `C_n of  typ_n | `C_n+1 of typ_n+1 |
 // ... | `C_n+m of typ_n+m ]
 // which may be an extensible type, if every typ_i is a subtype of typ_i.
-// 
-// 
+
 // Variance
 // --------
-// 
+
 // Other types do not introduce new subtyping, but they may propagate the
 // subtyping of their arguments. For instance, typ_1 *  typ_2 is a subtype of
 // typ_1 * typ_2 when typ_1 and typ_2 are respectively subtypes of typ_1
@@ -834,17 +798,17 @@ context-free priorities
 // private types, the variance must be given explicitly (see section 7.8.1),
 // otherwise the default is nonvariant. This is also the case for constrained
 // arguments in type definitions.
-// 
-// 
+
+
 // 7.7.8  Other
 // ============
-// 
-// 
-// 
+ 
 // Assertion checking
 // ------------------
-// 
-// 
+
+context-free syntax
+  Expr.Assert = "assert" Expr
+  
 // OCaml supports the assert construct to check debugging assertions. The
 // expression assert expr evaluates the expression expr and returns () if expr
 // evaluates to true. If it evaluates to false the exception Assert_failure is
@@ -860,15 +824,18 @@ context-free priorities
 // 
 // Lazy expressions
 // ----------------
-// 
+
+context-free syntax
+  Expr.Lazy = "lazy" Expr
+  
 // The expression lazy expr returns a value v of type Lazy.t that encapsulates
 // the computation of expr. The argument expr is not evaluated at this point in
 // the program. Instead, its evaluation will be performed the first time the
 // function Lazy.force is applied to the value v, returning the actual value of
 // expr. Subsequent applications of Lazy.force to v do not evaluate expr again.
 // Applications of Lazy.force may be implicit through pattern matching (see 7.6).
-// 
-// 
+
+
 // Local modules
 // -------------
 // 
@@ -889,12 +856,24 @@ context-free priorities
 // (string -> string -> int) -> string list -> string list = <fun>
 // 
 // >>
-// 
-// 
-// 
+
 // Local opens
 // -----------
-// 
+
+context-free syntax  
+  Expr.LetModuleT   = "let" "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr "in" Expr
+  Expr.LetModule    = "let" "module" ModuleName ModParam*                "=" ModuleExpr "in" Expr
+  
+  ModParam.ModParam = "(" ModuleName ":" ModuleType ")"
+  
+  Expr.LetOpen      = "let" "open" ModulePath "in" Expr
+  
+  Expr.ModPathExpr  = ModulePath "." "(" Expr ")"
+  Expr.ModPathList  = ModulePath "." "[" Expr "]"
+  Expr.ModPathArray = ModulePath "." "[|" Expr "|]"
+  Expr.ModPath1     = ModulePath "." "{" Expr "}"
+  Expr.ModPath2     = ModulePath "." "{<" Expr ">}"
+  
 // The expressions let open module-path in  expr and module-path.( expr) are
 // strictly equivalent. These constructions locally open the module referred to by
 // the module path module-path in the respective scope of the expression expr.
@@ -904,4 +883,14 @@ context-free priorities
 // module-path.([ expr]), and module-path.[|  expr |] is equivalent to
 // module-path.([|  expr |]).
 
+context-free syntax
+  Expr.Ascr   = "(" Expr ":" Typexpr ")"
+  
+
+ 
+ 
+
+  
+
+  
   
