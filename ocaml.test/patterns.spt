@@ -45,6 +45,11 @@ test or pattern [[
 ]] parse succeeds
 
 
+test tuple pattern [[ 
+  let a, b, c, d, e 
+  = 1
+]] parse succeeds
+
 test or / tuple pattern [[ 
   let a, b | c, d, e 
   = 1
