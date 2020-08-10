@@ -70,7 +70,7 @@ context-free syntax
   
 sorts TagName TagNameQ
 lexical syntax
-  TagName = CapitalizedIdent
+  TagName          = CapitalizedIdent
   TagNameQ.TagName = "'" TagName
   
 sorts TypeconstrName
@@ -107,7 +107,8 @@ lexical syntax
 
 sorts ValuePath
 context-free syntax
-  ValuePath.ValuePath0 = ModulePathPref? ValueName
+  ValuePath.ValuePath  = ValueName
+  ValuePath.ValuePathQ = ModulePathPref ValueName
   
 sorts Constr
 context-free syntax
@@ -126,20 +127,20 @@ context-free syntax
   
 sorts ModtypePath
 context-free syntax
-  ModtypePath.ModtypePath0 = ExtendedModulePathPref? ModtypeName
+  ModtypePath.ModtypePath = ExtendedModulePathPref? ModtypeName
   
 sorts ClassPath
 context-free syntax
-  ClassPath.ClassPath0 = ModulePathPref? ClassName
+  ClassPath.ClassPath = ModulePathPref? ClassName
   
 sorts ClasstypePath
 context-free syntax
-  ClasstypePath.ClasstypePath0 = ExtendedModulePathPref? ClassName
+  ClasstypePath.ClasstypePath = ExtendedModulePathPref? ClassName
   
 sorts ModulePath
 context-free syntax
-  ModulePath.ModulePath0 = {ModuleName "."}+
-  ModulePathPref.ModulePathPref = ModulePath "."
+  ModulePath.ModulePath         = {ModuleName "."}+
+  ModulePathPref.ModulePathPref = ModulePath "." // TODO: inline
   
 sorts ExtendedModulePath ExtendedModulePathPref ExtendedModulePathArg
 context-free syntax
