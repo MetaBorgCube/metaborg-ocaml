@@ -200,8 +200,11 @@ lexical syntax
 sorts Label Optlabel
 lexical syntax
   LabelName = LowercaseIdent
-  Label     = [\~] LabelName [\:]
-  Optlabel  = [\?] LabelName [\:]
+syntax 
+  Label-CF.Label         = "~" LabelName-LEX ":"
+  LabelE-CF.LabelE       = "~" LabelName-LEX 
+  OptLabel-CF.OptLabel   = "?" LabelName-LEX ":"
+  OptLabelE-CF.OptLabelE = "?" LabelName-LEX 
   
 // Naming labels come in two flavours: label for normal arguments and optlabel
 // for optional ones. They are simply distinguished by their first character,
@@ -380,11 +383,122 @@ lexical syntax
 // <     <-    "="     >     >]    >}    ?     [     [<    [>    [|
 // ]     _     `     {     {<    |     |]    ||    }     ~
 // >>
+
+
+lexical syntax
+  InfixSymbol = "!=" {reject}
+  InfixSymbol = "#" {reject}
+  InfixSymbol = "&" {reject}
+  InfixSymbol = "&&" {reject}
+  InfixSymbol = "'" {reject}
+  InfixSymbol = "(" {reject}
+  InfixSymbol = ")" {reject}
+  InfixSymbol = "*" {reject}
+  InfixSymbol = "+" {reject}
+  InfixSymbol = "," {reject}
+  InfixSymbol = "-" {reject}
+  InfixSymbol = "-." {reject}
+  InfixSymbol = "->" {reject}
+  InfixSymbol = "." {reject}
+  InfixSymbol = ".." {reject}
+  InfixSymbol = ".~" {reject}
+  InfixSymbol = ":" {reject}
+  InfixSymbol = "::" {reject}
+  InfixSymbol = ":=" {reject}
+  InfixSymbol = ":>" {reject}
+  InfixSymbol = ";" {reject}
+  InfixSymbol = ";;" {reject}
+  InfixSymbol = "<" {reject}
+  InfixSymbol = "<-" {reject}
+  InfixSymbol = "=" {reject}
+  InfixSymbol = ">" {reject}
+  InfixSymbol = ">]" {reject}
+  InfixSymbol = ">}" {reject}
+  InfixSymbol = "?" {reject}
+  InfixSymbol = "[" {reject}
+  InfixSymbol = "[<" {reject}
+  InfixSymbol = "[>" {reject}
+  InfixSymbol = "[|" {reject}
+  InfixSymbol = "]" {reject}
+  InfixSymbol = "_" {reject}
+  InfixSymbol = "`" {reject}
+  InfixSymbol = "{" {reject}
+  InfixSymbol = "{<" {reject}
+  InfixSymbol = "|" {reject}
+  InfixSymbol = "|]" {reject}
+  InfixSymbol = "||" {reject}
+  InfixSymbol = "}" {reject}
+  InfixSymbol = "~" {reject} 
+
+
+lexical syntax
+  PrefixSymbol = "!=" {reject}
+  PrefixSymbol = "#" {reject}
+  PrefixSymbol = "&" {reject}
+  PrefixSymbol = "&&" {reject}
+  PrefixSymbol = "'" {reject}
+  PrefixSymbol = "(" {reject}
+  PrefixSymbol = ")" {reject}
+  PrefixSymbol = "*" {reject}
+  PrefixSymbol = "+" {reject}
+  PrefixSymbol = "," {reject}
+  PrefixSymbol = "-" {reject}
+  PrefixSymbol = "-." {reject}
+  PrefixSymbol = "->" {reject}
+  PrefixSymbol = "." {reject}
+  PrefixSymbol = ".." {reject}
+  PrefixSymbol = ".~" {reject}
+  PrefixSymbol = ":" {reject}
+  PrefixSymbol = "::" {reject}
+  PrefixSymbol = ":=" {reject}
+  PrefixSymbol = ":>" {reject}
+  PrefixSymbol = ";" {reject}
+  PrefixSymbol = ";;" {reject}
+  PrefixSymbol = "<" {reject}
+  PrefixSymbol = "<-" {reject}
+  PrefixSymbol = "=" {reject}
+  PrefixSymbol = ">" {reject}
+  PrefixSymbol = ">]" {reject}
+  PrefixSymbol = ">}" {reject}
+  PrefixSymbol = "?" {reject}
+  PrefixSymbol = "[" {reject}
+  PrefixSymbol = "[<" {reject}
+  PrefixSymbol = "[>" {reject}
+  PrefixSymbol = "[|" {reject}
+  PrefixSymbol = "]" {reject}
+  PrefixSymbol = "_" {reject}
+  PrefixSymbol = "`" {reject}
+  PrefixSymbol = "{" {reject}
+  PrefixSymbol = "{<" {reject}
+  PrefixSymbol = "|" {reject}
+  PrefixSymbol = "|]" {reject}
+  PrefixSymbol = "||" {reject}
+  PrefixSymbol = "}" {reject}
+  PrefixSymbol = "~" {reject} 
 // Note that the following identifiers are keywords of the Camlp4 extensions
 // and should be avoided for compatibility reasons.
 // <<    parser    value    $     $$    $:    <:    <<    >>    ??
 // >>
 
+lexical syntax
+  InfixSymbol = "$" {reject}
+  InfixSymbol = "$$" {reject}
+  InfixSymbol = "$:" {reject}
+  InfixSymbol = "<:" {reject}
+  InfixSymbol = "<<" {reject}
+  InfixSymbol = ">>" {reject}
+  InfixSymbol = "??" {reject}
+  
+lexical syntax
+  PrefixSymbol = "$" {reject}
+  PrefixSymbol = "$$" {reject}
+  PrefixSymbol = "$:" {reject}
+  PrefixSymbol = "<:" {reject}
+  PrefixSymbol = "<<" {reject}
+  PrefixSymbol = ">>" {reject}
+  PrefixSymbol = "??" {reject}
+
+  
 // Ambiguities
 // -----------
 // 
