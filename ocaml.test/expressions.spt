@@ -1,8 +1,144 @@
-module compilation-units
+module expressions
 
 language ocaml
 
-test foo [[
+start symbol Expr
 
+
+// Value paths
+
+test begin ... end [[ 
+  x
 ]] parse succeeds
+
+test begin ... end [[ 
+  x.y.z
+]] parse succeeds
+
+
+// parenthesized expressions
+
+test begin ... end [[ 
+  begin 1 end
+]] parse to [[
+  1
+]]
+
+test ( ... ) [[ 
+  ( 1 )
+]] parse to [[
+  1
+]]
+
+test tuple [[ 
+  begin 1, (2, (3, 4), 5) end, 6
+]] parse to [[
+  (1, (2, (3, 4), 5)), 6
+]]
+
+// function application
+
+test function application [[ 
+  expr  argument_1 argument_2  argument_n
+]] parse succeeds
+
+test function application [[ 
+  f 1 a b
+]] parse succeeds
+
+test function application [[ 
+  (f 1 a) b
+]] parse succeeds
+
+test function application [[ 
+  f (g x) h
+]] parse succeeds
+
+test function application [[ 
+  f ?g:1 a b 
+]] parse succeeds
+
+test argument labels [[ 
+  mkcoord ?y:3 ?x:1 
+]] parse succeeds
+
+test argument labels [[ 
+  mkcoord ?y: ~x: ?color:Blue 
+]] parse succeeds
+
+test labels are lexical [[ 
+  mkcoord ? y:3 ?x :1 
+]] parse fails
+
+
+// function definition
+
+test function definition [[  
+  function x -> x
+         | y -> y
+]] parse succeeds
+
+test function definition [[ 
+  function x -> x
+         | y -> function z -> z | a -> a
+]] parse to [[ 
+  function x -> x
+         | y -> (function z -> z | a -> a)
+]] 
+
+
+test function definition [[  
+  fun x y -> x + y
+]] parse succeeds
+
+test function definition [[  
+  fun x y z : list int -> x ++ y
+]] parse succeeds
+
+
+// local definitions 
+
+
+test let binding [[  
+  lex x = 1 and y = f x and Cons z zs = g h i in x + z
+]] parse succeeds
+
+
+test let binding [[  
+  lex f = fun x y -> x + y g = fun z -> z + 1 in f 1 + g 1
+]] parse succeeds
+
+
+test let binding [[  
+  let ident = fun  parameter_1 parameter_m ->  expr
+]] parse succeeds
+
+test let binding [[  
+  let ident  parameter_1 parameter_m =  expr
+]] parse succeeds
+
+test let binding [[  
+  let pattern_1 :  typ_1 typ_n . typeexpr =  expr
+]] parse succeeds
+
+
+// tuples 
+
+
+test tuple [[ 
+  begin 1, (2, (3, 4), 5) end, 6
+]] parse to [[
+  (1, (2, (3, 4), 5)), 6
+]]
+
+test ascription [[ 
+  (1, 2, true : int * int * int)
+]] parse succeeds
+
+
+test tuple [[ 
+  1, 2, 3
+]] parse succeeds
+
+
 
