@@ -1,0 +1,95 @@
+module expressions-operators
+
+imports expressions
+imports names
+imports lex
+
+// 7.7.5  Operators
+// ================
+
+context-free syntax 
+  Expr.Prefix = PrefixSymbol Expr
+  Expr.Min    = "-" Expr
+  Expr.MinF   = "-." Expr
+  Expr.BinOp6 = Expr InfixOp60 Expr {left}
+  Expr.BinOp5 = Expr InfixOp50 Expr {right}
+  Expr.BinOp4 = Expr InfixOp40 Expr {left}
+  Expr.BinOp3 = Expr InfixOp30 Expr {left}
+  Expr.BinOp2 = Expr InfixOp20 Expr {right}
+  Expr.BinOp1 = Expr InfixOp10 Expr {left}
+  Expr.BinOp0 = Expr InfixOp5  Expr {right}
+  
+  
+// Symbols from the class infix-symbol, as well as the keywords *, +, -, -., =,
+// !=, <, >, or, ||, &, &&, :=, mod, land, lor, lxor, lsl, lsr, and asr can appear
+// in infix position (between two expressions). Symbols from the class
+// prefix-symbol, as well as the keywords - and -. can appear in prefix position
+// (in front of an expression).
+//
+// Infix and prefix symbols do not have a fixed meaning: they are simply
+// interpreted as applications of functions bound to the names corresponding to
+// the symbols. The expression prefix-symbol  expr is interpreted as the
+// application ( prefix-symbol )  expr. Similarly, the expression expr_1
+// infix-symbol  expr_2 is interpreted as the application ( infix-symbol )
+// expr_1  expr_2.
+//
+// The table below lists the symbols defined in the initial environment and
+// their initial meaning. (See the description of the core library module Stdlib
+// in chapter 24 for more details). Their meaning may be changed at any time using
+// let ( infix-op )  name_1  name_2 = ...
+// Note: the operators &&, ||, and ~- are handled specially and it is not
+// advisable to change their meaning.
+// The keywords - and -. can appear both as infix and prefix operators. When
+// they appear as prefix operators, they are interpreted respectively as the
+// functions (~-) and (~-.).
+// 
+// ------------------------------------------------------
+// |    Operator     |         Initial meaning          |
+// ------------------------------------------------------
+// | +               |Integer addition.                 |
+// |- (infix)        |Integer subtraction.              |
+// |~-   - (prefix)  |Integer negation.                 |
+// |*                |Integer multiplication.           |
+// |/                |Integer division. Raise           |
+// |                 |Division_by_zero if second        |
+// |                 |argument is zero.                 |
+// |mod              |Integer modulus. Raise            |
+// |                 |Division_by_zero if second        |
+// |                 |argument is zero.                 |
+// |land             |Bitwise logical and on      |
+// |                 |integers.                         |
+// |lor              |Bitwise logical or on       |
+// |                 |integers.                         |
+// |lxor             |Bitwise logical exclusive or|
+// |                 |on integers.                      |
+// |lsl              |Bitwise logical shift left on     |
+// |                 |integers.                         |
+// |lsr              |Bitwise logical shift right on    |
+// |                 |integers.                         |
+// |asr              |Bitwise arithmetic shift right on |
+// |                 |integers.                         |
+// |+.               |Floating-point addition.          |
+// |-. (infix)       |Floating-point subtraction.       |
+// |~-.   -. (prefix)|Floating-point negation.          |
+// |*.               |Floating-point multiplication.    |
+// |/.               |Floating-point division.          |
+// |**               |Floating-point exponentiation.    |
+// |@                |List concatenation.               |
+// |^                |String concatenation.             |
+// |!                |Dereferencing (return the current |
+// |                 |contents of a reference).         |
+// |:=               |Reference assignment (update the  |
+// |                 |reference given as first argument |
+// |                 |with the value of the second      |
+// |                 |argument).                        |
+// |=                |Structural equality test.         |
+// |<>               |Structural inequality test.       |
+// |==               |Physical equality test.           |
+// |!=               |Physical inequality test.         |
+// |<                |Test less than.             |
+// |<=               |Test less than or equal.    |
+// |>                |Test greater than.          |
+// |>=               |Test greater than or equal. |
+// |&&   &           |Boolean conjunction.              |
+// |||   or          |Boolean disjunction.              |
+// ------------------------------------------------------

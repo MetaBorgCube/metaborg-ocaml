@@ -37,32 +37,76 @@ lexical syntax
   
 sorts OperatorName
 context-free syntax
-  OperatorName.OperatorName8 = PrefixSymbol
-  OperatorName.OperatorName9 = InfixOp
+  OperatorName.Prefix = PrefixSymbol
+  OperatorName.Infix  = InfixOp
+  
+//  OperatorName60.Infix60 = InfixOp60
+//  OperatorName50.Infix50 = InfixOp50
+//  OperatorName40.Infix40 = InfixOp40
+//  OperatorName30.Infix30 = InfixOp30
+//  OperatorName20.Infix20 = InfixOp20
+//  OperatorName10.Infix10 = InfixOp10
   
 sorts InfixOp
-context-free syntax
-  InfixOp.InfixOp84 = InfixSymbol
-  InfixOp.InfixOp85 = "*"
-  InfixOp.InfixOp86 = "+"
-  InfixOp.InfixOp87 = "-"
-  InfixOp.InfixOp88 = "-."
-  InfixOp.InfixOp89 = "="
-  InfixOp.InfixOp90 = "!="
-  InfixOp.InfixOp91 = "<"
-  InfixOp.InfixOp92 = ">"
-  InfixOp.InfixOp93 = "or"
-  InfixOp.InfixOp94 = "||"
-  InfixOp.InfixOp95 = "&"
-  InfixOp.InfixOp96 = "&&"
-  InfixOp.InfixOp97 = ":="
-  InfixOp.InfixOp98 = "mod"
-  InfixOp.InfixOp99 = "land"
-  InfixOp.InfixOp100 = "lor"
-  InfixOp.InfixOp101 = "lxor"
-  InfixOp.InfixOp102 = "lsl"
-  InfixOp.InfixOp103 = "lsr"
-  InfixOp.InfixOp104 = "asr"
+lexical syntax
+  InfixOp = InfixSymbol
+  InfixOp = "*"
+  InfixOp = "+"
+  InfixOp = "-"
+  InfixOp = "-."
+  InfixOp = "="
+  InfixOp = "!="
+  InfixOp = "<"
+  InfixOp = ">"
+  InfixOp = "or"
+  InfixOp = "||"
+  InfixOp = "&"
+  InfixOp = "&&"
+  InfixOp = ":="
+  InfixOp = "mod"
+  InfixOp = "land"
+  InfixOp = "lor"
+  InfixOp = "lxor"
+  InfixOp = "lsl"
+  InfixOp = "lsr"
+  InfixOp = "asr"
+
+lexical syntax // priority levels
+
+  InfixOp60 = InfixSymbol60
+   
+  InfixOp50 = InfixSymbol50
+  InfixOp50 = "lsl"
+  InfixOp50 = "lsr"
+  InfixOp50 = "asr"
+  
+  InfixOp40 = InfixSymbol40
+  InfixOp40 = "mod"
+  InfixOp40 = "land"
+  InfixOp40 = "lor"
+  InfixOp40 = "lxor"
+//  InfixOp40 = "*"
+  
+  InfixOp30 = InfixSymbol30
+//  InfixOp30 = "+"
+//  InfixOp30 = "-"
+  
+  InfixOp20 = InfixSymbol20
+  
+  InfixOp10 = InfixSymbol10
+  InfixOp10 = "!="
+//  InfixOp10 = "="
+//  InfixOp10 = "<"
+//  InfixOp10 = ">"
+  
+//  InfixOp = "&"
+//  InfixOp = "&&"
+//  
+//  InfixOp = "or"
+//  InfixOp = "||"
+
+  InfixOp5 = ":="
+  
   
 sorts ConstrName
 context-free syntax

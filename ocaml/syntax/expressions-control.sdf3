@@ -1,0 +1,131 @@
+module expressions-control
+
+imports lex 
+imports names 
+imports expressions 
+imports expressions-basic 
+
+// 7.7.3  Control structures
+// =========================
+
+// Sequence
+// --------
+
+context-free syntax
+  Expr.Seq = Expr ";" Expr {right}
+  
+// The expression expr_1 ;  expr_2 evaluates expr_1 first, then expr_2, and
+// returns the value of expr_2.
+
+
+// Conditional
+// -----------
+
+context-free syntax
+  Expr.IfT = "if" Expr "then" Expr 
+  Expr.IfE = "if" Expr "then" Expr "else" Expr
+   
+// The expression if expr_1 then  expr_2 else  expr_3 evaluates to the value of
+// expr_2 if expr_1 evaluates to the boolean true, and to the value of expr_3 if
+// expr_1 evaluates to the boolean false.
+// The else expr_3 part can be omitted, in which case it defaults to else ().
+
+
+// Case expression
+// ---------------
+
+context-free syntax 
+  Expr.Match = "match" Expr "with" PatternMatching
+  
+// The expression
+// match expr
+// 
+// with pattern  -> expr
+// 		 1        1
+// | ...
+// 
+// | pattern  -> expr
+// 		 n        n
+// matches the value of expr against the patterns pattern_1 to pattern_n. If
+// the matching against pattern_i succeeds, the associated expression expr_i is
+// evaluated, and its value becomes the value of the whole match expression. The
+// evaluation of expr_i takes place in an environment enriched by the bindings
+// performed during matching. If several patterns match the value of expr, the one
+// that occurs first in the match expression is selected. If none of the patterns
+// match the value of expr, the exception Match_failure is raised.
+
+// Boolean operators
+// -----------------
+// 
+// The expression expr_1 &&  expr_2 evaluates to true if both expr_1 and expr_2
+// evaluate to true; otherwise, it evaluates to false. The first component,
+// expr_1, is evaluated first. The second component, expr_2, is not evaluated if
+// the first component evaluates to false. Hence, the expression expr_1 &&  expr_2
+// behaves exactly as
+// if expr_1 then  expr_2 else false.
+// 
+// The expression expr_1 ||  expr_2 evaluates to true if one of the expressions
+// expr_1 and expr_2 evaluates to true; otherwise, it evaluates to false. The
+// first component, expr_1, is evaluated first. The second component, expr_2, is
+// not evaluated if the first component evaluates to true. Hence, the expression
+// expr_1 ||  expr_2 behaves exactly as
+// if expr_1 then true else  expr_2.
+// 
+// The boolean operators & and or are deprecated synonyms for (respectively) &&
+// and ||.
+
+context-free syntax
+  Expr.And  = Expr "&&" Expr {right} 
+  Expr.Or   = Expr "||" Expr {right} 
+  Expr.AndD = Expr "&"  Expr {right, deprecated}
+  Expr.OrD  = Expr "or" Expr {right, deprecated}
+
+// Loops
+// -----
+
+context-free syntax
+  Expr.While = "while" Expr "do" Expr "done"
+  
+  Expr.For   = "for" ValueName "=" Expr Dir Expr "do" Expr "done"
+  Dir.To     = "to"
+  Dir.DownTo = "downto"
+  
+// The expression while expr_1 do  expr_2 done repeatedly evaluates expr_2
+// while expr_1 evaluates to true. The loop condition expr_1 is evaluated and
+// tested at the beginning of each iteration. The whole while ... done expression
+// evaluates to the unit value ().
+// The expression for name =  expr_1 to  expr_2 do  expr_3 done first evaluates
+// the expressions expr_1 and expr_2 (the boundaries) into integer values n and p.
+// Then, the loop body expr_3 is repeatedly evaluated in an environment where name
+// is successively bound to the values n, n+1, ..., p1, p. The loop body is
+// never evaluated if n > p.
+// The expression for name =  expr_1 downto  expr_2 do  expr_3 done evaluates
+// similarly, except that name is successively bound to the values n, n1, ...,
+// p+1, p. The loop body is never evaluated if n < p.
+// In both cases, the whole for expression evaluates to the unit value ().
+
+// Exception handling
+// ------------------
+
+context-free syntax 
+  Expr.Try = "try" Expr "with" PatternMatching
+  
+// The expression
+// try  expr
+// 
+// with pattern  -> expr
+// 		 1        1
+// | ...
+// 
+// | pattern  -> expr
+// 		 n        n
+// evaluates the expression expr and returns its value if the evaluation of
+// expr does not raise any exception. If the evaluation of expr raises an
+// exception, the exception value is matched against the patterns pattern_1 to
+// pattern_n. If the matching against pattern_i succeeds, the associated
+// expression expr_i is evaluated, and its value becomes the value of the whole
+// try expression. The evaluation of expr_i takes place in an environment enriched
+// by the bindings performed during matching. If several patterns match the value
+// of expr, the one that occurs first in the try expression is selected. If none
+// of the patterns matches the value of expr, the exception value is raised again,
+// thereby transparently passing through the try construct.

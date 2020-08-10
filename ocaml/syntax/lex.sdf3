@@ -72,6 +72,8 @@ lexical syntax
   Int64Literal.Int64Literal         = IntegerLiteral "L"
   NativeintLiteral.NativeintLiteral = IntegerLiteral "n"
   
+// TODO: CF in LEX
+  
 // Floating-point literals
 // -----------------------
 
@@ -223,12 +225,33 @@ lexical syntax
   InfixSymbol      = (CoreOperatorChar | [\%\<]) OperatorChar*
   InfixSymbol      = [\#] OperatorChar+
 
-  PrefixSymbol     = [\!] OperatorChar*
+  PrefixSymbol     = [\!]   OperatorChar*
   PrefixSymbol     = [\?\~] OperatorChar+
 
-  OperatorChar     = CoreOperatorChar | [\~\!\?\%\<\:\.]
+  OperatorChar     = [\$\&\*\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.]
+//OperatorChar     = CoreOperatorChar | [\~\!\?\%\<\:\.]
 
   CoreOperatorChar = [\$\&\*\+\-\/\=\>\@\^\|]
+    
+  InfixSymbol60    = [\#]           OperatorChar*
+  InfixSymbol50    = [\*] [\*]      OperatorChar*
+  
+  InfixSymbol40    = [\*] 
+  InfixSymbol40    = [\*] [\$\&\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.] OperatorChar*
+  InfixSymbol40    = [\/\%] OperatorChar*
+  
+  InfixSymbol30    = [\+\-] OperatorChar*
+  InfixSymbol30    = "->" {reject}
+  
+  InfixSymbol20    = [\@\^] OperatorChar*
+  
+  
+  InfixSymbol10    = [\=\<\>\|\&\$] OperatorChar*
+  InfixSymbol10    = "&&" {reject}
+  InfixSymbol10    = "&" {reject}
+  InfixSymbol10    = "||" {reject}
+  
+  
   
 // See also the following language extensions: extension operators, extended
 // indexing operators, and binding operators.

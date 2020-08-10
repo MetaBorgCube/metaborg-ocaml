@@ -1,6 +1,13 @@
 module classes
 
-imports lex names type-expressions expressions type-definitions patterns aux
+imports lex 
+imports names 
+imports type-expressions 
+imports expressions-basic
+imports expressions-objects // TODO: inline here?
+imports type-definitions 
+imports patterns 
+imports aux
 
 // 7.9  Classes
 // *=*=*=*=*=*=

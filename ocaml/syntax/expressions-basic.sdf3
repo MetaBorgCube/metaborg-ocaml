@@ -1,0 +1,283 @@
+module expressions-basic 
+
+imports expressions
+imports constants 
+imports lex  
+imports names    
+imports patterns  
+imports type-expressions  
+imports type-definitions
+imports aux
+
+// 7.7.2  Basic expressions
+// ========================
+
+// Constants
+// ---------
+
+context-free syntax 
+  Expr.Const = Constant
+  
+// An expression consisting in a constant evaluates to this constant.
+
+// Value paths
+// -----------
+
+context-free syntax
+  Expr.Var = ValuePath
+  
+// An expression consisting in an access path evaluates to the value bound to
+// this path in the current evaluation environment. The path can be either a value
+// name or an access path to a value component of a module.
+
+// Parenthesized expressions
+// -------------------------
+
+
+context-free syntax
+  Expr = "(" Expr ")"       {bracket}
+  Expr = "begin" Expr "end" {bracket}
+  
+// The expressions ( expr ) and begin expr end have the same value as expr. The
+// two constructs are semantically equivalent, but it is good style to use begin
+// ... end inside control structures:
+// <<
+// if ... then begin ... ; ... end else begin ... ; ... end
+// >>
+// and ( ... ) for the other grouping situations.
+// Parenthesized expressions can contain a type constraint, as in ( expr :
+// typexpr ). This constraint forces the type of expr to be compatible with
+// typexpr.
+// Parenthesized expressions can also contain coercions ( expr  [: typexpr] :>
+// typexpr) (see subsection 7.7.7 below).
+
+// Function application
+// --------------------
+
+sorts Argument 
+lexical syntax
+context-free syntax 
+  Expr.App             = Expr Argument+ {longest-match}
+  Argument.Arg         =           Expr
+  Argument.LabeledArgE = LabelE 
+  Argument.LabeledArg  = Label     Expr  
+  Argument.OptArgE     = OptLabelE  
+  Argument.OptArg      = OptLabel  Expr 
+  // TODO: check if : is required when Expr is left out in labeled argument
+context-free priorities  
+  // nested applications require parentheses
+  Expr.App            <0> .> Expr.App,   
+  Argument.Arg        <0> .> Expr.App,  
+  Argument.LabeledArg <1> .> Expr.App, 
+  Argument.OptArg     <1> .> Expr.App 
+  
+
+// Function application is denoted by juxtaposition of (possibly labeled)
+// expressions. The expression expr  argument_1 ...  argument_n evaluates the
+// expression expr and those appearing in argument_1 to argument_n. The expression
+// expr must evaluate to a functional value f, which is then applied to the values
+// of argument_1, ...,  argument_n.
+// The order in which the expressions expr,  argument_1, ...,  argument_n are
+// evaluated is not specified.
+// Arguments and parameters are matched according to their respective labels.
+// Argument order is irrelevant, except among arguments with the same label, or no
+// label.
+// If a parameter is specified as optional (label prefixed by ?) in the type of
+// expr, the corresponding argument will be automatically wrapped with the
+// constructor Some, except if the argument itself is also prefixed by ?, in which
+// case it is passed as is. If a non-labeled argument is passed, and its
+// corresponding parameter is preceded by one or several optional parameters, then
+// these parameters are defaulted, i.e. the value None will be passed for them.
+// All other missing parameters (without corresponding argument), both optional
+// and non-optional, will be kept, and the result of the function will still be a
+// function of these missing parameters to the body of f.
+// As a special case, if the function has a known arity, all the arguments are
+// unlabeled, and their number matches the number of non-optional parameters, then
+// labels are ignored and non-optional parameters are matched in their definition
+// order. Optional arguments are defaulted.
+// In all cases but exact match of order and labels, without optional
+// parameters, the function type should be known at the application point. This
+// can be ensured by adding a type constraint. Principality of the derivation can
+// be checked in the -principal mode.
+
+// Function definition
+// -------------------
+
+sorts Parameter 
+context-free syntax 
+  Expr.Function  = "function" PatternMatching
+  Expr.FunTyped  = "fun" Parameter+ ":" Typexpr "->" Expr
+  Expr.Fun       = "fun" Parameter+             "->" Expr
+  
+  Parameter.ParamPat = Pattern
+  
+  Parameter.Param1  = "~" LabelName
+  Parameter.Param2  = "~" "(" LabelName ":" Typexpr ")"
+  Parameter.Param3  = "~" "(" LabelName             ")"
+  Parameter.Param4  = "~" LabelName ":" Pattern
+  
+  Parameter.Param5  = "?" LabelName
+  Parameter.Param6  = "?" "(" LabelName ":" Typexpr "=" Expr ")"
+  Parameter.Param7  = "?" "(" LabelName             "=" Expr ")"
+  Parameter.Param8  = "?" "(" LabelName ":" Typexpr          ")"
+  
+  Parameter.Param9  = "?" LabelName ":" Pattern
+  Parameter.Param10 = "?" LabelName ":" "(" Pattern ":" Typexpr "=" Expr ")"
+  Parameter.Param11 = "?" LabelName ":" "(" Pattern             "=" Expr ")"
+  Parameter.Param12 = "?" LabelName ":" "(" Pattern ":" Typexpr          ")"
+  
+// Two syntactic forms are provided to define functions. The first form is
+// introduced by the keyword function:
+// 
+// function pattern_1  -> expr_1
+// | ...
+// | pattern_n  -> expr_n
+//
+// This expression evaluates to a functional value with one argument. When this
+// function is applied to a value v, this value is matched against each pattern
+// pattern_1 to pattern_n. If one of these matchings succeeds, that is, if the
+// value v matches the pattern pattern_i for some i, then the expression expr_i
+// associated to the selected pattern is evaluated, and its value becomes the
+// value of the function application. The evaluation of expr_i takes place in an
+// environment enriched by the bindings performed during the matching.
+// If several patterns match the argument v, the one that occurs first in the
+// function definition is selected. If none of the patterns matches the argument,
+// the exception Match_failure is raised.
+// 
+// The other form of function definition is introduced by the keyword fun:
+// fun parameter_1 ...  parameter_n ->  expr
+// This expression is equivalent to:
+// fun parameter_1 -> ... fun  parameter_n ->  expr
+// 
+// An optional type constraint typexpr can be added before -> to enforce the
+// type of the result to be compatible with the constraint typexpr:
+// fun parameter_1 ...  parameter_n :  typexpr ->  expr
+// is equivalent to
+// fun parameter_1 -> ... fun  parameter_n ->  (expr :  typexpr )
+// Beware of the small syntactic difference between a type constraint on the
+// last parameter
+// fun parameter_1 ...  (parameter_n: typexpr)->  expr
+// and one on the result
+// fun parameter_1 ...  parameter_n:  typexpr ->  expr
+// 
+// The parameter patterns ~lab and ~(lab  [: typ]) are shorthands for
+// respectively ~lab: lab and ~lab:( lab  [: typ]), and similarly for their
+// optional counterparts.
+// A function of the form fun ? lab :(  pattern =  expr_0 ) ->  expr is
+// equivalent to
+// fun ? lab :  ident -> let  pattern = match  ident with Some  ident ->  ident
+// | None ->  expr_0 in  expr
+// where ident is a fresh variable, except that it is unspecified when expr_0
+// is evaluated.
+// After these two transformations, expressions are of the form
+// fun [label_1]  pattern_1 -> ... fun  [label_n]  pattern_n ->  expr
+// If we ignore labels, which will only be meaningful at function application,
+// this is equivalent to
+// function pattern_1 -> ... function  pattern_n ->  expr
+// That is, the fun expression above evaluates to a curried function with n
+// arguments: after applying this function n times to the values v_1 ... v_n, the
+// values will be matched in parallel against the patterns pattern_1 ...
+// pattern_n. If the matching succeeds, the function returns the value of expr in
+// an environment enriched by the bindings performed during the matchings. If the
+// matching fails, the exception Match_failure is raised.
+
+// Guards in pattern-matchings
+// ---------------------------
+
+sorts PatternMatching 
+context-free syntax 
+  PatternMatching.PatMatch = OptBar {MatchCase "|"}+ {longest-match}
+  
+  MatchCase.MatchCase      = Pattern             "->" Expr 
+  MatchCase.MatchCaseGuard = Pattern "when" Expr "->" Expr
+  
+// The cases of a pattern matching (in the function, match and try constructs)
+// can include guard expressions, which are arbitrary boolean expressions that
+// must evaluate to true for the match case to be selected. Guards occur just
+// before the -> token and are introduced by the when keyword:
+// 
+// function pattern    [when   cond1 ]  -> expr1
+// | ...
+// | patternn     [when   condn ] -> exprn
+// 
+// Matching proceeds as described before, except that if the value matches some
+// pattern pattern_i which has a guard cond_i, then the expression cond_i is
+// evaluated (in an environment enriched by the bindings performed during
+// matching). If cond_i evaluates to true, then expr_i is evaluated and its value
+// returned as the result of the matching, as usual. But if cond_i evaluates to
+// false, the matching is resumed against the patterns following pattern_i.
+
+// Local definitions
+// -----------------
+
+sorts LetBinding
+context-free syntax // let bindings
+  Expr.Let       = "let"       {LetBinding "and"}+ "in" Expr
+  Expr.LetRec    = "let" "rec" {LetBinding "and"}+ "in" Expr
+  Expr.LetExc    = "let" "exception" ConstrDecl "in" Expr
+  
+  LetBinding.LetBinding = Pattern "=" Expr
+  
+  LetBinding.LetBinding4 = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
+  LetBinding.LetBinding5 = ValueName Parameter*              ":>" Typexpr "=" Expr
+  LetBinding.LetBinding6 = ValueName Parameter* ":" Typexpr               "=" Expr
+  
+  LetBinding.LetBinding5 = ValueName ":" PolyTypexpr "=" Expr
+  
+// The let and let rec constructs bind value names locally. The construct
+// let pattern_1 =  expr_1 and ... and  pattern_n =  expr_n in  expr
+// evaluates expr_1 ...  expr_n in some unspecified order and matches their
+// values against the patterns pattern_1 ...  pattern_n. If the matchings succeed,
+// expr is evaluated in the environment enriched by the bindings performed during
+// matching, and the value of expr is returned as the value of the whole let
+// expression. If one of the matchings fails, the exception Match_failure is
+// raised.
+//
+// An alternate syntax is provided to bind variables to functional values:
+// instead of writing
+// let ident = fun  parameter_1 ...  parameter_m ->  expr
+// in a let expression, one may instead write
+// let ident  parameter_1 ...  parameter_m =  expr
+// 
+// 
+// Recursive definitions of names are introduced by let rec:
+// let rec pattern_1 =  expr_1 and ... and  pattern_n =  expr_n in  expr
+// The only difference with the let construct described above is that the
+// bindings of names to values performed by the pattern-matching are considered
+// already performed when the expressions expr_1 to expr_n are evaluated. That is,
+// the expressions expr_1 to expr_n can reference identifiers that are bound by
+// one of the patterns pattern_1, ...,  pattern_n, and expect them to have the
+// same value as in expr, the body of the let rec construct.
+// The recursive definition is guaranteed to behave as described above if the
+// expressions expr_1 to expr_n are function definitions (fun ... or function
+// ...), and the patterns pattern_1 ...  pattern_n are just value names, as in:
+// let rec name_1 = fun ... and ... and  name_n = fun ... in  expr
+// This defines name_1 ...  name_n as mutually recursive functions local to
+// expr.
+// The behavior of other forms of let rec definitions is
+// implementation-dependent. The current implementation also supports a certain
+// class of recursive definitions of non-functional values, as explained in
+// section 8.1.
+// 
+// Explicit polymorphic type annotations
+// -------------------------------------
+// (Introduced in OCaml 3.12)
+// Polymorphic type annotations in let-definitions behave in a way similar to
+// polymorphic methods:
+// let pattern_1 :  typ_1 ...  typ_n .  typeexpr =  expr
+// 
+// These annotations explicitly require the defined value to be polymorphic, and
+// allow one to use this polymorphism in recursive occurrences (when using let
+// rec). Note however that this is a normal polymorphic type, unifiable with any
+// instance of itself.
+//
+// It is possible to define local exceptions in expressions:  let exception
+// constr-decl in  expr  . The syntactic scope of the exception constructor is
+// the inner expression, but nothing prevents exception values created with this
+// constructor from escaping this scope. Two executions of the definition above
+// result in two incompatible exception constructors (as for any exception
+// definition). For instance, the following assertion is true:
+// <<  let gen () = let exception A in A
+// let () = assert(gen () <> gen ())
+// >>
+

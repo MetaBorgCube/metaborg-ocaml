@@ -1,0 +1,93 @@
+module expressions-other
+
+imports expressions
+imports names
+imports type-expressions
+imports module-expressions
+imports module-types
+
+// 7.7.8  Other
+// ============
+ 
+// Assertion checking
+// ------------------
+
+context-free syntax
+  Expr.Assert = "assert" Expr
+  
+// OCaml supports the assert construct to check debugging assertions. The
+// expression assert expr evaluates the expression expr and returns () if expr
+// evaluates to true. If it evaluates to false the exception Assert_failure is
+// raised with the source file name and the location of expr as arguments.
+// Assertion checking can be turned off with the -noassert compiler option. In
+// this case, expr is not evaluated at all.
+// As a special case, assert false is reduced to raise (Assert_failure ...),
+// which gives it a polymorphic type. This means that it can be used in place of
+// any expression (for example as a branch of any pattern-matching). It also means
+// that the assert false assertions cannot be turned off by the -noassert
+// option.
+// 
+// 
+// Lazy expressions
+// ----------------
+
+context-free syntax
+  Expr.Lazy = "lazy" Expr
+  
+// The expression lazy expr returns a value v of type Lazy.t that encapsulates
+// the computation of expr. The argument expr is not evaluated at this point in
+// the program. Instead, its evaluation will be performed the first time the
+// function Lazy.force is applied to the value v, returning the actual value of
+// expr. Subsequent applications of Lazy.force to v do not evaluate expr again.
+// Applications of Lazy.force may be implicit through pattern matching (see 7.6).
+
+
+// Local modules
+// -------------
+// 
+// The expression let module module-name =  module-expr in  expr locally binds
+// the module expression module-expr to the identifier module-name during the
+// evaluation of the expression expr. It then returns the value of expr. For
+// example:
+// <<
+// 
+// #let remove_duplicates comparison_fun string_list =
+// #  let module StringSet =
+// #    Set.Make(struct type t = string
+// #                    let compare = comparison_fun end) in
+// #  StringSet.elements
+// #    (List.fold_right StringSet.add string_list StringSet.empty)
+// 
+// val remove_duplicates :
+// (string -> string -> int) -> string list -> string list = <fun>
+// 
+// >>
+
+// Local opens
+// -----------
+
+context-free syntax  
+  Expr.LetModuleT   = "let" "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr "in" Expr
+  Expr.LetModule    = "let" "module" ModuleName ModParam*                "=" ModuleExpr "in" Expr
+  
+  
+  Expr.LetOpen      = "let" "open" ModulePath "in" Expr
+  
+  Expr.ModPathExpr  = ModulePath "." "(" Expr ")"
+  Expr.ModPathList  = ModulePath "." "[" Expr "]"
+  Expr.ModPathArray = ModulePath "." "[|" Expr "|]"
+  Expr.ModPath1     = ModulePath "." "{" Expr "}"
+  Expr.ModPath2     = ModulePath "." "{<" Expr ">}"
+  
+// The expressions let open module-path in  expr and module-path.( expr) are
+// strictly equivalent. These constructions locally open the module referred to by
+// the module path module-path in the respective scope of the expression expr.
+// When the body of a local open expression is delimited by [ ], [| |], or { },
+// the parentheses can be omitted. For expression, parentheses can also be omitted
+// for {< >}. For example, module-path.[ expr] is equivalent to
+// module-path.([ expr]), and module-path.[|  expr |] is equivalent to
+// module-path.([|  expr |]).
+
+context-free syntax
+  Expr.Ascr   = "(" Expr ":" Typexpr ")"
+  

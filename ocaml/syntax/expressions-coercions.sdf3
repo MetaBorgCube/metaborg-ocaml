@@ -1,0 +1,91 @@
+module expressions-coercions
+
+imports expressions
+imports type-expressions
+
+// 7.7.7  Coercions
+// ================
+
+context-free syntax 
+  Expr.CoerceTo     = "(" Expr ":>" Typexpr ")"
+  Expr.CoerceFromTo = "(" Expr ":" Typexpr ":>" Typexpr ")"
+  
+// Expressions whose type contains object or polymorphic variant types can be
+// explicitly coerced (weakened) to a supertype. The expression (expr :>  typexpr)
+// coerces the expression expr to type typexpr. The expression (expr :  typexpr_1
+// :>  typexpr_2) coerces the expression expr from type typexpr_1 to type
+// typexpr_2.
+// The former operator will sometimes fail to coerce an expression expr from a
+// type typ_1 to a type typ_2 even if type typ_1 is a subtype of type typ_2: in
+// the current implementation it only expands two levels of type abbreviations
+// containing objects and/or polymorphic variants, keeping only recursion when it
+// is explicit in the class type (for objects). As an exception to the above
+// algorithm, if both the inferred type of expr and typ are ground (i.e. do not
+// contain type variables), the former operator behaves as the latter one, taking
+// the inferred type of expr as typ_1. In case of failure with the former
+// operator, the latter one should be used.
+// It is only possible to coerce an expression expr from type typ_1 to type
+// typ_2, if the type of expr is an instance of typ_1 (like for a type
+// annotation), and typ_1 is a subtype of typ_2. The type of the coerced
+// expression is an instance of typ_2. If the types contain variables, they may be
+// instantiated by the subtyping algorithm, but this is only done after
+// determining whether typ_1 is a potential subtype of typ_2. This means that
+// typing may fail during this latter unification step, even if some instance of
+// typ_1 is a subtype of some instance of typ_2. In the following paragraphs we
+// describe the subtyping relation used.
+ 
+// Object types
+// ------------
+// A fixed object type admits as subtype any object type that includes all its
+// methods. The types of the methods shall be subtypes of those in the supertype.
+// Namely,
+// < met_1 :  typ_1 ; ... ;  met_n :  typ_n >
+// is a supertype of
+// < met_1 :  typ_1 ; ... ; met_n :  typ_n ; met_n+1 : typ_n+1 ; ...
+// ; met_n+m : typ_n+m  [; ..] >
+// which may contain an ellipsis .. if every typ_i is a supertype of the
+// corresponding typ_i.
+// A monomorphic method type can be a supertype of a polymorphic method type.
+// Namely, if typ is an instance of typ, then  'a_1 ... 'a_n . typ is a
+// subtype of typ.
+// Inside a class definition, newly defined types are not available for
+// subtyping, as the type abbreviations are not yet completely defined. There is
+// an exception for coercing self to the (exact) type of its class: this is
+// allowed if the type of self does not appear in a contravariant position in the
+// class type, i.e. if there are no binary methods.
+
+
+// Polymorphic variant types
+// -------------------------
+
+// A polymorphic variant type typ is a subtype of another polymorphic variant
+// type typ if the upper bound of typ (i.e. the maximum set of constructors
+// that may appear in an instance of typ) is included in the lower bound of
+// typ, and the types of arguments for the constructors of typ are subtypes of
+// those in typ. Namely,
+// [[<] `C_1 of  typ_1 | ... | ` C_n of  typ_n ]
+// which may be a shrinkable type, is a subtype of
+// [[>] `C_1 of  typ_1 | ... | `C_n of  typ_n | `C_n+1 of typ_n+1 |
+// ... | `C_n+m of typ_n+m ]
+// which may be an extensible type, if every typ_i is a subtype of typ_i.
+
+// Variance
+// --------
+
+// Other types do not introduce new subtyping, but they may propagate the
+// subtyping of their arguments. For instance, typ_1 *  typ_2 is a subtype of
+// typ_1 * typ_2 when typ_1 and typ_2 are respectively subtypes of typ_1
+// and typ_2. For function types, the relation is more subtle: typ_1 ->  typ_2
+// is a subtype of typ_1 -> typ_2 if typ_1 is a supertype of typ_1 and
+// typ_2 is a subtype of typ_2. For this reason, function types are covariant
+// in their second argument (like tuples), but contravariant in their first
+// argument. Mutable types, like array or ref are neither covariant nor
+// contravariant, they are nonvariant, that is they do not propagate subtyping.
+// For user-defined types, the variance is automatically inferred: a parameter
+// is covariant if it has only covariant occurrences, contravariant if it has only
+// contravariant occurrences, variance-free if it has no occurrences, and
+// nonvariant otherwise. A variance-free parameter may change freely through
+// subtyping, it does not have to be a subtype or a supertype. For abstract and
+// private types, the variance must be given explicitly (see section 7.8.1),
+// otherwise the default is nonvariant. This is also the case for constrained
+// arguments in type definitions.

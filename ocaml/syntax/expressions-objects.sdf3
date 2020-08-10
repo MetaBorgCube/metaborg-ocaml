@@ -1,0 +1,71 @@
+module expressions-objects
+
+imports classes names aux
+
+// 7.7.6  Objects
+// ==============
+
+context-free syntax 
+  Expr.New    = "new" ClassPath
+  Expr.Object = "object" ClassBody "end"
+  Expr.Invoke = Expr "#" MethodName
+  Expr.InstAssign = InstVarName "<-" Expr  
+  Expr.Clone  = "{<" {InstVar ";"}* OptSemicolon ">}"
+
+  InstVar.InstVarInit = InstVarName "=" Expr
+  InstVar.InstVar     = InstVarName  
+  
+//Expr.Var    = InstVarName // overlaps with ValuePath // TODO: check 
+  
+// Object creation
+// ---------------
+// 
+// When class-path evaluates to a class body, new class-path evaluates to a new
+// object containing the instance variables and methods of this class.
+// When class-path evaluates to a class function, new class-path evaluates to a
+// function expecting the same number of arguments and returning a new object of
+// this class.
+//  
+// Immediate object creation
+// -------------------------
+// 
+// Creating directly an object through the object class-body end construct is
+// operationally equivalent to defining locally a class class-name = object
+// class-body end see sections 7.9.2 and following for the syntax of
+// class-body and immediately creating a single object from it by new
+// class-name.
+// The typing of immediate objects is slightly different from explicitly
+// defining a class in two respects. First, the inferred object type may contain
+// free type variables. Second, since the class body of an immediate object will
+// never be extended, its self type can be unified with a closed object type.
+// 
+// Method invocation
+// -----------------
+// 
+// The expression expr #  method-name invokes the method method-name of the
+// object denoted by expr.
+// If method-name is a polymorphic method, its type should be known at the
+// invocation site. This is true for instance if expr is the name of a fresh
+// object (let ident = new  class-path ... ) or if there is a type constraint.
+// Principality of the derivation can be checked in the -principal mode.
+// 
+// 
+// Accessing and modifying instance variables
+// ------------------------------------------
+// 
+// The instance variables of a class are visible only in the body of the methods
+// defined in the same class or a class that inherits from the class defining the
+// instance variables. The expression inst-var-name evaluates to the value of the
+// given instance variable. The expression inst-var-name <-  expr assigns the
+// value of expr to the instance variable inst-var-name, which must be mutable.
+// The whole expression inst-var-name <-  expr evaluates to ().
+// 
+// Object duplication
+// ------------------
+// 
+// An object can be duplicated using the library function Oo.copy (see module
+// Oo). Inside a method, the expression  {< [inst-var-name  [= expr]  { ;
+// inst-var-name  [= expr] }] >} returns a copy of self with the given instance
+// variables replaced by the values of the associated expressions. A single
+// instance variable name id stands for id =  id. Other instance variables have
+// the same value in the returned object as in self.

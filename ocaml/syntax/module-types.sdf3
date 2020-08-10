@@ -1,8 +1,13 @@
 module module-types
 
-imports lex names type-expressions 
-type-definitions classes expressions
-aux
+imports lex 
+imports names 
+imports type-expressions 
+imports type-definitions 
+imports module-expressions
+imports classes 
+imports expressions
+imports aux
 
 // 7.10  Module types (module specifications)
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=

@@ -1,7 +1,14 @@
 module module-expressions
 
-imports lex module-types expressions type-expressions 
-names type-definitions exception-definitions classes
+imports lex 
+imports names  
+imports module-types  
+imports expressions  
+imports expressions-basic  
+imports type-expressions 
+imports type-definitions  
+imports exception-definitions  
+imports classes
 
 // 7.11  Module expressions (module implementations)
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
@@ -48,6 +55,8 @@ context-free syntax
   
   Definition.DefModTyped  = "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr
   Definition.DefMod       = "module" ModuleName ModParam*                "=" ModuleExpr
+   
+  ModParam.ModParam = "(" ModuleName ":" ModuleType ")"
   
   Definition.DefModType   = "module" "type" ModtypeName "=" ModuleType
   Definition.DefOpen      = "open" ModulePath

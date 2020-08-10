@@ -1,0 +1,141 @@
+module expressions-data-structures
+
+imports aux expressions names type-expressions
+
+// 7.7.4  Operations on data structures
+// ====================================
+// 
+// 
+// 
+// Products
+// --------
+
+context-free syntax 
+  Expr.Tuple = {Expr ","}+
+context-free priorities
+  Expr.Tuple <0> .> {Expr ","}+ = Expr
+  
+// The expression expr_1 , ... ,  expr_n evaluates to the n-tuple of the values
+// of expressions expr_1 to expr_n. The evaluation order of the subexpressions is
+// not specified.
+
+
+  
+// Variants
+// --------
+
+context-free syntax
+  Expr.ConApp = Constr Expr  
+  
+// The expression constr  expr evaluates to the unary variant value whose
+// constructor is constr, and whose argument is the value of expr. Similarly, the
+// expression constr (  expr_1 , ... ,  expr_n ) evaluates to the n-ary variant
+// value whose constructor is constr and whose arguments are the values of expr_1,
+// ...,  expr_n.
+// The expression constr ( expr_1, ...,  expr_n) evaluates to the variant value
+// whose constructor is constr, and whose arguments are the values of expr_1 ...
+// expr_n.
+
+context-free syntax
+  Expr.Cns  = Expr "::" Expr  
+  Expr.List = "[" {Expr ";"}+ OptSemicolon "]" 
+  
+// For lists, some syntactic sugar is provided. The expression expr_1 ::  expr_2
+// stands for the constructor ( :: )  applied to the arguments ( expr_1 ,  expr_2
+// ), and therefore evaluates to the list whose head is the value of expr_1 and
+// whose tail is the value of expr_2. The expression [ expr_1 ; ... ;  expr_n ] is
+// equivalent to expr_1 :: ... ::  expr_n :: [], and therefore evaluates to the
+// list whose elements are the values of expr_1 to expr_n.
+ 
+// Polymorphic variants
+// --------------------
+
+context-free syntax 
+  Expr.TagApp = TagNameQ Expr
+  
+// The expression `tag-name  expr evaluates to the polymorphic variant value
+// whose tag is tag-name, and whose argument is the value of expr.
+ 
+// Records
+// -------
+
+context-free syntax // record expressions 
+
+  Expr.Record  = "{"             {FieldInit ";"}+ OptSemicolon "}"
+  Expr.RecordW = "{" Expr "with" {FieldInit ";"}+ OptSemicolon "}"
+                
+  FieldInit.FieldInit1 = Field ":" Typexpr "=" Expr 
+  FieldInit.FieldInit2 = Field             "=" Expr
+  FieldInit.FieldInit3 = Field ":" Typexpr 
+  FieldInit.FieldInit4 = Field  
+  
+  Expr.Proj      = Expr "." Field 
+  Expr.Expr70    = Expr "." Field "<-" Expr
+  Expr.Expr71    = Expr "." "(" Expr ")"
+  Expr.Expr72    = Expr "." "(" Expr ")" "<-" Expr
+  Expr.Expr73    = Expr "." "[" Expr "]"
+  Expr.Expr74    = Expr "." "[" Expr "]" "<-" Expr
+  
+// The expression { field_1  [= expr_1] ; ... ;  field_n  [= expr_n ]} evaluates
+// to the record value { field_1 = v_1; ...; field_n = v_n } where v_i is the
+// value of expr_i for i = 1,... , n. A single identifier field_k stands for
+// field_k =  field_k, and a qualified identifier module-path .  field_k stands
+// for module-path .  field_k =  field_k. The fields field_1 to field_n must all
+// belong to the same record type; each field of this record type must appear
+// exactly once in the record expression, though they can appear in any order. The
+// order in which expr_1 to expr_n are evaluated is not specified. Optional type
+// constraints can be added after each field { field_1 :  typexpr_1 =  expr_1 ;...
+// ;  field_n :  typexpr_n =  expr_n } to force the type of field_k to be
+// compatible with typexpr_k.
+// The expression { expr with  field_1  [= expr_1] ; ... ;  field_n  [= expr_n]
+// } builds a fresh record with fields field_1 ...  field_n equal to expr_1 ...
+// expr_n, and all other fields having the same value as in the record expr. In
+// other terms, it returns a shallow copy of the record expr, except for the
+// fields field_1 ...  field_n, which are initialized to expr_1 ...  expr_n. As
+// previously, single identifier field_k stands for field_k =  field_k, a
+// qualified identifier module-path .  field_k stands for module-path .  field_k =
+// field_k and it is possible to add an optional type constraint on each field
+// being updated with { expr with  field_1 :  typexpr_1 =  expr_1 ; ... ;  field_n
+// :  typexpr_n =  expr_n }.
+// The expression expr_1 .  field evaluates expr_1 to a record value, and
+// returns the value associated to field in this record value.
+// The expression expr_1 .  field <-  expr_2 evaluates expr_1 to a record value,
+// which is then modified in-place by replacing the value associated to field in
+// this record by the value of expr_2. This operation is permitted only if field
+// has been declared mutable in the definition of the record type. The whole
+// expression expr_1 .  field <-  expr_2 evaluates to the unit value ().
+
+// Arrays
+// ------
+
+
+context-free syntax
+  Expr.Array  = "[|" {Expr ";"}+ OptSemicolon "|]"
+   
+// The expression [| expr_1 ; ... ;  expr_n |] evaluates to a n-element array,
+// whose elements are initialized with the values of expr_1 to expr_n
+// respectively. The order in which these expressions are evaluated is
+// unspecified.
+// The expression expr_1 .(  expr_2 ) returns the value of element number expr_2
+// in the array denoted by expr_1. The first element has number 0; the last
+// element has number n1, where n is the size of the array. The exception
+// Invalid_argument is raised if the access is out of bounds.
+// The expression expr_1 .(  expr_2 ) <-  expr_3 modifies in-place the array
+// denoted by expr_1, replacing element number expr_2 by the value of expr_3. The
+// exception Invalid_argument is raised if the access is out of bounds. The value
+// of the whole expression is ().
+
+// Strings
+// -------
+// 
+// The expression expr_1 .[  expr_2 ] returns the value of character number
+// expr_2 in the string denoted by expr_1. The first character has number 0; the
+// last character has number , where n is the length of the string. The
+// exception Invalid_argument is raised if the access is out of bounds.
+// The expression expr_1 .[  expr_2 ] <-  expr_3 modifies in-place the string
+// denoted by expr_1, replacing character number expr_2 by the value of expr_3.
+// The exception Invalid_argument is raised if the access is out of bounds. The
+// value of the whole expression is ().
+// Note: this possibility is offered only for backward compatibility with older
+// versions of OCaml and will be removed in a future version. New code should use
+// byte sequences and the Bytes.set function.
