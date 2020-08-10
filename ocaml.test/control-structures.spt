@@ -1,0 +1,72 @@
+module operators
+
+language ocaml
+
+start symbol Expr
+
+test if-then-else [[  
+  if x then y else z
+]] parse succeeds
+
+test if-then-else [[  
+  if x then y 
+]] parse succeeds
+
+test if-then-else [[  
+  if x then if y then z else a
+]] parse to [[ 
+   if x then (if y then z else a)
+]]  
+
+test if-then-else [[  
+  if a then b; if y then z else a
+]] parse to [[ 
+  (if a then b); (if y then z else a)
+]]
+
+test if-then-else [[  
+  0 + if a then b else c + d
+]] parse to [[ 
+  0 + (if a then b else (c + d))
+]]  
+
+test if-then-else [[  
+  0 && if a then b else c && d
+]] parse to [[ 
+  0 && (if a then b else (c && d))
+]]  
+
+test if-then-else [[  
+  4 + if true then 4 else 5 && false
+]] parse succeeds
+
+test if-then-else [[  
+  4 + if true then 4 else 5 && false
+]] parse to [[
+  4 + (if true then 4 else (5 && false))
+]] 
+
+
+
+test match [[  
+  fun ys -> match ys with Nil -> 0 | Cons(x, xs) -> 1 + length xs
+]] parse to [[
+  fun ys -> (match ys with Nil -> 0 | (Cons(x, xs)) -> (1 + (length xs)))
+]] 
+
+test match [[  
+  match a with b -> match c with d -> e | f -> g 
+]] parse to [[
+  match a with b -> (match c with d -> e | f -> g)
+]] 
+
+test match [[  
+  a + match a with b -> c && d
+]] parse to [[
+  a + (match a with b -> (c && d))
+]] 
+
+
+
+
+
