@@ -157,7 +157,7 @@ test range pattern [[
   = 1
 ]] parse succeeds
 
-test range pattern [[   
+test range pattern [[    
   let Cons 'a' .. 'z', xs
   = 1
 ]] parse to [[
@@ -165,10 +165,10 @@ test range pattern [[
   = 1
 ]]
 
-test lazy pattern (this is safe; correct in OCaml?) [[    
+test lazy pattern (this is safe; correct in OCaml?) [[
   let lazy Cons a
   = 1
-]] parse succeeds
+]] parse fails
 
 test lazy pattern  [[    
   let lazy x | exception y

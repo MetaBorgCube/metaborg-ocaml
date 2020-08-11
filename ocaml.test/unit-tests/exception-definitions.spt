@@ -1,8 +1,14 @@
-module compilation-units
+module exception-definitions
 
 language ocaml
 
-test foo [[
+start symbol Definition
 
+test exception definition [[
+  exception RunTimeException of string
+]] parse succeeds
+
+test exception definition [[ 
+  exception RunTimeException = RTE
 ]] parse succeeds
 

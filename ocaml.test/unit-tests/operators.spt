@@ -65,3 +65,9 @@ test operators [[
   (true && false) or ((false & true) || false)
 ]]  
 
+
+test operators [[ 
+  (f (x +. dx) -. f x)
+]] parse to [[
+  (f (x +. dx) -. f x)
+]]

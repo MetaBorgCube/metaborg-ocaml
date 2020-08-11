@@ -2,7 +2,39 @@ module classes
 
 language ocaml
 
-test foo [[
+start symbol Specification
 
+test class type [[
+  class point : object
+    val x : int
+    val virtual y : int
+    val mutable virtual color : color
+  end 
+]] parse succeeds
+
+test class type [[ 
+  class point : let open Lib.Color in 
+  object
+    val x : int
+    val mutable y : int
+    val virtual mutable color : color
+  end
+]] parse succeeds
+
+test class type [[ 
+  class list : 'a -> 
+  object ('self)
+    val hd : 'a
+    val tl : 'self
+    method length : int
+    method virtual append : 'self -> 'self
+  end
+]] parse succeeds
+
+test class type [[ 
+  class color_point : object
+    inherit point 
+    val color : Lib.Color.color
+  end
 ]] parse succeeds
 

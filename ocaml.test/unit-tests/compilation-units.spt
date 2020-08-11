@@ -3,10 +3,5 @@ module compilation-units
 language ocaml
 
 test foo [[
-
-  module unit-name : sigunit-interface end 
-       = struct  
-           unit-implementation 
-         end
 ]] parse succeeds
 

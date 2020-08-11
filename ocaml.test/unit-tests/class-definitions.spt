@@ -1,0 +1,13 @@
+module class-definitions
+
+
+language ocaml
+
+start symbol Definition
+
+test class type [[
+  class color_point =
+  object
+  end
+]] parse succeeds
+

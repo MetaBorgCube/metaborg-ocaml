@@ -1,8 +1,38 @@
-module compilation-units
+module type-definitions
 
 language ocaml
 
-test foo [[
+start symbol Definition
 
+test type definition [[
+  type ('a, 'b) pair = 'a * 'b
 ]] parse succeeds
 
+test type definition [[
+  type 'a list = Nil | Cons of 'a * ('a list)
+]] parse succeeds
+
+test type definition [[
+  type 'a list = [] | (::) of 'a * ('a list)
+]] parse succeeds
+
+test type definition [[
+  type 'a list = [] | (::) of 'a * 'a list
+]] parse succeeds
+
+test type definition [[
+  type 'a list = Nil | Cons of 'a * 'a list
+   and 'a tree = Node of 'a * ('a tree) list
+]] parse succeeds
+
+test type definition [[
+  type person = {
+     name : string;
+     birthday : date;
+     mutable age : int; 
+     friends : person list;
+  }
+]] parse succeeds
+
+
+ 
