@@ -24,13 +24,14 @@ context-free restrictions
 // treated as blank characters. Comments do not occur inside string or character
 // literals. Nested comments are handled correctly.
 
-lexical sorts AST EOF
+lexical sorts AST LBR EOF
 lexical syntax
   LAYOUT = Com
-  Com    = "(*" (~[\*] | AST | Com)* "*)"
+  Com    = "(*" (~[\(\*] | AST | LBR | Com)* "*)"
   AST    = [\*]
 lexical restrictions
   AST -/- [\/]
+  LBR -/- [\*]
 context-free restrictions
   LAYOUT? -/- [\(].[\*]
   
@@ -59,6 +60,12 @@ context-free syntax
 context-free restrictions 
   IntegerLiteral -/- [0-9A-Fa-fxXoObB]
   "-" -/- [0-9A-Fa-fxXoObB]
+  
+//lexical syntax
+//  DecInt = [0-9] [0-9\_]*
+//  HexInt = ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
+//  OctInt = ("0o" | "0O") [0-7] [0-7\_]*
+//  BinInt = ("0b" | "0B") [0-1] [0-1\_]*
   
 lexical syntax
   DecInt = [\-]? [0-9] [0-9\_]*
@@ -233,7 +240,7 @@ lexical syntax
 
   CoreOperatorChar = [\$\&\*\+\-\/\=\>\@\^\|]
     
-  InfixSymbol60    = [\#]           OperatorChar*
+  InfixSymbol60    = [\#]           OperatorChar+
   InfixSymbol50    = [\*] [\*]      OperatorChar*
   
   InfixSymbol40    = [\*] 
@@ -250,6 +257,16 @@ lexical syntax
   InfixSymbol10    = "&&" {reject}
   InfixSymbol10    = "&" {reject}
   InfixSymbol10    = "||" {reject}
+  InfixSymbol10    = "<-" {reject}
+  
+lexical restrictions
+
+  InfixSymbol60 -/- [\$\&\*\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.]
+  InfixSymbol50 -/- [\$\&\*\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.]
+  InfixSymbol40 -/- [\$\&\*\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.]
+  InfixSymbol30 -/- [\$\&\*\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.]
+  InfixSymbol30 -/- [\$\&\*\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.]
+  InfixSymbol10 -/- [\$\&\*\+\-\/\=\>\@\^\|\~\!\?\%\<\:\.]
   
   
   
@@ -400,7 +417,8 @@ lexical syntax
   LowercaseIdent = "value" {reject}
   
 lexical restrictions 
-  "fun" -/- [a-zA-Z0-9]
+  "fun" "lazy" 
+   -/- [a-zA-Z0-9\_]
    
 // The following character sequences are also keywords:
 // <<
