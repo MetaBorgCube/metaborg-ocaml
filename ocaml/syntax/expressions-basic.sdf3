@@ -221,7 +221,7 @@ context-free syntax // let bindings
   LetBinding.LetVar   = ValueName ":" PolyTypexpr                      "=" Expr
   
   LetBinding.LetFun   = ValueName Parameter+                           "=" Expr
-  LetBinding.LetFunRT = ValueName Parameter* ":" Typexpr               "=" Expr
+  LetBinding.LetFunRT = ValueName Parameter+ ":" Typexpr               "=" Expr
   LetBinding.LetFunTT = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
   LetBinding.LetFunST = ValueName Parameter*              ":>" Typexpr "=" Expr
   
