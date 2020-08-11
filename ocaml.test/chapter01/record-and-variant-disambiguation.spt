@@ -1,0 +1,47 @@
+module record-and-variant-disambiguation
+
+language ocaml
+
+start symbol Definition
+
+
+test test 2 [[ 
+ type first_record  = { x:int; y:int; z:int }
+]] parse succeeds
+
+test test 2 [[ 
+ type middle_record = { x:int; z:int }
+]] parse succeeds
+
+test test 2 [[ 
+ type last_record   = { x:int }
+]] parse succeeds
+
+test test 2 [[ 
+  type first_variant = A | B | C
+]] parse succeeds
+
+test test 2 [[ 
+  type last_variant  = A
+]] parse succeeds
+
+test test 2 [[  
+   let look_at_x_then_z (r:first_record) =
+   let x = r.x in
+   x + r.z
+]] parse succeeds
+
+test test 2 [[ 
+   let permute (x:first_variant) = match x with
+   | A -> (B:first_variant)
+   | B -> A
+   | C -> C
+]] parse succeeds
+
+test test 2 [[ 
+   type wrapped = First of first_record
+]] parse succeeds
+
+test test 2 [[
+   let f (First r) = r, r.x
+]] parse succeeds
