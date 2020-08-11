@@ -13,12 +13,12 @@ context-free syntax
   Typexpr             = "(" Typexpr ")" {bracket}
   
   Typexpr.TypeVar     = TypeVar
-  Typexpr.TypeAnon    = "_"
+//  Typexpr.TypeAnon    = "_"
   
   Typexpr.TypeFun     = Typexpr "->" Typexpr {right}
   Typexpr.TypeFunL    = OptLabel Typexpr "->" Typexpr {right}
   
-  Typexpr.TypeTup     = {Typexpr "*"}+ {non-assoc} // Note combination with prio
+  Typexpr.TypeTup     = {Typexpr "*"}+ 
   
   Typexpr             = Typeconstr
   Typexpr.TypeApp     = Typexpr Typeconstr {non-assoc}
@@ -47,15 +47,19 @@ context-free syntax // # types
   Typexpr.HashTypeN = "(" {Typexpr ","}+ ")" "#" ClassPath
   
 context-free priorities
-
   {Typexpr.TypeApp Typexpr.TypeAppN}
   >  {Typexpr.HashType Typexpr.HashType1 Typexpr.HashTypeN}
-  > Typexpr.TypeTup
+  > {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr
   > {right: Typexpr.TypeFun Typexpr.TypeFunL}
-  > Typexpr.TypeAlias,
+  > Typexpr.TypeAlias
   
-  Typexpr.TypeAppN <1> .> {Typexpr ","}+ = Typexpr,  
-  Typexpr.TypeTup  <0> .> {Typexpr "*"}+ = Typexpr
+context-free priorities
+  Typexpr.TypeAppN <1> .> {Typexpr ","}+ = Typexpr
+  
+context-free priorities
+  Typexpr.TypeTup <0> .> {Typexpr "*"}+ = Typexpr,  
+  {Typexpr "*"}+ = Typexpr                    <0> .> Typexpr.TypeTup,  
+  {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr <2> .> Typexpr.TypeTup 
 
 context-free syntax
   TypeAscr.TypeAscr = ":" Typexpr

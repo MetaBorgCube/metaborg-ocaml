@@ -30,13 +30,13 @@ context-free priorities
   > Pattern.LazyPat
   > {Pattern.ConstrPat Pattern.PolyPat}
   > {Pattern ","}+ = {Pattern ","}+ "," Pattern
-  > Pattern.TuplePat 
   > Pattern.OrPat
   > Pattern.AliasPat
   
 context-free priorities 
   Pattern.TuplePat         <0> .> {Pattern ","}+ = Pattern,
-  {Pattern ","}+ = Pattern <0> .> Pattern.TuplePat
+  {Pattern ","}+ = Pattern <0> .> Pattern.TuplePat,
+  {Pattern ","}+ = {Pattern ","}+ "," Pattern <2> .> Pattern.TuplePat
      
 context-free syntax // record patterns
 

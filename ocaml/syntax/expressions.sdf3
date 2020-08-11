@@ -32,8 +32,8 @@ imports expressions-other
 sorts Expr
 context-free priorities
   Expr.Prefix
-  > {non-assoc: Expr.Proj Expr.ProjAssign Expr.Proj1 Expr.Proj1Assign Expr.Proj2 Expr.Proj2Assign}
-  > Expr.BinOp6 // #
+  > {Expr.Proj Expr.Proj1 Expr.Proj2}
+  > {left: Expr.BinOp6 Expr.Invoke} // #
   > Argument+ = Argument+ Argument
   > {non-assoc: Expr.App Expr.ConApp Expr.Lazy Expr.Assert}
   > {Expr.Min Expr.MinF}
@@ -46,8 +46,9 @@ context-free priorities
   > {right: Expr.And Expr.AndD}
   > {right: Expr.Or  Expr.OrD}
   > {Expr ","}+ = {Expr ","}+ "," Expr
-  > Expr.Tuple    
-  > {right: Expr.InstAssign Expr.BinOp0}  // := 
+  //> Expr.Tuple    
+  > {right: Expr.InstAssign Expr.BinOp0 
+            Expr.ProjAssign Expr.Proj1Assign Expr.Proj2Assign} // := <-
   > Expr.IfE
   > Expr.IfT  
   > Expr.Seq
