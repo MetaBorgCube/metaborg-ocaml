@@ -18,7 +18,6 @@ context-free syntax
   Typexpr.TypeFun     = Typexpr "->" Typexpr {right}
   Typexpr.TypeFunL    = OptLabel Typexpr "->" Typexpr {right}
   
-  //Typexpr.TypeTup     = Typexpr "*" {Typexpr "*"}+ {non-assoc} 
   Typexpr.TypeTup     = {Typexpr "*"}+ {non-assoc} // Note combination with prio
   
   Typexpr             = Typeconstr
@@ -55,7 +54,6 @@ context-free priorities
   > {right: Typexpr.TypeFun Typexpr.TypeFunL}
   > Typexpr.TypeAlias,
   
-  Typexpr.TypeTup  <0> .> Typexpr.TypeTup,  
   Typexpr.TypeAppN <1> .> {Typexpr ","}+ = Typexpr,  
   Typexpr.TypeTup  <0> .> {Typexpr "*"}+ = Typexpr
 

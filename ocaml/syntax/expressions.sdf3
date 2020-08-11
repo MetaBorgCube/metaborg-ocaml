@@ -34,17 +34,17 @@ context-free priorities
   Expr.Prefix
   > {non-assoc: Expr.Proj Expr.ProjAssign Expr.Proj1 Expr.Proj1Assign Expr.Proj2 Expr.Proj2Assign}
   > Expr.BinOp6 // #
-  > {non-nested: Expr.App Expr.ConApp Expr.Lazy Expr.Assert}
+  > Argument+ = Argument+ Argument
+  > {non-assoc: Expr.App Expr.ConApp Expr.Lazy Expr.Assert}
   > {Expr.Min Expr.MinF}
   > Expr.BinOp5 // **
   > Expr.BinOp4 // *
   > Expr.BinOp3 // +-
-  > Expr.Cns     // ::
+  > Expr.Cns    // ::
   > Expr.BinOp2 // @^
   > Expr.BinOp1 // =<>
   > {right: Expr.And Expr.AndD}
   > {right: Expr.Or  Expr.OrD}
-  > {Expr ","}+ = Expr 
   > {Expr ","}+ = {Expr ","}+ "," Expr
   > Expr.Tuple    
   > {right: Expr.InstAssign Expr.BinOp0}  // := 
@@ -54,10 +54,9 @@ context-free priorities
   > Expr.Let 
   > Expr.LetRec 
   > Expr.Match 
-  > Expr.Fun 
-  > Expr.Function 
-  > Expr.Try,
+  > {Expr.Fun Expr.FunTyped Expr.Function Expr.Try}
   
+context-free priorities
   {non-nested: Argument.Arg Expr.Lazy Expr.Assert}
    
 context-free priorities
@@ -74,7 +73,7 @@ context-free priorities
   
 context-free priorities 
 
-  {Expr ";"}+ = Expr <0> .> Expr.Seq,
+  {Expr ";"}+ = Expr                 <0> .> Expr.Seq,
   {Expr ";"}+ = {Expr ";"}+ ";" Expr <0> .> Expr.Seq
 
  

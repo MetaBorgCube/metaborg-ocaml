@@ -24,7 +24,20 @@ context-free syntax
   Pattern.RangePat   = CharLiteral ".." CharLiteral
   Pattern.LazyPat    = "lazy" Pattern
   Pattern.ExcPat     = "exception" Pattern
-   
+
+context-free priorities 
+  Pattern.RangePat
+  > Pattern.LazyPat
+  > {Pattern.ConstrPat Pattern.PolyPat}
+  > {Pattern ","}+ = {Pattern ","}+ "," Pattern
+  > Pattern.TuplePat 
+  > Pattern.OrPat
+  > Pattern.AliasPat
+  
+context-free priorities 
+  Pattern.TuplePat         <0> .> {Pattern ","}+ = Pattern,
+  {Pattern ","}+ = Pattern <0> .> Pattern.TuplePat
+     
 context-free syntax // record patterns
 
   Pattern.RecPat         = "{" {FieldPat ";"}+             "}"
@@ -35,7 +48,7 @@ context-free syntax // record patterns
   FieldPat.FieldPat      = Field ":" Typexpr "=" Pattern 
   FieldPat.FieldPatInit  = Field             "=" Pattern
   FieldPat.FieldPatTyped = Field ":" Typexpr
-  FieldPat.FieldPat      = Field  
+  FieldPat.FieldPatUT    = Field  
   
   Field = "_" {reject}
   
@@ -45,22 +58,7 @@ context-free syntax // local open patterns
   Pattern.LocalOpenPatList  = ModulePath "." "[" Pattern "]"
   Pattern.LocalOpenPatArray = ModulePath "." "[|" Pattern "|]"
   Pattern.LocalOpenPatRec   = ModulePath "." "{" Pattern "}"
-  
-context-free priorities 
-  Pattern.RangePat
-  > Pattern.LazyPat
-  > {Pattern.ConstrPat Pattern.PolyPat}
-  > {Pattern ","}+ = Pattern 
-  > {Pattern ","}+ = {Pattern ","}+ "," Pattern
-  > Pattern.TuplePat 
-  > Pattern.OrPat
-  > Pattern.AliasPat,
-  
-  Pattern.TuplePat <0> .> {Pattern ","}+ = Pattern
-  
-  // TODO: more concise formulation of these rules (non-assoc?)
-
-  
+ 
 // See also the following language extensions: first-class modules, attributes
 // and extension nodes.
 // The table below shows the relative precedences and associativity of operators

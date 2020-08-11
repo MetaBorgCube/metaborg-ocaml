@@ -17,7 +17,9 @@ imports type-expressions
 context-free syntax 
   Expr.Tuple = {Expr ","}+
 context-free priorities
-  Expr.Tuple <0> .> {Expr ","}+ = Expr
+  Expr.Tuple <0> .> {Expr ","}+ = Expr,
+  {Expr ","}+ = Expr <0> .> Expr.Tuple
+  
   
 // The expression expr_1 , ... ,  expr_n evaluates to the n-tuple of the values
 // of expressions expr_1 to expr_n. The evaluation order of the subexpressions is
