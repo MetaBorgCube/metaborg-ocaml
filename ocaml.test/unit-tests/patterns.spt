@@ -3,7 +3,7 @@ module patterns
 language ocaml
 start symbol Definition
 
-test var pattern [[ 
+test var pattern [[  
   let xyab
   = 1
 ]] parse succeeds
@@ -28,7 +28,7 @@ test alias pattern [[
   = 1
 ]] parse succeeds
  
-test alias pattern [[ 
+test alias pattern [[  
   let Cons(x, xs) as xyz
   = 1
 ]] parse succeeds
@@ -50,7 +50,7 @@ test tuple pattern [[
   = 1
 ]] parse succeeds
 
-test or / tuple pattern [[ 
+test or / tuple pattern [[  
   let a, b | c, d, e 
   = 1
 ]] parse to [[
@@ -58,19 +58,43 @@ test or / tuple pattern [[
   = 1
 ]]
 
-test or / constructor pattern [[ 
+test or / constructor pattern [[  
+  let A b | C d
+  = 1 
+]] parse to [[
+  let (A b) | (C d) 
+  = 1 
+]]
+
+test or / constructor pattern [[  
   let A b | C d, e 
-  = 1
+  = 1 
 ]] parse to [[
   let (A b) | ((C d), e) 
-  = 1
+  = 1 
 ]]
+
+test constructor / as pattern [[ 
+  let Cons a as b | Cons c as d 
+  = 1
+]] parse to [[
+  let ((Cons a) as b | Cons c) as d  
+  = 1
+]] 
 
 test or / as pattern [[ 
   let a as b | c as d 
   = 1
 ]] parse to [[
   let ((a as b) | c) as d 
+  = 1
+]] 
+
+test or / as pattern [[ 
+  let Cons a as b, Cons c as d 
+  = 1
+]] parse to [[
+  let Cons a as b Cons c as d 
   = 1
 ]] 
 
@@ -90,19 +114,19 @@ test as / tuple pattern [[
   = 1
 ]]
 
-test as / tuple pattern [[    
-  let a as c, d
+test as / tuple pattern [[     
+  let a as c, d 
   = 1
 ]] parse to [[
-  let ((a as c), d)
+  let (a as c), d
   = 1
-]]
+]] 
 
-test as / tuple pattern [[    
+test as / tuple pattern [[     
   let a as c, d, e 
-  = 1
+  = 1 
 ]] parse to [[
-  let ((a as c), d, e)
+  let (a as c), d, e
   = 1
 ]]
 
@@ -119,7 +143,7 @@ test constructor pattern [[
 test constructor is uppercase identifier [[  
   let cons a, b, c
   = 1
-]] parse fails
+]] parse succeeds
 
 test constructor pattern [[ 
   let Cons(x, xs)
@@ -169,7 +193,7 @@ test lazy pattern (this is safe; correct in OCaml?) [[
   let lazy Cons a
   = 1
 ]] parse fails
-
+ 
 test lazy pattern  [[    
   let lazy x | exception y
   = 1

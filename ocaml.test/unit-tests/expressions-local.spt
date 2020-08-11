@@ -1,0 +1,29 @@
+module expressions
+
+language ocaml
+
+start symbol Expr
+
+// local definitions 
+
+test let binding [[  
+  (let x = 1 and y = f x and Cons z zs = g h i in x + z) + 1
+]] parse succeeds
+
+
+test let binding [[  
+  let f = fun x y -> x + y g = fun z -> z + 1 in f 1 + g 1
+]] parse succeeds
+
+
+test let binding [[  
+  let ident = fun  parameter_1 parameter_m ->  expr
+]] parse succeeds
+
+test let binding [[  
+  let ident  parameter_1 parameter_m =  expr
+]] parse succeeds
+
+test let binding [[  
+  let pattern_1 :  typ_1 typ_n . typeexpr =  expr
+]] parse succeeds

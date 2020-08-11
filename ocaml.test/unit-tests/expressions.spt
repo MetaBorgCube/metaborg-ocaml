@@ -47,7 +47,7 @@ test function application [[
   f Blue 10
 ]] parse succeeds
 
-test constructor / function application [[ 
+test constructor / function application [[  
   Blue f 10
 ]] parse succeeds
 
@@ -104,35 +104,11 @@ test function definition [[
   fun x y -> x + y
 ]] parse succeeds
 
-test function definition [[  
+test function definition [[   
   fun x y z : list int -> x ++ y
 ]] parse succeeds
 
 
-// local definitions 
-
-
-test let binding [[  
-  lex x = 1 and y = f x and Cons z zs = g h i in x + z
-]] parse succeeds
-
-
-test let binding [[  
-  lex f = fun x y -> x + y g = fun z -> z + 1 in f 1 + g 1
-]] parse succeeds
-
-
-test let binding [[  
-  let ident = fun  parameter_1 parameter_m ->  expr
-]] parse succeeds
-
-test let binding [[  
-  let ident  parameter_1 parameter_m =  expr
-]] parse succeeds
-
-test let binding [[  
-  let pattern_1 :  typ_1 typ_n . typeexpr =  expr
-]] parse succeeds
 
 
 // tuples 

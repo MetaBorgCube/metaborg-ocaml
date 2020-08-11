@@ -31,7 +31,7 @@ test operators [[
 test operators [[ 
   x + - y * -.z ** a
 ]] parse to [[
-  x + ((-y) * ((-.z) ** a))
+  x + ((-y) * ((-.z) ** a)) 
 ]]  
 
 test operators [[ 

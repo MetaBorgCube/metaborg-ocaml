@@ -67,20 +67,32 @@ test function type [[
   type x = 'a * ('b list)
 ]]
 
-test function type [[
+test type [[
   type x = 'a list
 ]] parse succeeds
 
-test function type [[
+test type [[
   type x = ('a) list
 ]] parse succeeds
 
-test function type [[
+test type [[
   type x = ('a, 'b) list
 ]] parse succeeds
 
-test function type [[ 
+test type [[ 
   type x = ('a * 'b) list
+]] parse succeeds
+
+test type [[ 
+  type x = ('a, 'b) list
+]] parse succeeds
+
+test type [[ 
+  type x = ('a, 'b, 'c) list
+]] parse succeeds
+
+test type [[ 
+  type x = ('a, 'b as 'c, 'd) list
 ]] parse succeeds
 
 
@@ -94,6 +106,24 @@ test function type [[
   type notmap = 'a -> 'b -> 'a list -> 'b list
 ]] parse to [[
   type notmap = 'a -> ('b -> (('a list) -> ('b list)))
+]]
+
+// alias types
+
+test alias type [[
+  type x = 'a as 'b
+]] parse succeeds
+
+test alias type [[
+  type x = 'a * 'b as 'c
+]] parse to [[
+  type x = ('a * 'b) as 'c
+]]
+
+test alias type [[
+  type x = 'a as 'b, 'c
+]] parse to [[
+  type x = ('a as 'b), 'c
 ]]
 
 
