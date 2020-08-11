@@ -212,18 +212,18 @@ context-free syntax
 
 sorts LetBinding
 context-free syntax // let bindings
-  Expr.Let          = "let"       {LetBinding "and"}+ "in" Expr
-  Expr.LetRec       = "let" "rec" {LetBinding "and"}+ "in" Expr
-  Expr.LetExc       = "let" "exception" ConstrDecl "in" Expr
+  Expr.Let            = "let"       {LetBinding "and"}+ "in" Expr
+  Expr.LetRec         = "let" "rec" {LetBinding "and"}+ "in" Expr
+  Expr.LetExc         = "let" "exception" ConstrDecl "in" Expr
   
-  LetBinding.LetPat = Pattern "=" Expr
+  LetBinding.LetPat   = Pattern "=" Expr
   
-  LetBinding.LetFun   = ValueName Parameter*                           "=" Expr
+  LetBinding.LetVar   = ValueName ":" PolyTypexpr                      "=" Expr
+  
+  LetBinding.LetFun   = ValueName Parameter+                           "=" Expr
+  LetBinding.LetFunRT = ValueName Parameter* ":" Typexpr               "=" Expr
   LetBinding.LetFunTT = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
   LetBinding.LetFunST = ValueName Parameter*              ":>" Typexpr "=" Expr
-  LetBinding.LetFunRT = ValueName Parameter* ":" Typexpr               "=" Expr
-  
-  LetBinding.LetBinding5 = ValueName ":" PolyTypexpr "=" Expr
   
 // The let and let rec constructs bind value names locally. The construct
 // let pattern_1 =  expr_1 and ... and  pattern_n =  expr_n in  expr
