@@ -1,0 +1,21 @@
+module immediate-objects
+
+language ocaml
+
+start symbol CompilationUnit 
+ 
+test test [[ 
+   let p =
+   object
+     val mutable x = 0
+     method get_x = x
+     method move d = x <- x + d
+   end;;
+]] parse succeeds  
+ 
+test test [[ 
+   let minmax x y =
+   if x < y then object method min = x method max = y end
+   else object method min = y method max = x end;;
+]] parse succeeds 
+

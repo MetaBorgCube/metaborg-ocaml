@@ -1,0 +1,62 @@
+module exceptions
+
+language ocaml
+
+start symbol Definition 
+
+test test [[ 
+  let head l =
+   match l with
+     [] -> raise Empty_list
+   | hd :: tl -> hd
+]] parse succeeds 
+
+test test [[ 
+  let name_of_binary_digit digit =
+   try
+     List.assoc digit [0, "zero"; 1, "one"]
+   with Not_found ->
+     "not a binary digit"
+]] parse succeeds
+
+test test [[ 
+  let rec first_named_value values names =
+   try
+     List.assoc (head values) names
+   with
+   | Empty_list -> "no named value"
+   | Not_found -> first_named_value (List.tl values) names
+]] parse succeeds
+
+test test [[ 
+   let temporarily_set_reference ref newval funct =
+   let oldval = !ref in
+   try
+     ref := newval;
+     let res = funct () in
+     ref := oldval;
+     res
+   with x ->
+     ref := oldval;
+     raise x
+]] parse succeeds
+
+test test [[ 
+   let assoc_may_map f x l =
+   match List.assoc x l with
+   | exception Not_found -> None
+   | y -> f y
+]] parse succeeds
+
+test test [[ 
+   let fixpoint f x =
+   let exception Done in
+   let x = ref x in
+   try while true do
+       let y = f !x in
+       if !x = y then raise Done else x := y
+     done; assert false
+   with Done -> !x
+]] parse succeeds
+
+

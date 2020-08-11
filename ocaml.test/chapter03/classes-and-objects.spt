@@ -1,0 +1,90 @@
+module classes-and-objects
+
+language ocaml
+
+start symbol CompilationUnit 
+ 
+test test [[ 
+   class point =
+   object
+     val mutable x = 0
+     method get_x = x
+     method move d = x <- x + d
+   end;;
+]] parse succeeds  
+ 
+test test [[ 
+  let p = new point;;
+]] parse succeeds 
+ 
+test test [[ 
+  p#get_x;;
+]] parse succeeds 
+ 
+test test [[ 
+  p#move 3;;
+]] parse succeeds 
+ 
+test test [[ 
+  let x0 = ref 0;;
+]] parse succeeds 
+ 
+test test [[ 
+  class point =
+   object
+     val mutable x = incr x0; !x0
+     method get_x = x
+     method move d = x <- x + d
+   end;;
+]] parse succeeds 
+ 
+test test [[ 
+  class point = fun x_init ->
+   object
+     val mutable x = x_init
+     method get_x = x
+     method move d = x <- x + d
+   end;;
+]] parse succeeds 
+ 
+test test [[ 
+  class point x_init =
+   object
+     val mutable x = x_init
+     method get_x = x
+     method move d = x <- x + d
+   end;;
+]] parse succeeds  
+ 
+test test [[ 
+  class point x_init =
+   object
+     val mutable x = x_init
+     method get_x = x
+     method get_offset = x - x_init
+     method move d = x <- x + d
+   end;;
+]] parse succeeds  
+ 
+test test [[ 
+  class adjusted_point x_init =
+   let origin = (x_init / 10) * 10 in
+   object
+     val mutable x = origin
+     method get_x = x
+     method get_offset = x - origin
+     method move d = x <- x + d
+   end;;
+]] parse succeeds  
+ 
+test test [[ 
+  class adjusted_point x_init =  point ((x_init / 10) * 10);;
+]] parse succeeds  
+ 
+test test [[ 
+  let new_adjusted_point x_init = new point ((x_init / 10) * 10);;
+]] parse succeeds  
+
+
+
+

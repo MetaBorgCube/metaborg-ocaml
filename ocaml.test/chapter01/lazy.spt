@@ -1,0 +1,20 @@
+module lazy
+
+language ocaml
+
+start symbol Definition 
+
+test test [[ 
+  let lazy_l = lazy ([1; 2] @ [3; 4])
+]] parse succeeds 
+
+test test [[ 
+  let maybe_eval lazy_guard lazy_expr =
+     match lazy_guard, lazy_expr with
+     | lazy false, _ -> "matches if (Lazy.force lazy_guard = false); lazy_expr not forced"
+     | lazy true, lazy _ -> "matches if (Lazy.force lazy_guard = true); lazy_expr forced"
+]] parse succeeds 
+
+test test [[ 
+  let lazy_two = lazy ( print_endline "lazy_two evaluation"; 1 + 1 )
+]] parse succeeds  

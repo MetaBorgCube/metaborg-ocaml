@@ -1,0 +1,64 @@
+module signatures
+
+language ocaml
+
+start symbol CompilationUnit 
+
+test test [[ 
+  module type SETFUNCTOR =
+   functor (Elt: ORDERED_TYPE) ->
+     sig
+       type element = Elt.t      (* concrete *)
+       type set                  (* abstract *)
+       val empty : set
+       val add : element -> set -> set
+       val member : element -> set -> bool
+     end;;
+]] parse succeeds 
+
+test test [[ 
+  module AbstractSet = (Set : SETFUNCTOR);;
+]] parse succeeds  
+
+test test [[ 
+  module AbstractStringSet = AbstractSet(OrderedString);;
+]] parse succeeds 
+
+test test [[ 
+  module type SET =
+   sig
+     type element
+     type set
+     val empty : set
+     val add : element -> set -> set
+     val member : element -> set -> bool
+   end;;
+]] parse succeeds 
+
+test test [[ 
+  module WrongSet = (Set : functor(Elt: ORDERED_TYPE) -> SET);;
+]] parse succeeds 
+
+test test [[ 
+  module AbstractSet2 =
+   (Set : functor(Elt: ORDERED_TYPE) -> (SET with type element = Elt.t));;
+]] parse succeeds 
+
+test test [[ 
+  module NoCaseString =
+   struct
+     type t = string
+     let compare s1 s2 =
+       OrderedString.compare (String.lowercase_ascii s1) (String.lowercase_ascii s2)
+   end;;
+]] parse succeeds 
+
+test test [[ 
+  module NoCaseString =
+   struct
+     type t = string
+     let compare s1 s2 =
+       OrderedString.compare (String.lowercase_ascii s1) (String.lowercase_ascii s2)
+   end;;
+]] parse succeeds 
+

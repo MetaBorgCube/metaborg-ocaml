@@ -1,0 +1,37 @@
+module private-methods
+
+language ocaml
+
+start symbol CompilationUnit 
+  
+test test [[ 
+   class restricted_point x_init =
+   object (self)
+     val mutable x = x_init
+     method get_x = x
+     method private move d = x <- x + d
+     method bump = self#move 1
+   end;;
+]] parse succeeds 
+  
+test test [[ 
+  let p = new restricted_point 0;;
+]] parse succeeds 
+  
+test test [[ 
+  class point_again x =
+   object (self)
+     inherit restricted_point x
+     method virtual move : _
+   end;;
+]] parse succeeds 
+
+  
+test test [[ 
+  class point_again x =
+   object (self)
+     inherit restricted_point x
+     method virtual move : _
+   end;;
+]] parse succeeds 
+
