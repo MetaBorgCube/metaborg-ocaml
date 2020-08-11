@@ -63,7 +63,7 @@ test match [[
 test match [[  
   a + match a with b -> c && d
 ]] parse to [[
-  a + (match a with b -> (c && d))
+  a + (match a with b -> (c && d)) 
 ]] 
 
 

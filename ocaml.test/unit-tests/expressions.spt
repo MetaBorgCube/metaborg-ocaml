@@ -12,7 +12,7 @@ test begin ... end [[
 ]] parse succeeds
 
 test begin ... end [[ 
-  x.y.z
+  x.y.z 
 ]] parse succeeds
 
 

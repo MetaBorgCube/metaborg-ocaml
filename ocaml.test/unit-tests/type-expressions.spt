@@ -10,7 +10,7 @@ test foo [[
 
 test type variable [[
   type x = 'a
-]] parse succeeds
+]] parse succeeds 
 
 
 // function types
@@ -33,9 +33,9 @@ test function type [[
 
 
 // tuple types
-
+ 
 test function type [[ 
-  type x = int * (int * int)
+  type x = int * (int * int) 
 ]] parse succeeds
 
 // function types and tuple types
@@ -120,10 +120,10 @@ test alias type [[
   type x = ('a * 'b) as 'c
 ]]
 
-test alias type [[
-  type x = 'a as 'b, 'c
-]] parse to [[
-  type x = ('a as 'b), 'c
+test alias type [[ 
+  type x = 'a as 'b * 'c
+]] parse to [[ 
+  type x = ('a as 'b) * 'c
 ]]
 
 

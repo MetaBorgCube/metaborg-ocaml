@@ -45,7 +45,7 @@ test or pattern [[
 ]] parse succeeds
 
 
-test tuple pattern [[ 
+test tuple pattern [[  
   let a, b, c, d, e 
   = 1
 ]] parse succeeds
@@ -90,11 +90,11 @@ test or / as pattern [[
   = 1
 ]] 
 
-test or / as pattern [[ 
-  let Cons a as b, Cons c as d 
+test or / tuple pattern [[ 
+  let Cons a as b, Cons c as d  
   = 1
 ]] parse to [[
-  let Cons a as b Cons c as d 
+  let (((Cons a) as b), Cons c) as d
   = 1
 ]] 
 

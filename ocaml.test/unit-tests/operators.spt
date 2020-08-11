@@ -5,6 +5,12 @@ language ocaml
 start symbol Expr
 
 test operators [[ 
+  x-1
+]] parse to [[
+  (x) - (1)
+]]
+
+test operators [[ 
   x + y + z
 ]] parse to [[
   (x + y) + z

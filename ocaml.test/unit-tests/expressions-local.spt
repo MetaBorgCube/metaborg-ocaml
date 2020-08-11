@@ -17,13 +17,17 @@ test let binding [[
 
 
 test let binding [[  
-  let ident = fun  parameter_1 parameter_m ->  expr
+  let ident = fun  parameter_1 parameter_m ->  expr in ident
 ]] parse succeeds
 
 test let binding [[  
-  let ident  parameter_1 parameter_m =  expr
+  let ident  parameter_1 parameter_m =  expr in ident 
+]] parse succeeds
+	
+test let binding [[  
+  let pattern_1 :  typ_1 * typ_n typeexpr =  expr in ident
 ]] parse succeeds
 
 test let binding [[  
-  let pattern_1 :  typ_1 typ_n . typeexpr =  expr
+  let f : 'a list -> 'a list = fun x -> x in f []
 ]] parse succeeds
