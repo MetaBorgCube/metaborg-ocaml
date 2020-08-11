@@ -32,10 +32,9 @@ imports expressions-other
 sorts Expr
 context-free priorities
   Expr.Prefix
+  > {non-assoc: Expr.Proj Expr.ProjAssign Expr.Proj1 Expr.Proj1Assign Expr.Proj2 Expr.Proj2Assign}
   > Expr.BinOp6 // #
-  > Expr.Assert
-  > Expr.Lazy
-  > {left: Expr.App Expr.ConApp  }
+  > {non-nested: Expr.App Expr.ConApp Expr.Lazy Expr.Assert}
   > {Expr.Min Expr.MinF}
   > Expr.BinOp5 // **
   > Expr.BinOp4 // *
@@ -57,19 +56,27 @@ context-free priorities
   > Expr.Match 
   > Expr.Fun 
   > Expr.Function 
-  > Expr.Try 
-
+  > Expr.Try,
+  
+  {non-nested: Argument.Arg Expr.Lazy Expr.Assert}
+   
 context-free priorities
   // TODO: check ambiguity between argument and constructor app
-  Expr.App            <0> .> Expr.Const, 
+  Expr.App            <0> .> {Expr.Lazy Expr.Assert Expr.Const}, 
   Argument.Arg        <0> .> {Expr.App Expr.ConApp},   
   Argument.LabeledArg <1> .> {Expr.ConApp Expr.Lazy Expr.Assert},
-  Argument.OptArg     <1> .> {Expr.ConApp Expr.Lazy Expr.Assert}
+  Argument.OptArg     <1> .> {Expr.ConApp Expr.Lazy Expr.Assert},
+  Expr.Lazy           <0> .> {Expr.ConApp}
 
 context-free priorities
 
-  Argument.Arg <0> .> Expr.Min
- 
+  Argument.Arg <0> .> {Expr.Min Expr.MinF}
+  
+context-free priorities 
+
+  {Expr ";"}+ = Expr <0> .> Expr.Seq,
+  {Expr ";"}+ = {Expr ";"}+ ";" Expr <0> .> Expr.Seq
+
  
 
   

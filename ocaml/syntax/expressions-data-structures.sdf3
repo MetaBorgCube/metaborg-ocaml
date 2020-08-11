@@ -1,6 +1,10 @@
 module expressions-data-structures
 
-imports aux expressions names type-expressions
+imports aux 
+imports expressions 
+imports expressions-control
+imports names 
+imports type-expressions
 
 // 7.7.4  Operations on data structures
 // ====================================
@@ -64,17 +68,21 @@ context-free syntax // record expressions
   Expr.Record  = "{"             {FieldInit ";"}+ OptSemicolon "}"
   Expr.RecordW = "{" Expr "with" {FieldInit ";"}+ OptSemicolon "}"
                 
-  FieldInit.FieldInit1 = Field ":" Typexpr "=" Expr 
-  FieldInit.FieldInit2 = Field             "=" Expr
-  FieldInit.FieldInit3 = Field ":" Typexpr 
-  FieldInit.FieldInit4 = Field  
+  FieldInit.FieldInit = Field TypeAscr? "=" Expr 
+  FieldInit.FieldDecl = Field TypeAscr? 
   
-  Expr.Proj      = Expr "." Field 
-  Expr.Expr70    = Expr "." Field "<-" Expr
-  Expr.Expr71    = Expr "." "(" Expr ")"
-  Expr.Expr72    = Expr "." "(" Expr ")" "<-" Expr
-  Expr.Expr73    = Expr "." "[" Expr "]"
-  Expr.Expr74    = Expr "." "[" Expr "]" "<-" Expr
+  Expr.Proj        = Expr "." Field 
+  Expr.ProjAssign  = Expr "." Field        "<-" Expr {non-assoc}
+  Expr.Proj1       = Expr "." "(" Expr ")"
+  Expr.Proj1Assign = Expr "." "(" Expr ")" "<-" Expr {non-assoc}
+  Expr.Proj2       = Expr "." "[" Expr "]"
+  Expr.Proj2Assign = Expr "." "[" Expr "]" "<-" Expr {non-assoc}
+  
+context-free priorities
+  FieldInit.FieldInit <3> .> Expr.Seq
+  
+
+  
   
 // The expression { field_1  [= expr_1] ; ... ;  field_n  [= expr_n ]} evaluates
 // to the record value { field_1 = v_1; ...; field_n = v_n } where v_i is the

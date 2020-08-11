@@ -151,51 +151,54 @@ lexical syntax
 
 sorts ValuePath
 context-free syntax
-  ValuePath.ValuePath  = ValueName
-  ValuePath.ValuePathQ = ModulePathPref ValueName
+  ValuePath.ValuePath  =                       ValueName
+  ValuePath.ValuePathQ = {ModuleName "."}+ "." ValueName
   
 sorts Constr
 context-free syntax
-  Constr.Constr  = ConstrName
-  Constr.ConstrQ = ModulePathPref ConstrName
+  Constr.Constr  =                       ConstrName
+  Constr.ConstrQ = {ModuleName "."}+ "." ConstrName
   
 sorts Typeconstr
 context-free syntax
-  Typeconstr.TypeConstr  =                        TypeconstrName
-  Typeconstr.TypeConstrQ = ExtendedModulePathPref TypeconstrName
+  Typeconstr.TypeConstr  =                               TypeconstrName
+  Typeconstr.TypeConstrQ = {ExtendedModuleName "."}+ "." TypeconstrName
   
 sorts Field
 context-free syntax
-  Field.Field  = FieldName
-  Field.FieldQ = ModulePathPref FieldName
+  Field.Field  =                       FieldName
+  Field.FieldQ = {ModuleName "."}+ "." FieldName
   
 sorts ModtypePath
 context-free syntax
-  ModtypePath.ModtypePath = ExtendedModulePathPref? ModtypeName
+  ModtypePath.ModtypePath =                                ModtypeName
+  ModtypePath.ModtypePathQ = {ExtendedModuleName "."}+ "." ModtypeName
   
 sorts ClassPath
 context-free syntax
-  ClassPath.ClassPath = ModulePathPref? ClassName
+  ClassPath.ClassPath =                        ClassName
+  ClassPath.ClassPathQ = {ModuleName "."}+ "." ClassName
   
-sorts ClasstypePath
+sorts ClasstypePath  
+context-free syntax 
+  ClasstypePath.ClasstypePath  =                               ClassName
+  ClasstypePath.ClasstypePathQ = {ExtendedModuleName "."}+ "." ClassName
+  
+sorts ModulePath ExtendedModulePath ExtendedModuleName ModArg
 context-free syntax
-  ClasstypePath.ClasstypePath = ExtendedModulePathPref? ClassName
+  ModulePath.ModPath            = {ModuleName "."}+
+  ExtendedModulePath.ExtModPath = {ExtendedModuleName "."}+
+  ExtendedModuleName.ExtModName = ModuleName ModArg*  
+  ModArg.ModArg                 = "(" {ExtendedModuleName "."}+ ")"
   
-sorts ModulePath
-context-free syntax
-  ModulePath.ModulePath         = {ModuleName "."}+
-  ModulePathPref.ModulePathPref = ModulePath "." // TODO: inline
+//  ModulePathPref.ModulePathPref = {ModuleName "."}+ "." // TODO: inline?
+//  
+//sorts  ExtendedModulePathPref ExtendedModulePathArg
+//context-free syntax
+//  ExtendedModulePathPref.ExtendedModulePathPref = {ExtendedModuleName "."}+ "."
   
-sorts ExtendedModulePath ExtendedModulePathPref ExtendedModulePathArg
-context-free syntax
-  ExtendedModulePath.ExtendedModulePath = {ExtendedModuleName "."}+
-  ExtendedModulePathPref.ExtendedModulePathPref = ExtendedModulePath "."
   
-  ExtendedModulePathArg.ExtendedModulePathArg = "(" ExtendedModulePath ")"
-  
-sorts ExtendedModuleName
-context-free syntax
-  ExtendedModuleName.ExtendedModuleName = ModuleName ExtendedModulePathArg*
+
   
   
   

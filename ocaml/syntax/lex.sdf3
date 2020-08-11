@@ -199,7 +199,7 @@ lexical syntax
 // syntactically as the sequence of the three tokens ~, ident and :, and have to
 // be defined at the lexical level.
 
-sorts Label Optlabel
+sorts Label OptLabel
 lexical syntax
   LabelName = LowercaseIdent
 syntax 
@@ -398,6 +398,9 @@ lexical syntax
   
   LowercaseIdent = "parser" {reject}   
   LowercaseIdent = "value" {reject}
+  
+lexical restrictions 
+  "fun" -/- [a-zA-Z0-9]
    
 // The following character sequences are also keywords:
 // <<

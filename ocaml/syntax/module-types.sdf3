@@ -27,30 +27,29 @@ context-free syntax
   
   SpecDelim.SpecDelim = Specification OptSemicolon
   
-  
 sorts ModConstraint
 context-free syntax
-  ModConstraint.ModConstraint6 = "type" TypeParams? Typeconstr TypeEquation TypeConstraint*
-  ModConstraint.ModConstraint7 = "module" ModulePath "=" ExtendedModulePath
+  ModConstraint.TypeConstraint = "type" TypeParams? Typeconstr TypeEquation TypeConstraint*
+  ModConstraint.ModConstraint  = "module" ModulePath "=" ExtendedModulePath
   
 sorts Specification
 context-free syntax
-  Specification.Specification12 = "val" ValueName ":" Typexpr
-  Specification.Specification14 = TypeDefinition
-  Specification.Specification15 = "exception" ConstrDecl
-  Specification.Specification16 = ClassSpecification
-  Specification.Specification17 = ClasstypeDefinition
-  Specification.Specification18 = "module" ModuleName ":" ModuleType
-  Specification.Specification19 = "module" ModuleName ModParam* ":" ModuleType
-  Specification.Specification20 = "module" "type" ModtypeName
-  Specification.Specification21 = "module" "type" ModtypeName "=" ModuleType
-  Specification.Specification22 = "open" ModulePath
-  Specification.Specification23 = "include" ModuleType
+  Specification.ValSpec         = "val" ValueName ":" Typexpr
+  Specification.TypeSpec        = TypeDefinition
+  Specification.ExcSpec         = "exception" ConstrDecl
+  Specification.ClassSpec       = ClassSpecification
+  Specification.ClasstypeSpec   = ClasstypeDefinition
+//Specification.ModSpec         = "module" ModuleName ":" ModuleType
+  Specification.ModSpec         = "module" ModuleName ModParam* ":" ModuleType
+  Specification.ModTypeSpec     = "module" "type" ModtypeName
+  Specification.ModTypeSpecInst = "module" "type" ModtypeName "=" ModuleType
+  Specification.OpenMod         = "open" ModulePath
+  Specification.IncludeMod      = "include" ModuleType
   
   
-  Specification.Specification13 = "external" ValueName ":" Typexpr "=" ExternalDeclaration // see chapter 20
+  Specification.ExtSpec         = "external" ValueName ":" Typexpr "=" ExternalDeclaration // see chapter 20
   
-  ExternalDeclaration.ExternalDeclaration = "not defined yet"
+  ExternalDeclaration.ExtDecl = "not defined yet"
   
 // See also the following language extensions: recovering the type of a module,
 // substitution inside a signature, type-level module aliases, attributes,

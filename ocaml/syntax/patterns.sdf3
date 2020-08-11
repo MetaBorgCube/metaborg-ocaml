@@ -239,5 +239,4 @@ context-free priorities
 // parentheses can be omitted. For example, module-path.[ pattern] is equivalent
 // to module-path.([ pattern]), and module-path.[|  pattern |] is equivalent to
 // module-path.([|  pattern |]).
-// 
-// 
+

@@ -21,7 +21,8 @@ context-free syntax
   
 sorts Typedef
 context-free syntax
-  Typedef.Typedef = TypeParams? TypeconstrName TypeEquation? TypeRepresentation? TypeConstraint*
+  Typedef.Typedef = 
+    TypeParams? TypeconstrName TypeEquation? TypeRepresentation? TypeConstraint*
   
 //sorts Typedef
 //context-free syntax
@@ -52,22 +53,26 @@ context-free syntax
   Variance.PosVar       = "+"
   Variance.NegVar       = "-"
   
-sorts RecordDecl
-context-free syntax
-  RecordDecl.RecordDecl = "{" {FieldDecl ";"}+ OptSemicolon "}"
-  
 sorts ConstrDecl
 context-free syntax
-  ConstrDecl.ConstrDecl0 = ConstrName  "of" {Typexpr "*"}+
-  ConstrDecl.ConstrDecl0 = ConstrName  
-  ConstrDecl.ConstrDecl0 = "[]"        "of" {Typexpr "*"}+
-  ConstrDecl.ConstrDecl0 = "[]"        
-  ConstrDecl.ConstrDecl0 = "(::)"      "of" {Typexpr "*"}+
-  ConstrDecl.ConstrDecl0 = "(::)"     
+  ConstrDecl.ConstrDeclN     = ConstrName  "of" {Typexpr "*"}+
+  ConstrDecl.ConstrDecl0     = ConstrName  
+  ConstrDecl.ConstrDeclNilN  = "[]"        "of" {Typexpr "*"}+
+  ConstrDecl.ConstrDeclNil   = "[]"        
+  ConstrDecl.ConstrDeclCons  = "(::)"      "of" {Typexpr "*"}+
+  ConstrDecl.ConstrDeclCons0 = "(::)"     
+  
+context-free priorities
+  {Typexpr "*"}+ = Typexpr                    <0> .> Typexpr.TypeTup,
+  {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr <2> .> Typexpr.TypeTup
   
 //sorts ConstrArgs
 //context-free syntax
 //  ConstrArgs.ConstrArgs0 = {Typexpr "*"}+
+  
+sorts RecordDecl
+context-free syntax
+  RecordDecl.RecordDecl = "{" {FieldDecl ";"}+ OptSemicolon "}"
   
 sorts FieldDecl
 context-free syntax

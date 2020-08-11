@@ -16,7 +16,7 @@ context-free syntax
   Typexpr.TypeAnon    = "_"
   
   Typexpr.TypeFun     = Typexpr "->" Typexpr {right}
-  Typexpr.TypeFunL    = Optlabel Typexpr "->" Typexpr {right}
+  Typexpr.TypeFunL    = OptLabel Typexpr "->" Typexpr {right}
   
   //Typexpr.TypeTup     = Typexpr "*" {Typexpr "*"}+ {non-assoc} 
   Typexpr.TypeTup     = {Typexpr "*"}+ {non-assoc} // Note combination with prio
@@ -59,6 +59,8 @@ context-free priorities
   Typexpr.TypeAppN <1> .> {Typexpr ","}+ = Typexpr,  
   Typexpr.TypeTup  <0> .> {Typexpr "*"}+ = Typexpr
 
+context-free syntax
+  TypeAscr.TypeAscr = ":" Typexpr
   
 // See also the following language extensions: first-class modules, attributes
 // and extension nodes.
