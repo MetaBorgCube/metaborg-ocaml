@@ -6,11 +6,11 @@ imports classes names aux
 // ==============
 
 context-free syntax 
-  Expr.New    = "new" ClassPath
-  Expr.Object = "object" ClassBody "end"
-  Expr.Invoke = Expr "#" MethodName
+  Expr.New        = "new" ClassPath
+  Expr.Object     = "object" ClassBody "end"
+  Expr.Invoke     = Expr "#" MethodName
   Expr.InstAssign = InstVarName "<-" Expr  
-  Expr.Clone  = "{<" {InstVar ";"}* OptSemicolon ">}"
+  Expr.Clone      = "{<" {InstVar ";"}* OptSemicolon ">}"
 
   InstVar.InstVarInit = InstVarName "=" Expr
   InstVar.InstVar     = InstVarName  
