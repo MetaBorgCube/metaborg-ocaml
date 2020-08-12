@@ -109,7 +109,7 @@ lexical syntax // priority levels
   
   
 sorts ConstrName
-context-free syntax
+lexical syntax
   ConstrName = CapitalizedIdent
   
 sorts TagName TagNameQ
