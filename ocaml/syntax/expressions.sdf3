@@ -46,7 +46,6 @@ context-free priorities
   > {right: Expr.And Expr.AndD}
   > {right: Expr.Or  Expr.OrD}
   > {Expr ","}+ = {Expr ","}+ "," Expr
-  //> Expr.Tuple    
   > {right: Expr.InstAssign Expr.BinOp0 
             Expr.ProjAssign Expr.Proj1Assign Expr.Proj2Assign} // := <-
   > Expr.IfE
