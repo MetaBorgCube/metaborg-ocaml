@@ -25,7 +25,9 @@ sorts ClassType ClassBodyType TypeArg TypeArgs
 context-free syntax
   ClassType = ClassBodyType 
 
-  ClassType.ClassFunType = <<OptLabel?> <Typexpr> -\> <ClassType>> 
+  ClassType.ClassFunType = [
+    [OptLabel?] [Typexpr] -> [ClassType]
+  ] 
   ClassBodyType.ObjectType = <
     object <TypeArg?> 
       <{ClassFieldSpec "\n"}*> 
@@ -36,7 +38,7 @@ context-free syntax
   > 
   ClassBodyType.LetOpenCT = <
     let open <ModulePath> in 
-      <ClassBodyType>
+    <ClassBodyType>
   > 
   TypeArg.TypeArg   = <(<Typexpr>)> 
   TypeArgs.TypeArgs = <[<{Typexpr ", "}+>]>
@@ -44,34 +46,34 @@ context-free syntax
 sorts ClassFieldSpec
 context-free syntax
   ClassFieldSpec.Val = <
-    val <InstVarName> : <Typexpr>
+    val <InstVarNameDef> : <Typexpr>
   > 
   ClassFieldSpec.ValMV = <
-    val mutable virtual <InstVarName> : <Typexpr>
+    val mutable virtual <InstVarNameDef> : <Typexpr>
   > 
   ClassFieldSpec.ValV = <
-    val virtual <InstVarName> : <Typexpr>
+    val virtual <InstVarNameDef> : <Typexpr>
   > 
   ClassFieldSpec.ValM = <
-    val mutable <InstVarName> : <Typexpr>
+    val mutable <InstVarNameDef> : <Typexpr>
   > 
   ClassFieldSpec.ValVM = <
-    val virtual mutable <InstVarName> : <Typexpr>
+    val virtual mutable <InstVarNameDef> : <Typexpr>
   > 
   ClassFieldSpec.Method = <
-    method <MethodName> : <PolyTypexpr>
+    method <MethodNameDef> : <PolyTypexpr>
   > 
   ClassFieldSpec.MethodPV = <
-    method private virtual <MethodName> : <PolyTypexpr>
+    method private virtual <MethodNameDef> : <PolyTypexpr>
   > 
   ClassFieldSpec.MethodV = <
-    method virtual <MethodName> : <PolyTypexpr>
+    method virtual <MethodNameDef> : <PolyTypexpr>
   > 
   ClassFieldSpec.MethodP = <
-    method private <MethodName> : <PolyTypexpr>
+    method private <MethodNameDef> : <PolyTypexpr>
   > 
   ClassFieldSpec.MethodVP = <
-    method virtual private <MethodName> : <PolyTypexpr>
+    method virtual private <MethodNameDef> : <PolyTypexpr>
   > 
   ClassFieldSpec.Inherit = <
     inherit <ClassBodyType>
@@ -239,38 +241,38 @@ context-free syntax
     inherit! <ClassExpr> <Alias?>
   > 
   ClassField.Val = <
-    val <Mutable?> <InstVarName> <TypeAscr?> = <Expr>
+    val <Mutable?> <InstVarNameDef> <TypeAscr?> = <Expr>
   > 
   ClassField.Val = <
-    val! <Mutable?> <InstVarName> <TypeAscr?> = <Expr>
+    val! <Mutable?> <InstVarNameDef> <TypeAscr?> = <Expr>
   > 
   ClassField.ValV = <
-    val <Mutable?> virtual <InstVarName> : <Typexpr>
+    val <Mutable?> virtual <InstVarNameDef> : <Typexpr>
   > 
   ClassField.ValVM = <
-    val virtual mutable <InstVarName> : <Typexpr>
+    val virtual mutable <InstVarNameDef> : <Typexpr>
   > 
   ClassField.Method = <
-    method <Private?> <MethodName> <Parameter*> <TypeAscr?> = 
+    method <Private?> <MethodNameDef> <Parameter*> <TypeAscr?> = 
       <Expr>
   > 
   ClassField.Method = <
-    method! <Private?> <MethodName> <Parameter*> <TypeAscr?> = 
+    method! <Private?> <MethodNameDef> <Parameter*> <TypeAscr?> = 
       <Expr>
   > 
   ClassField.Method = <
-    method <Private?> <MethodName> : <PolyTypexpr> = 
+    method <Private?> <MethodNameDef> : <PolyTypexpr> = 
       <Expr>
   > 
   ClassField.Method = <
-    method! <Private?> <MethodName> : <PolyTypexpr> = 
+    method! <Private?> <MethodNameDef> : <PolyTypexpr> = 
       <Expr>
   > 
   ClassField.Method = <
-    method <Private?> virtual <MethodName> : <PolyTypexpr>
+    method <Private?> virtual <MethodNameDef> : <PolyTypexpr>
   > 
   ClassField.MethodVP = <
-    method virtual private <MethodName> : <PolyTypexpr>
+    method virtual private <MethodNameDef> : <PolyTypexpr>
   > 
   ClassField.Constraint = <
     constraint <Typexpr> = <Typexpr>
@@ -450,8 +452,12 @@ sorts Expr
 
 context-free syntax
 
-  Expr.Assign = <<InstVarName> \<- <Expr>> 
-  Expr.Clone = <{\< <{InstVar ";"}+> <OptSemicolon> \>}> 
+  Expr.Assign = [
+    [InstVarName] <- [Expr]
+  ] 
+  Expr.Clone = [
+    {< [{InstVar "; "}+] <OptSemicolon> >}
+  ]
 
 
 // The expression inst-var-name <-  expr modifies in-place the current object by
@@ -524,8 +530,7 @@ context-free syntax
 context-free syntax
 
   ClassDefinition.ClassDef = <
-    class 
-      <{ClassBinding "\nand"}+>
+    class <{ClassBinding "\nand"}+; float>
   > 
   ClassBinding.ClassBinding = <
     <Virtual?> <TypeParams?> <ClassName> <Parameter*> <ClassTypeAscr?> = 
@@ -579,7 +584,8 @@ sorts ClassSpecification ClassSpec
 context-free syntax
 
   ClassSpecification.Class = <
-    class <{ClassSpec "\nand"}+>
+    class 
+      <{ClassSpec "\nand"}+>
   > 
   ClassSpec.ClassSpec = <
     <Virtual?> <TypeParams?> <ClassName> : <ClassType>

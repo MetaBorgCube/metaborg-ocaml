@@ -142,10 +142,12 @@ lexical syntax
 sorts InstVarName
 lexical syntax
   InstVarName = LowercaseIdent
+  InstVarNameDef = LowercaseIdent
   
 sorts MethodName
 lexical syntax
   MethodName = LowercaseIdent
+  MethodNameDef = LowercaseIdent
   
  
 // Referring to named objects

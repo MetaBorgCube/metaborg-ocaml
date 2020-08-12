@@ -19,50 +19,6 @@ imports aux
 // evaluate to modules, thus providing implementations for the specifications
 // expressed in module types.
 
-//sorts ModuleExpr
-//context-free syntax
-//  ModuleExpr.ModPath    = ModulePath
-//  ModuleExpr.Struct     = "struct" ModuleItems? "end"
-//  ModuleExpr.Functor    = "functor" "(" ModuleName ":" ModuleType ")" "->" ModuleExpr
-//  ModuleExpr.FunctorApp = ModuleExpr "(" ModuleExpr ")"
-//  ModuleExpr            = "(" ModuleExpr ")" {bracket}
-//  ModuleExpr.ModAscr    = "(" ModuleExpr ":" ModuleType ")"
-//  
-//sorts ModuleItems
-//context-free syntax
-//  ModuleItems.ModuleItems = 
-//    DoubleSemi* 
-//    DefOrExpr 
-//    DefOrExprDelim* 
-//    DoubleSemi*
-//    
-//  DefOrExpr = Definition
-//  DefOrExpr = Expr
-//  
-//  DefOrExprDelim.Def = DoubleSemi* Definition
-//  DefOrExprDelim.Expr = DoubleSemi+ Expr
-//  
-//  DoubleSemi.DoubleSemi = ";;"
-//  
-//sorts Definition
-//context-free syntax
-//  Definition.DefLetRec    = "let" "rec" {LetBinding "and"}+
-//  Definition.DefLet       = "let"       {LetBinding "and"}+
-//  Definition.DefExternal  = "external" ValueName ":" Typexpr "=" ExternalDeclaration
-//  Definition.DefType      = TypeDefinition
-//  Definition.DefExc       = ExceptionDefinition
-//  Definition.DefClass     = ClassDefinition
-//  Definition.DefClasstype = ClasstypeDefinition
-//  
-//  Definition.DefModTyped  = "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr
-//  Definition.DefMod       = "module" ModuleName ModParam*                "=" ModuleExpr
-//   
-//  ModParam.ModParam = "(" ModuleName ":" ModuleType ")"
-//  
-//  Definition.DefModType   = "module" "type" ModtypeName "=" ModuleType
-//  Definition.DefOpen      = "open" ModulePath
-//  Definition.DefInclude   = "include" ModuleExpr
-
 sorts ModuleExpr
 
 context-free syntax
@@ -76,9 +32,9 @@ context-free syntax
       <ModuleItems?> 
     end
   > 
-  ModuleExpr.Functor = <
-    functor(<ModuleName> : <ModuleType>) -\> <ModuleExpr>
-  > 
+  ModuleExpr.Functor = [
+    functor([ModuleName] : [ModuleType]) -> [ModuleExpr]
+  ] 
   ModuleExpr.FunctorApp = <<ModuleExpr>(<ModuleExpr>)> 
   ModuleExpr.ModAscr = <(<ModuleExpr> : <ModuleType>)> 
 
@@ -87,7 +43,7 @@ context-free syntax
   ModuleItems.ModuleItems = <
     <DoubleSemi*> 
     <DefOrExpr> 
-    <{DefOrExprDelim "\n"}*> <DoubleSemi*>
+    <{DefOrExprDelim "\n\n"}*> <DoubleSemi*>
   > 
   DefOrExpr = Definition 
   DefOrExpr = Expr 
@@ -108,8 +64,7 @@ context-free syntax
   Definition.DefClasstype = ClasstypeDefinition
 
   Definition.DefLetRec = <
-    let rec 
-      <{LetBinding "\nand"}+>
+    let rec <{LetBinding "\nand"}+; float>
   > 
   Definition.DefLet = <
     let <{LetBinding "\nand"}+>
