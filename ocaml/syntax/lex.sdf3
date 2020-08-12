@@ -75,9 +75,9 @@ lexical syntax
   
 sorts Int32Literal Int64Literal NativeintLiteral
 lexical syntax
-  Int32Literal.Int32Literal         = IntegerLiteral "l"
-  Int64Literal.Int64Literal         = IntegerLiteral "L"
-  NativeintLiteral.NativeintLiteral = IntegerLiteral "n"
+  Int32Literal.Int32Literal         = (DecInt | HexInt | OctInt | BinInt) "l"
+  Int64Literal.Int64Literal         = (DecInt | HexInt | OctInt | BinInt) "L"
+  NativeintLiteral.NativeintLiteral = (DecInt | HexInt | OctInt | BinInt) "n"
   
 // TODO: CF in LEX
   
