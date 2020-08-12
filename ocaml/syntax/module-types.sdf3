@@ -15,42 +15,77 @@ imports aux
 // 
 // Module types are the module-level equivalent of type expressions: they
 // specify the general shape and type properties of modules.
-
+  
 sorts ModuleType
 context-free syntax
-  ModuleType.ModuleType18 = ModtypePath
-  ModuleType.ModuleType19 = "sig" SpecDelim* "end"
-  ModuleType.ModuleType20 = "functor" "(" ModuleName ":" ModuleType ")" "->" ModuleType
-  ModuleType.ModuleType21 = ModuleType "->" ModuleType
-  ModuleType.ModuleType22 = ModuleType "with" {ModConstraint "and"}+
-  ModuleType.ModuleType23 = "(" ModuleType ")"
+  ModuleType = <(<ModuleType>)> {bracket}
+  ModuleType = ModtypePath 
   
-  SpecDelim.SpecDelim = Specification OptSemicolon
-  
+  ModuleType.ModType = <
+    <ModuleType> -\> <ModuleType>
+  > 
+  ModuleType.ModTypeWith = <
+    <ModuleType> 
+    with <{ModConstraint "and"}+>
+  >
+  ModuleType.Sig = <
+    sig 
+      <{SpecDelim "\n"}*> 
+    end
+  >  
+  SpecDelim.SpecDelim = <
+    <Specification> <OptSemicolon>
+  > 
+  ModuleType.Functor = [
+    functor ([ModuleName] : [ModuleType]) -> [ModuleType]
+  ] 
+
 sorts ModConstraint
+
 context-free syntax
-  ModConstraint.TypeConstraint = "type" TypeParams? Typeconstr TypeEquation TypeConstraint*
-  ModConstraint.ModConstraint  = "module" ModulePath "=" ExtendedModulePath
-  
+
+  ModConstraint.TypeConstraint = <
+    type <TypeParams?> <Typeconstr> <TypeEquation> <TypeConstraint*>
+  > 
+  ModConstraint.ModConstraint = <
+    module <ModulePath> = 
+      <ExtendedModulePath>
+  > 
+
 sorts Specification
+
 context-free syntax
-  Specification.ValSpec         = "val" ValueName ":" Typexpr
-  Specification.TypeSpec        = TypeDefinition
-  Specification.ExcSpec         = "exception" ConstrDecl
-  Specification.ClassSpec       = ClassSpecification
-  Specification.ClasstypeSpec   = ClasstypeDefinition
-//Specification.ModSpec         = "module" ModuleName ":" ModuleType
-  Specification.ModSpec         = "module" ModuleName ModParam* ":" ModuleType
-  Specification.ModTypeSpec     = "module" "type" ModtypeName
-  Specification.ModTypeSpecInst = "module" "type" ModtypeName "=" ModuleType
-  Specification.OpenMod         = "open" ModulePath
-  Specification.IncludeMod      = "include" ModuleType
-  
-  
-  Specification.ExtSpec         = "external" ValueName ":" Typexpr "=" ExternalDeclaration // see chapter 20
-  
-  ExternalDeclaration.ExtDecl = "not defined yet"
-  
+  Specification.TypeSpec = TypeDefinition 
+  Specification.ClassSpec = ClassSpecification 
+  Specification.ClasstypeSpec = ClasstypeDefinition 
+
+  Specification.ValSpec = <
+    val <ValueNameDef> : <Typexpr>
+  > 
+  Specification.ExcSpec = <
+    exception <ConstrDecl>
+  > 
+  Specification.ModSpec = <
+    module <ModuleName> <ModParam*> : <ModuleType>
+  > 
+  Specification.ModTypeSpec = <
+    module type <ModtypeName>
+  > 
+  Specification.ModTypeSpecInst = <
+    module type <ModtypeName> = <ModuleType>
+  > 
+  Specification.OpenMod = <
+    open <ModulePath>
+  > 
+  Specification.IncludeMod = <
+    include <ModuleType>
+  > 
+  Specification.ExtSpec = <
+    external <ValueNameDef> : <Typexpr> = <ExternalDeclaration>
+  > 
+  ExternalDeclaration.ExtDecl = <not defined yet> 
+
+
 // See also the following language extensions: recovering the type of a module,
 // substitution inside a signature, type-level module aliases, attributes,
 // extension nodes and generative functors.

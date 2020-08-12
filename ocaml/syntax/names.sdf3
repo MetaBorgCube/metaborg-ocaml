@@ -29,11 +29,13 @@ imports lex module-expressions
 // Naming objects
 // --------------
 
-sorts ValueName
+sorts ValueName ValueNameDef
 lexical syntax
   ValueName = LowercaseIdent
   ValueName = "(" OperatorName ")"
   ValueName = "_" {reject} // overlap with patterns (TODO: check)
+  
+  ValueNameDef = ValueName
   
 sorts OperatorName
 context-free syntax
@@ -151,46 +153,89 @@ lexical syntax
 
 sorts ValuePath
 context-free syntax
-  ValuePath.ValuePath  =                       ValueName
-  ValuePath.ValuePathQ = {ModuleName "."}+ "." ValueName
-  
+  ValuePath.ValuePath = ValueName 
+  ValuePath.ValuePathQ = <<{ModuleName "."}+>.<ValueName>> 
+
 sorts Constr
 context-free syntax
-  Constr.Constr  =                       ConstrName
-  Constr.ConstrQ = {ModuleName "."}+ "." ConstrName
-  
+  Constr.Constr = ConstrName 
+  Constr.ConstrQ = <<{ModuleName "."}+>.<ConstrName>> 
+
 sorts Typeconstr
 context-free syntax
-  Typeconstr.TypeConstr  =                               TypeconstrName
-  Typeconstr.TypeConstrQ = {ExtendedModuleName "."}+ "." TypeconstrName
-  
+  Typeconstr.TypeConstr = TypeconstrName 
+  Typeconstr.TypeConstrQ = <<{ExtendedModuleName "."}+>.<TypeconstrName>> 
+
 sorts Field
 context-free syntax
-  Field.Field  =                       FieldName
-  Field.FieldQ = {ModuleName "."}+ "." FieldName
-  
+  Field.Field = FieldName 
+  Field.FieldQ = <<{ModuleName "."}+>.<FieldName>> 
+
 sorts ModtypePath
 context-free syntax
-  ModtypePath.ModtypePath =                                ModtypeName
-  ModtypePath.ModtypePathQ = {ExtendedModuleName "."}+ "." ModtypeName
-  
+  ModtypePath.ModtypePath = ModtypeName 
+  ModtypePath.ModtypePathQ = <<{ExtendedModuleName "."}+>.<ModtypeName>> 
+
 sorts ClassPath
 context-free syntax
-  ClassPath.ClassPath =                        ClassName
-  ClassPath.ClassPathQ = {ModuleName "."}+ "." ClassName
-  
-sorts ClasstypePath  
-context-free syntax 
-  ClasstypePath.ClasstypePath  =                               ClassName
-  ClasstypePath.ClasstypePathQ = {ExtendedModuleName "."}+ "." ClassName
-  
+  ClassPath.ClassPath = ClassName 
+  ClassPath.ClassPathQ = <<{ModuleName "."}+>.<ClassName>> 
+
+sorts ClasstypePath
+context-free syntax
+  ClasstypePath.ClasstypePath = ClassName 
+  ClasstypePath.ClasstypePathQ = <<{ExtendedModuleName "."}+>.<ClassName>> 
+
 sorts ModulePath ExtendedModulePath ExtendedModuleName ModArg
 context-free syntax
-  ModulePath.ModPath            = {ModuleName "."}+
-  ExtendedModulePath.ExtModPath = {ExtendedModuleName "."}+
-  ExtendedModuleName.ExtModName = ModuleName ModArg*  
-  ModArg.ModArg                 = "(" {ExtendedModuleName "."}+ ")"
-  
+  ModulePath.ModPath = <<{ModuleName "."}+>> 
+  ExtendedModulePath.ExtModPath = <<{ExtendedModuleName "."}+>> 
+  ExtendedModuleName.ExtModName = <<ModuleName><ModArg*>> 
+  ModArg.ModArg = <(<{ExtendedModuleName "."}+>)> 
+
+
+//sorts ValuePath
+//context-free syntax
+//  ValuePath.ValuePath  =                       ValueName
+//  ValuePath.ValuePathQ = {ModuleName "."}+ "." ValueName
+//  
+//sorts Constr
+//context-free syntax
+//  Constr.Constr  =                       ConstrName
+//  Constr.ConstrQ = {ModuleName "."}+ "." ConstrName
+//  
+//sorts Typeconstr
+//context-free syntax
+//  Typeconstr.TypeConstr  =                               TypeconstrName
+//  Typeconstr.TypeConstrQ = {ExtendedModuleName "."}+ "." TypeconstrName
+//  
+//sorts Field
+//context-free syntax
+//  Field.Field  =                       FieldName
+//  Field.FieldQ = {ModuleName "."}+ "." FieldName
+//  
+//sorts ModtypePath
+//context-free syntax
+//  ModtypePath.ModtypePath =                                ModtypeName
+//  ModtypePath.ModtypePathQ = {ExtendedModuleName "."}+ "." ModtypeName
+//  
+//sorts ClassPath
+//context-free syntax
+//  ClassPath.ClassPath =                        ClassName
+//  ClassPath.ClassPathQ = {ModuleName "."}+ "." ClassName
+//  
+//sorts ClasstypePath  
+//context-free syntax 
+//  ClasstypePath.ClasstypePath  =                               ClassName
+//  ClasstypePath.ClasstypePathQ = {ExtendedModuleName "."}+ "." ClassName
+//  
+//sorts ModulePath ExtendedModulePath ExtendedModuleName ModArg
+//context-free syntax
+//  ModulePath.ModPath            = {ModuleName "."}+
+//  ExtendedModulePath.ExtModPath = {ExtendedModuleName "."}+
+//  ExtendedModuleName.ExtModName = ModuleName ModArg*  
+//  ModArg.ModArg                 = "(" {ExtendedModuleName "."}+ ")"
+//  
 //  ModulePathPref.ModulePathPref = {ModuleName "."}+ "." // TODO: inline?
 //  
 //sorts  ExtendedModulePathPref ExtendedModulePathArg

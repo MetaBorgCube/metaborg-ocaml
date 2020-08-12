@@ -16,14 +16,19 @@ imports lex names expressions type-expressions aux
 
 sorts TypeDefinition
 context-free syntax
-  TypeDefinition.TypeDef       = "type"          {Typedef "and"}+
-  TypeDefinition.TypeDefNonRec = "type" "nonrec" {Typedef "and"}+
-  
+  TypeDefinition.TypeDef = <
+    type <{Typedef "\nand"}+>
+  > 
+  TypeDefinition.TypeDefNonRec = <
+    type nonrec <{Typedef "and"}+>
+  > 
+
 sorts Typedef
 context-free syntax
-  Typedef.Typedef = 
-    TypeParams? TypeconstrName TypeEquation? TypeRepresentation? TypeConstraint*
-  
+  Typedef.Typedef = <
+    <TypeParams?> <TypeconstrName> <TypeEquation?> <TypeRepresentation?> <TypeConstraint*>
+  > 
+
 //sorts Typedef
 //context-free syntax
 //  Typedef.Typedef = TypeParams? TypeconstrName TypeInformation
@@ -35,53 +40,68 @@ context-free syntax
   
 sorts TypeEquation
 context-free syntax
-  TypeEquation.TypeEquation = "=" Typexpr
-  
+  TypeEquation.TypeEquation = [= [Typexpr]]
+
 sorts TypeRepresentation
 context-free syntax
-  TypeRepresentation.TypeRep1 = "=" OptBar {ConstrDecl "|"}+
-  TypeRepresentation.TypeRep2 = "=" RecordDecl
-  TypeRepresentation.TypeRep3 = "=" "|"
+  TypeRepresentation.TypeRep1 = [
+    = [OptBar] [{ConstrDecl " | "}+]
+  ] 
+  
+  TypeRepresentation.TypeRep2 = [
+    = [RecordDecl]
+  ] 
+  TypeRepresentation.TypeRep3 = [
+    = |
+  ] 
   
 sorts TypeParams TypeParam Variance
 context-free syntax
-  TypeParams            = TypeParam
-  TypeParams.TypeParams = "(" {TypeParam ","}+ ")"
-  
-  TypeParam.TypeParam   = Variance? TypeVar
-
-  Variance.PosVar       = "+"
-  Variance.NegVar       = "-"
+  TypeParams = TypeParam 
+  TypeParams.TypeParams = <(<{TypeParam ", "}+>)> 
+  TypeParam.TypeParam = <<Variance?> <TypeVar>> 
+  Variance.PosVar = <+> 
+  Variance.NegVar = [-] 
   
 sorts ConstrDecl
 context-free syntax
-  ConstrDecl.ConstrDeclN     = ConstrName  "of" {Typexpr "*"}+
-  ConstrDecl.ConstrDecl0     = ConstrName  
-  ConstrDecl.ConstrDeclNilN  = "[]"        "of" {Typexpr "*"}+
-  ConstrDecl.ConstrDeclNil   = "[]"        
-  ConstrDecl.ConstrDeclCons  = "(::)"      "of" {Typexpr "*"}+
-  ConstrDecl.ConstrDeclCons0 = "(::)"     
+  ConstrDecl.ConstrDecl0     = ConstrName 
+  ConstrDecl.ConstrDeclNil   = <[]> 
+  ConstrDecl.ConstrDeclCons0 = <(::)> 
   
+  ConstrDecl.ConstrDeclN = <
+    <ConstrName> of <{Typexpr " * "}+>
+  > 
+  ConstrDecl.ConstrDeclNilN = <
+    [] of <{Typexpr " * "}+>
+  > 
+  ConstrDecl.ConstrDeclCons = <
+    (::) of <{Typexpr " * "}+>
+  > 
+    
 context-free priorities
   {Typexpr "*"}+ = Typexpr                    <0> .> Typexpr.TypeTup,
   {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr <2> .> Typexpr.TypeTup
   
-//sorts ConstrArgs
-//context-free syntax
-//  ConstrArgs.ConstrArgs0 = {Typexpr "*"}+
-  
 sorts RecordDecl
 context-free syntax
-  RecordDecl.RecordDecl = "{" {FieldDecl ";"}+ OptSemicolon "}"
-  
+  RecordDecl.RecordDecl = <{<{FieldDecl "; "}+> <OptSemicolon>}> 
+
 sorts FieldDecl
 context-free syntax
-  FieldDecl.FieldDecl    =           FieldName ":" PolyTypexpr
-  FieldDecl.FieldDeclMut = "mutable" FieldName ":" PolyTypexpr
-  
+  FieldDecl.FieldDecl = <
+     <FieldName> : <PolyTypexpr>
+   > 
+  FieldDecl.FieldDeclMut = <
+    mutable <FieldName> : <PolyTypexpr>
+  > 
+
 sorts TypeConstraint
-context-free syntax
-  TypeConstraint.TypeConstr = "constraint" TypeVar "=" Typexpr
+context-free syntax  
+  TypeConstraint.TypeConstr = <
+    constraint <TypeVar> = <Typexpr>
+  > 
+
   
 // See also the following language extensions: private types, generalized
 // algebraic datatypes, attributes, extension nodes, extensible variant types and

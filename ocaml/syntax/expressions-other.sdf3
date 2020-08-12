@@ -13,7 +13,7 @@ imports module-types
 // ------------------
 
 context-free syntax
-  Expr.Assert = "assert" Expr
+  Expr.Assert = <assert <Expr>> 
   
 // OCaml supports the assert construct to check debugging assertions. The
 // expression assert expr evaluates the expression expr and returns () if expr
@@ -32,7 +32,7 @@ context-free syntax
 // ----------------
 
 context-free syntax
-  Expr.Lazy = "lazy" Expr
+  Expr.Lazy = <lazy <Expr>>
   
 // The expression lazy expr returns a value v of type Lazy.t that encapsulates
 // the computation of expr. The argument expr is not evaluated at this point in
@@ -67,17 +67,40 @@ context-free syntax
 // -----------
 
 context-free syntax  
-  Expr.LetModuleT   = "let" "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr "in" Expr
-  Expr.LetModule    = "let" "module" ModuleName ModParam*                "=" ModuleExpr "in" Expr
-  
-  
-  Expr.LetOpen      = "let" "open" ModulePath "in" Expr
-  
-  Expr.ModPathExpr  = ModulePath "." "(" Expr ")"
-  Expr.ModPathList  = ModulePath "." "[" Expr "]"
-  Expr.ModPathArray = ModulePath "." "[|" Expr "|]"
-  Expr.ModPath1     = ModulePath "." "{" Expr "}"
-  Expr.ModPath2     = ModulePath "." "{<" Expr ">}"
+
+  Expr.LetModuleT = <
+    let module <ModuleName> <ModParam*> : <ModuleType> = 
+      <ModuleExpr> 
+    in <Expr>
+  > 
+  Expr.LetModule = <
+    let module <ModuleName> <ModParam*> = 
+      <ModuleExpr> 
+    in <Expr>
+  > 
+  Expr.LetOpen = <
+    let open <ModulePath> 
+    in <Expr>
+  > 
+  Expr.ModPathExpr  = <<ModulePath>.(<Expr>)> 
+  Expr.ModPathList  = <<ModulePath>.[<Expr>]> 
+  Expr.ModPathArray = <<ModulePath>.[|<Expr>|]> 
+  Expr.ModPath1     = <<ModulePath>.{ <Expr> }> 
+  Expr.ModPath2     = <<ModulePath>.{\< <Expr> \>}> 
+
+
+
+//  Expr.LetModuleT   = "let" "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr "in" Expr
+//  Expr.LetModule    = "let" "module" ModuleName ModParam*                "=" ModuleExpr "in" Expr
+//  
+//  
+//  Expr.LetOpen      = "let" "open" ModulePath "in" Expr
+//  
+//  Expr.ModPathExpr  = ModulePath "." "(" Expr ")"
+//  Expr.ModPathList  = ModulePath "." "[" Expr "]"
+//  Expr.ModPathArray = ModulePath "." "[|" Expr "|]"
+//  Expr.ModPath1     = ModulePath "." "{" Expr "}"
+//  Expr.ModPath2     = ModulePath "." "{<" Expr ">}"
   
 // The expressions let open module-path in  expr and module-path.( expr) are
 // strictly equivalent. These constructions locally open the module referred to by
@@ -89,5 +112,5 @@ context-free syntax
 // module-path.([|  expr |]).
 
 context-free syntax
-  Expr.Ascr   = "(" Expr ":" Typexpr ")"
+   Expr.Ascr = <(<Expr> : <Typexpr>)> 
   

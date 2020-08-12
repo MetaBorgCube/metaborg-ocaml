@@ -9,6 +9,7 @@ imports type-expressions
 imports type-definitions  
 imports exception-definitions  
 imports classes
+imports aux
 
 // 7.11  Module expressions (module implementations)
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
@@ -18,49 +19,126 @@ imports classes
 // evaluate to modules, thus providing implementations for the specifications
 // expressed in module types.
 
+//sorts ModuleExpr
+//context-free syntax
+//  ModuleExpr.ModPath    = ModulePath
+//  ModuleExpr.Struct     = "struct" ModuleItems? "end"
+//  ModuleExpr.Functor    = "functor" "(" ModuleName ":" ModuleType ")" "->" ModuleExpr
+//  ModuleExpr.FunctorApp = ModuleExpr "(" ModuleExpr ")"
+//  ModuleExpr            = "(" ModuleExpr ")" {bracket}
+//  ModuleExpr.ModAscr    = "(" ModuleExpr ":" ModuleType ")"
+//  
+//sorts ModuleItems
+//context-free syntax
+//  ModuleItems.ModuleItems = 
+//    DoubleSemi* 
+//    DefOrExpr 
+//    DefOrExprDelim* 
+//    DoubleSemi*
+//    
+//  DefOrExpr = Definition
+//  DefOrExpr = Expr
+//  
+//  DefOrExprDelim.Def = DoubleSemi* Definition
+//  DefOrExprDelim.Expr = DoubleSemi+ Expr
+//  
+//  DoubleSemi.DoubleSemi = ";;"
+//  
+//sorts Definition
+//context-free syntax
+//  Definition.DefLetRec    = "let" "rec" {LetBinding "and"}+
+//  Definition.DefLet       = "let"       {LetBinding "and"}+
+//  Definition.DefExternal  = "external" ValueName ":" Typexpr "=" ExternalDeclaration
+//  Definition.DefType      = TypeDefinition
+//  Definition.DefExc       = ExceptionDefinition
+//  Definition.DefClass     = ClassDefinition
+//  Definition.DefClasstype = ClasstypeDefinition
+//  
+//  Definition.DefModTyped  = "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr
+//  Definition.DefMod       = "module" ModuleName ModParam*                "=" ModuleExpr
+//   
+//  ModParam.ModParam = "(" ModuleName ":" ModuleType ")"
+//  
+//  Definition.DefModType   = "module" "type" ModtypeName "=" ModuleType
+//  Definition.DefOpen      = "open" ModulePath
+//  Definition.DefInclude   = "include" ModuleExpr
+
 sorts ModuleExpr
+
 context-free syntax
-  ModuleExpr.ModPath    = ModulePath
-  ModuleExpr.Struct     = "struct" ModuleItems? "end"
-  ModuleExpr.Functor    = "functor" "(" ModuleName ":" ModuleType ")" "->" ModuleExpr
-  ModuleExpr.FunctorApp = ModuleExpr "(" ModuleExpr ")"
-  ModuleExpr            = "(" ModuleExpr ")" {bracket}
-  ModuleExpr.ModAscr    = "(" ModuleExpr ":" ModuleType ")"
+
+  ModuleExpr.ModPath = ModulePath 
   
+  ModuleExpr = <(<ModuleExpr>)> {bracket}
+  
+  ModuleExpr.Struct = <
+    struct 
+      <ModuleItems?> 
+    end
+  > 
+  ModuleExpr.Functor = <
+    functor(<ModuleName> : <ModuleType>) -\> <ModuleExpr>
+  > 
+  ModuleExpr.FunctorApp = <<ModuleExpr>(<ModuleExpr>)> 
+  ModuleExpr.ModAscr = <(<ModuleExpr> : <ModuleType>)> 
+
 sorts ModuleItems
 context-free syntax
-  ModuleItems.ModuleItems = 
-    DoubleSemi* 
-    DefOrExpr 
-    DefOrExprDelim* 
-    DoubleSemi*
-    
-  DefOrExpr = Definition
-  DefOrExpr = Expr
-  
-  DefOrExprDelim.Def = DoubleSemi* Definition
-  DefOrExprDelim.Expr = DoubleSemi+ Expr
-  
-  DoubleSemi.DoubleSemi = ";;"
-  
+  ModuleItems.ModuleItems = <
+    <DoubleSemi*> 
+    <DefOrExpr> 
+    <{DefOrExprDelim "\n"}*> <DoubleSemi*>
+  > 
+  DefOrExpr = Definition 
+  DefOrExpr = Expr 
+  DefOrExprDelim.Def = <
+    <DoubleSemi*>
+    <Definition>
+  > 
+  DefOrExprDelim.Expr = <
+    <DoubleSemi+>
+    <Expr>
+  > 
+
 sorts Definition
 context-free syntax
-  Definition.DefLetRec    = "let" "rec" {LetBinding "and"}+
-  Definition.DefLet       = "let"       {LetBinding "and"}+
-  Definition.DefExternal  = "external" ValueName ":" Typexpr "=" ExternalDeclaration
-  Definition.DefType      = TypeDefinition
-  Definition.DefExc       = ExceptionDefinition
-  Definition.DefClass     = ClassDefinition
+  Definition.DefType      = TypeDefinition 
+  Definition.DefExc       = ExceptionDefinition 
+  Definition.DefClass     = ClassDefinition 
   Definition.DefClasstype = ClasstypeDefinition
-  
-  Definition.DefModTyped  = "module" ModuleName ModParam* ":" ModuleType "=" ModuleExpr
-  Definition.DefMod       = "module" ModuleName ModParam*                "=" ModuleExpr
-   
-  ModParam.ModParam = "(" ModuleName ":" ModuleType ")"
-  
-  Definition.DefModType   = "module" "type" ModtypeName "=" ModuleType
-  Definition.DefOpen      = "open" ModulePath
-  Definition.DefInclude   = "include" ModuleExpr
+
+  Definition.DefLetRec = <
+    let rec 
+      <{LetBinding "\nand"}+>
+  > 
+  Definition.DefLet = <
+    let <{LetBinding "\nand"}+>
+  > 
+  Definition.DefExternal = <
+    external <ValueNameDef> : <Typexpr> = 
+      <ExternalDeclaration>
+  > 
+  Definition.DefModTyped = <
+    module <ModuleName> <ModParam*> : <ModuleType> = 
+      <ModuleExpr>
+  > 
+  Definition.DefMod = <
+    module <ModuleName> <ModParam*> = 
+      <ModuleExpr>
+  > 
+  ModParam.ModParam = <
+    (<ModuleName> : <ModuleType>)
+  > 
+  Definition.DefModType = <
+    module type <ModtypeName> = 
+      <ModuleType>
+  > 
+  Definition.DefOpen = <
+    open <ModulePath>
+  > 
+  Definition.DefInclude = <
+    include <ModuleExpr>
+  >
   
 // See also the following language extensions: recursive modules, first-class
 // modules, overriding in open statements, attributes, extension nodes and

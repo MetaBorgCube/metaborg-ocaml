@@ -12,7 +12,10 @@ imports expressions-basic
 // --------
 
 context-free syntax
-  Expr.Seq = Expr ";" Expr {right}
+  Expr.Seq = <
+    <Expr>; 
+    <Expr>
+  > {right}
   
 // The expression expr_1 ;  expr_2 evaluates expr_1 first, then expr_2, and
 // returns the value of expr_2.
@@ -22,8 +25,15 @@ context-free syntax
 // -----------
 
 context-free syntax
-  Expr.IfT = "if" Expr "then" Expr 
-  Expr.IfE = "if" Expr "then" Expr "else" Expr
+  Expr.IfT = <
+    if <Expr> 
+    then <Expr>
+  > 
+  Expr.IfE = <
+    if <Expr> 
+    then <Expr>
+    else <Expr>
+  >
    
 // The expression if expr_1 then  expr_2 else  expr_3 evaluates to the value of
 // expr_2 if expr_1 evaluates to the boolean true, and to the value of expr_3 if
@@ -34,8 +44,12 @@ context-free syntax
 // Case expression
 // ---------------
 
-context-free syntax 
-  Expr.Match = "match" Expr "with" PatternMatching
+context-free syntax
+  Expr.Match = <
+    match <Expr> with 
+      <PatternMatching>
+  > 
+
   
 // The expression
 // match expr
@@ -75,20 +89,27 @@ context-free syntax
 // and ||.
 
 context-free syntax
-  Expr.And  = Expr "&&" Expr {right} 
-  Expr.Or   = Expr "||" Expr {right} 
-  Expr.AndD = Expr "&"  Expr {right, deprecated}
-  Expr.OrD  = Expr "or" Expr {right, deprecated}
+  Expr.And  = <<Expr> && <Expr>> {right}
+  Expr.Or   = <<Expr> || <Expr>> {right}
+  Expr.AndD = <<Expr> & <Expr>> {right, deprecated}
+  Expr.OrD  = <<Expr> or <Expr>> {right, deprecated}
 
 // Loops
 // -----
 
 context-free syntax
-  Expr.While = "while" Expr "do" Expr "done"
-  
-  Expr.For   = "for" ValueName "=" Expr Dir Expr "do" Expr "done"
-  Dir.To     = "to"
-  Dir.DownTo = "downto"
+  Expr.While = <
+    while <Expr> do 
+      <Expr> 
+    done
+  > 
+  Expr.For = <
+    for <ValueName> = <Expr> <Dir> <Expr> do 
+      <Expr> 
+    done
+  > 
+  Dir.To = <to> 
+  Dir.DownTo = <downto> 
   
 // The expression while expr_1 do  expr_2 done repeatedly evaluates expr_2
 // while expr_1 evaluates to true. The loop condition expr_1 is evaluated and
@@ -107,8 +128,11 @@ context-free syntax
 // Exception handling
 // ------------------
 
-context-free syntax 
-  Expr.Try = "try" Expr "with" PatternMatching
+context-free syntax
+  Expr.Try = <
+    try <Expr> with 
+      <PatternMatching>
+  > 
   
 // The expression
 // try  expr

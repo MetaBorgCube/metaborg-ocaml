@@ -7,18 +7,29 @@ imports lex
 // 7.7.5  Operators
 // ================
 
-context-free syntax 
-  Expr.Prefix = PrefixSymbol Expr
-  Expr.Min    = "-" Expr
-  Expr.MinF   = "-." Expr
-  Expr.BinOp6 = Expr InfixOp60 Expr {left}
-  Expr.BinOp5 = Expr InfixOp50 Expr {right}
-  Expr.BinOp4 = Expr InfixOp40 Expr {left}
-  Expr.BinOp3 = Expr InfixOp30 Expr {left}
-  Expr.BinOp2 = Expr InfixOp20 Expr {right}
-  Expr.BinOp1 = Expr InfixOp10 Expr {left}
-  Expr.BinOp0 = Expr InfixOp5  Expr {right}
-  
+//context-free syntax 
+//  Expr.Prefix = PrefixSymbol Expr
+//  Expr.Min    = "-" Expr
+//  Expr.MinF   = "-." Expr
+//  Expr.BinOp6 = Expr InfixOp60 Expr {left}
+//  Expr.BinOp5 = Expr InfixOp50 Expr {right}
+//  Expr.BinOp4 = Expr InfixOp40 Expr {left}
+//  Expr.BinOp3 = Expr InfixOp30 Expr {left}
+//  Expr.BinOp2 = Expr InfixOp20 Expr {right}
+//  Expr.BinOp1 = Expr InfixOp10 Expr {left}
+//  Expr.BinOp0 = Expr InfixOp5  Expr {right}
+
+context-free syntax
+  Expr.Prefix = <<PrefixSymbol> <Expr>> 
+  Expr.Min    = [- [Expr]] 
+  Expr.MinF   = [-. [Expr]] 
+  Expr.BinOp6 = <<Expr> <InfixOp60> <Expr>> {left}
+  Expr.BinOp5 = <<Expr> <InfixOp50> <Expr>> {right}
+  Expr.BinOp4 = <<Expr> <InfixOp40> <Expr>> {left}
+  Expr.BinOp3 = <<Expr> <InfixOp30> <Expr>> {left}
+  Expr.BinOp2 = <<Expr> <InfixOp20> <Expr>> {right}
+  Expr.BinOp1 = <<Expr> <InfixOp10> <Expr>> {left}
+  Expr.BinOp0 = <<Expr> <InfixOp5> <Expr>> {right}
   
 // Symbols from the class infix-symbol, as well as the keywords *, +, -, -., =,
 // !=, <, >, or, ||, &, &&, :=, mod, land, lor, lxor, lsl, lsr, and asr can appear

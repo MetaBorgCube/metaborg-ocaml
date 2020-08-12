@@ -23,35 +23,63 @@ imports aux
 
 sorts ClassType ClassBodyType TypeArg TypeArgs
 context-free syntax
-  ClassType.ClassFunType     = OptLabel? Typexpr "->" ClassType  
-  ClassType                  = ClassBodyType
-  
-  ClassBodyType.ObjectType   = "object" TypeArg? ClassFieldSpec* "end"
-  
-  ClassBodyType.ClassTypeRef = TypeArgs? ClasstypePath
-  
-  ClassBodyType.LetOpenCT    = "let" "open" ModulePath "in" ClassBodyType
-  
-  TypeArg.TypeArg   = "(" Typexpr ")"
-  TypeArgs.TypeArgs = "[" {Typexpr ","}+ "]"
-  
+  ClassType = ClassBodyType 
+
+  ClassType.ClassFunType = <<OptLabel?> <Typexpr> -\> <ClassType>> 
+  ClassBodyType.ObjectType = <
+    object <TypeArg?> 
+      <{ClassFieldSpec "\n"}*> 
+    end
+  > 
+  ClassBodyType.ClassTypeRef = <
+    <TypeArgs?> <ClasstypePath>
+  > 
+  ClassBodyType.LetOpenCT = <
+    let open <ModulePath> in 
+      <ClassBodyType>
+  > 
+  TypeArg.TypeArg   = <(<Typexpr>)> 
+  TypeArgs.TypeArgs = <[<{Typexpr ", "}+>]>
+
 sorts ClassFieldSpec
 context-free syntax
-  ClassFieldSpec.Val      = "val"                        InstVarName ":" Typexpr
-  ClassFieldSpec.ValMV    = "val"    "mutable" "virtual" InstVarName ":" Typexpr
-  ClassFieldSpec.ValV     = "val"              "virtual" InstVarName ":" Typexpr
-  ClassFieldSpec.ValM     = "val"    "mutable"           InstVarName ":" Typexpr
-  ClassFieldSpec.ValVM    = "val"    "virtual" "mutable" InstVarName ":" Typexpr
-  
-  ClassFieldSpec.Method   = "method"                     MethodName ":" PolyTypexpr
-  ClassFieldSpec.MethodPV = "method" "private" "virtual" MethodName ":" PolyTypexpr
-  ClassFieldSpec.MethodV  = "method"           "virtual" MethodName ":" PolyTypexpr
-  ClassFieldSpec.MethodP  = "method" "private"           MethodName ":" PolyTypexpr
-  ClassFieldSpec.MethodVP = "method" "virtual" "private" MethodName ":" PolyTypexpr
-  
-  ClassFieldSpec.Inherit    = "inherit" ClassBodyType
-  
-  ClassFieldSpec.Constraint = "constraint" Typexpr "=" Typexpr
+  ClassFieldSpec.Val = <
+    val <InstVarName> : <Typexpr>
+  > 
+  ClassFieldSpec.ValMV = <
+    val mutable virtual <InstVarName> : <Typexpr>
+  > 
+  ClassFieldSpec.ValV = <
+    val virtual <InstVarName> : <Typexpr>
+  > 
+  ClassFieldSpec.ValM = <
+    val mutable <InstVarName> : <Typexpr>
+  > 
+  ClassFieldSpec.ValVM = <
+    val virtual mutable <InstVarName> : <Typexpr>
+  > 
+  ClassFieldSpec.Method = <
+    method <MethodName> : <PolyTypexpr>
+  > 
+  ClassFieldSpec.MethodPV = <
+    method private virtual <MethodName> : <PolyTypexpr>
+  > 
+  ClassFieldSpec.MethodV = <
+    method virtual <MethodName> : <PolyTypexpr>
+  > 
+  ClassFieldSpec.MethodP = <
+    method private <MethodName> : <PolyTypexpr>
+  > 
+  ClassFieldSpec.MethodVP = <
+    method virtual private <MethodName> : <PolyTypexpr>
+  > 
+  ClassFieldSpec.Inherit = <
+    inherit <ClassBodyType>
+  > 
+  ClassFieldSpec.Constraint = <
+    constraint <Typexpr> = <Typexpr>
+  > 
+
   
 // See also the following language extensions: attributes and extension nodes.
 // 
@@ -163,47 +191,98 @@ context-free syntax
 // expressed in class types.
 
 sorts ClassExpr
+
 context-free syntax
-  ClassExpr             = "(" ClassExpr ")" {bracket}
-  ClassExpr.ClassRef    = ClassPath
-  ClassExpr.ClassRefP   = "[" {Typexpr ","}+ "]" ClassPath
-  ClassExpr.ClassAscr   = "(" ClassExpr ":" ClassType ")"
-  ClassExpr.ClassApp    = ClassExpr Argument+
+
+  ClassExpr = <(<ClassExpr>)> {bracket}
+  ClassExpr.ClassRef = ClassPath 
   
-  ClassExpr.ClassFun    = "fun" Parameter+ "->" ClassExpr
-  ClassExpr.ClassLetRec = "let" "rec" {LetBinding "and"}+ "in" ClassExpr
-  ClassExpr.ClassLet    = "let"       {LetBinding "and"}+ "in" ClassExpr
-  ClassExpr.Object      = "object" ClassBody "end"
-  ClassExpr.LetOpenCE   = "let" "open" ModulePath "in" ClassExpr
-  
+  ClassExpr.ClassRefP = <
+    [<{Typexpr ", "}+>] <ClassPath>
+  > 
+  ClassExpr.ClassAscr = <
+    (<ClassExpr> : <ClassType>)
+  > 
+  ClassExpr.ClassApp = <
+    <ClassExpr> <Argument+>
+  > 
+  ClassExpr.ClassFun = <
+    fun <Parameter+> -\> <ClassExpr>
+  > 
+  ClassExpr.ClassLetRec = <
+    let rec 
+      <{LetBinding "\nand"}+> 
+    in <ClassExpr>
+  > 
+  ClassExpr.ClassLet = <
+    let 
+      <{LetBinding "\nand"}+> 
+    in <ClassExpr>
+  > 
+  ClassExpr.Object = <
+    object 
+      <ClassBody> 
+    end
+  > 
+  ClassExpr.LetOpenCE = <
+    let open <ModulePath> 
+    in <ClassExpr>
+  > 
+
 sorts ClassField
 context-free syntax
-  ClassField.InheritCE = "inherit" ClassExpr Alias?
-  ClassField.InheritCE = "inherit!" ClassExpr Alias?
-  
-  Alias.Alias       = "as" LowercaseIdent
-  TypeAscr.TypeAscr = ":" Typexpr
-  
-  Mutable.Mutable = "mutable"
-  Private.Private = "private"
-  
-  ClassField.Val = "val"  Mutable? InstVarName TypeAscr? "=" Expr
-  ClassField.Val = "val!" Mutable? InstVarName TypeAscr? "=" Expr
-  
-  ClassField.ValV  = "val" Mutable?  "virtual" InstVarName ":" Typexpr
-  ClassField.ValVM = "val" "virtual" "mutable" InstVarName ":" Typexpr
-  
-  ClassField.Method   = "method"  Private?           MethodName Parameter* TypeAscr? "=" Expr
-  ClassField.Method   = "method!" Private?           MethodName Parameter* TypeAscr? "=" Expr
-  ClassField.Method   = "method"  Private?           MethodName ":" PolyTypexpr      "=" Expr
-  ClassField.Method   = "method!" Private?           MethodName ":" PolyTypexpr      "=" Expr
-  ClassField.Method   = "method"  Private? "virtual" MethodName ":" PolyTypexpr
-  ClassField.MethodVP = "method" "virtual" "private" MethodName ":" PolyTypexpr
-  
-  ClassField.Constraint  = "constraint" Typexpr "=" Typexpr
-  ClassField.Initializer = "initializer" Expr
-  
-  
+
+  ClassField.InheritCE = <
+    inherit <ClassExpr> <Alias?>
+  > 
+  ClassField.InheritCE = <
+    inherit! <ClassExpr> <Alias?>
+  > 
+  ClassField.Val = <
+    val <Mutable?> <InstVarName> <TypeAscr?> = <Expr>
+  > 
+  ClassField.Val = <
+    val! <Mutable?> <InstVarName> <TypeAscr?> = <Expr>
+  > 
+  ClassField.ValV = <
+    val <Mutable?> virtual <InstVarName> : <Typexpr>
+  > 
+  ClassField.ValVM = <
+    val virtual mutable <InstVarName> : <Typexpr>
+  > 
+  ClassField.Method = <
+    method <Private?> <MethodName> <Parameter*> <TypeAscr?> = 
+      <Expr>
+  > 
+  ClassField.Method = <
+    method! <Private?> <MethodName> <Parameter*> <TypeAscr?> = 
+      <Expr>
+  > 
+  ClassField.Method = <
+    method <Private?> <MethodName> : <PolyTypexpr> = 
+      <Expr>
+  > 
+  ClassField.Method = <
+    method! <Private?> <MethodName> : <PolyTypexpr> = 
+      <Expr>
+  > 
+  ClassField.Method = <
+    method <Private?> virtual <MethodName> : <PolyTypexpr>
+  > 
+  ClassField.MethodVP = <
+    method virtual private <MethodName> : <PolyTypexpr>
+  > 
+  ClassField.Constraint = <
+    constraint <Typexpr> = <Typexpr>
+  > 
+  ClassField.Initializer = <
+    initializer <Expr>
+  > 
+
+  Alias.Alias = <as <LowercaseIdent>> 
+  TypeAscr.TypeAscr = <: <Typexpr>> 
+  Mutable.Mutable = <mutable> 
+  Private.Private = <private> 
   
 // See also the following language extensions: locally abstract types,
 // attributes and extension nodes.
@@ -274,9 +353,16 @@ context-free syntax
 // 
 
 sorts ClassBody
+
 context-free syntax
-  ClassBody.ClassBody = "(" Pattern TypeAscr? ")" ClassField*
-  ClassBody.ClassBody =                           ClassField*
+
+  ClassBody.ClassBody = <
+    (<Pattern> <TypeAscr?>) 
+    <{ClassField "\n"}*>
+  >
+  ClassBody.ClassBody = <
+    <{ClassField "\n"}*>
+  > 
   
 // The expression object class-body end denotes a class body. This is the
 // prototype for an object : it lists the instance variables and methods of an
@@ -361,9 +447,12 @@ context-free syntax
 // instance variables and duplicating self:
 
 sorts Expr
+
 context-free syntax
-  Expr.Assign = InstVarName "<-" Expr
-  Expr.Clone  = "{<" {InstVar ";"}+ OptSemicolon ">}"
+
+  Expr.Assign = <<InstVarName> \<- <Expr>> 
+  Expr.Clone = <{\< <{InstVar ";"}+> <OptSemicolon> \>}> 
+
 
 // The expression inst-var-name <-  expr modifies in-place the current object by
 // replacing the value associated to inst-var-name by the value of expr. Of
@@ -418,17 +507,34 @@ context-free syntax
 // 7.9.3  Class definitions
 // ========================
 
-sorts ClassDefinition ClassBinding TypeParameters
+//sorts ClassDefinition ClassBinding TypeParameters
+//context-free syntax
+//  ClassDefinition.ClassDef    = "class" {ClassBinding "and"}+
+//
+//  ClassBinding.ClassBinding   = Virtual? TypeParams? ClassName Parameter* ClassTypeAscr? "=" ClassExpr
+//
+//  Virtual.Virtual             = "virtual"
+//  
+//  TypeParams.TypeParams       = "[" {TypeVar ","}+ "]"
+//  
+//  ClassTypeAscr.ClassTypeAscr = ":" ClassType
+  
+  sorts ClassDefinition ClassBinding TypeParameters
+
 context-free syntax
-  ClassDefinition.ClassDef    = "class" {ClassBinding "and"}+
 
-  ClassBinding.ClassBinding   = Virtual? TypeParams? ClassName Parameter* ClassTypeAscr? "=" ClassExpr
-
-  Virtual.Virtual             = "virtual"
+  ClassDefinition.ClassDef = <
+    class 
+      <{ClassBinding "\nand"}+>
+  > 
+  ClassBinding.ClassBinding = <
+    <Virtual?> <TypeParams?> <ClassName> <Parameter*> <ClassTypeAscr?> = 
+    <ClassExpr>
+  > 
   
-  TypeParams.TypeParams       = "[" {TypeVar ","}+ "]"
-  
-  ClassTypeAscr.ClassTypeAscr = ":" ClassType
+  Virtual.Virtual = <virtual> 
+  TypeParams.TypeParams = <[<{TypeVar ", "}+>]> 
+  ClassTypeAscr.ClassTypeAscr = <: <ClassType>> 
 
 //  TypeParameters.TypeParameters0 = {TypeVar ","}+ 
 
@@ -462,11 +568,23 @@ context-free syntax
 // must either be type parameters or be bound in the constraint clause.
 
 
+//sorts ClassSpecification ClassSpec
+//context-free syntax
+//  ClassSpecification.Class = "class" {ClassSpec "and"}+
+//
+//  ClassSpec.ClassSpec      = Virtual? TypeParams? ClassName ":" ClassType
+  
 sorts ClassSpecification ClassSpec
-context-free syntax
-  ClassSpecification.Class = "class" {ClassSpec "and"}+
 
-  ClassSpec.ClassSpec      = Virtual? TypeParams? ClassName ":" ClassType
+context-free syntax
+
+  ClassSpecification.Class = <
+    class <{ClassSpec "\nand"}+>
+  > 
+  ClassSpec.ClassSpec = <
+    <Virtual?> <TypeParams?> <ClassName> : <ClassType>
+  > 
+  
   
 // This is the counterpart in signatures of class definitions. A class
 // specification matches a class definition if they have the same type parameters
@@ -477,11 +595,22 @@ context-free syntax
 // =============================
   
   
-sorts ClasstypeDefinition ClasstypeDef
-context-free syntax
-  ClasstypeDefinition.ClasstypeDefinition = "class" "type" {ClasstypeDef "and"}+
+//sorts ClasstypeDefinition ClasstypeDef
+//context-free syntax
+//  ClasstypeDefinition.ClasstypeDefinition = "class" "type" {ClasstypeDef "and"}+
+//
+//  ClasstypeDef.ClasstypeDef = Virtual? TypeParams? ClassName "=" ClassBodyType
+  
+  context-free syntax
 
-  ClasstypeDef.ClasstypeDef = Virtual? TypeParams? ClassName "=" ClassBodyType
+  ClasstypeDefinition.ClasstypeDefinition = <
+    class type 
+      <{ClasstypeDef "\nand"}+>
+  > 
+  ClasstypeDef.ClasstypeDef = <
+    <Virtual?> <TypeParams?> <ClassName> = 
+      <ClassBodyType>
+  > 
   
 // A class type definition class class-name =  class-body-type defines an
 // abbreviation class-name for the class body type class-body-type. As for class

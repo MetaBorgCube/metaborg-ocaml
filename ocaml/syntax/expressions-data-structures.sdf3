@@ -15,13 +15,19 @@ imports type-expressions
 // Products
 // --------
 
-context-free syntax 
-  Expr.Tuple = {Expr ","}+
-context-free priorities
-  Expr.Tuple <0> .> {Expr ","}+ = Expr,
-  {Expr ","}+ = Expr                 <0> .> Expr.Tuple,
-  {Expr ","}+ = {Expr ","}+ "," Expr <2> .> Expr.Tuple
+//context-free syntax 
+//  Expr.Tuple = {Expr ","}+
+//context-free priorities
+//  Expr.Tuple <0> .> {Expr ","}+ = Expr,
+//  {Expr ","}+ = Expr                 <0> .> Expr.Tuple,
+//  {Expr ","}+ = {Expr ","}+ "," Expr <2> .> Expr.Tuple
   
+context-free syntax
+  Expr.Tuple = <<{Expr ", "}+>> 
+context-free priorities
+  Expr.Tuple <0>. > {Expr ","}+ = Expr ,
+  {Expr ","}+ = Expr  <0>. > Expr.Tuple,
+  {Expr ","}+ = {Expr ","}+ "," Expr  <2>. > Expr.Tuple
   
 // The expression expr_1 , ... ,  expr_n evaluates to the n-tuple of the values
 // of expressions expr_1 to expr_n. The evaluation order of the subexpressions is
@@ -33,7 +39,7 @@ context-free priorities
 // --------
 
 context-free syntax
-  Expr.ConApp = Constr Expr  
+  Expr.ConApp = <<Constr> <Expr>>
   
 // The expression constr  expr evaluates to the unary variant value whose
 // constructor is constr, and whose argument is the value of expr. Similarly, the
@@ -45,9 +51,9 @@ context-free syntax
 // expr_n.
 
 context-free syntax
-  Expr.Cns  = Expr "::" Expr  
-  Expr.List = "[" {Expr ";"}+ OptSemicolon "]" 
-  
+  Expr.Cns  = <<Expr> :: <Expr>> 
+  Expr.List = <[<{Expr "; "}+> <OptSemicolon>]> 
+
 // For lists, some syntactic sugar is provided. The expression expr_1 ::  expr_2
 // stands for the constructor ( :: )  applied to the arguments ( expr_1 ,  expr_2
 // ), and therefore evaluates to the list whose head is the value of expr_1 and
@@ -58,8 +64,8 @@ context-free syntax
 // Polymorphic variants
 // --------------------
 
-context-free syntax 
-  Expr.TagApp = TagNameQ Expr
+context-free syntax   
+  Expr.TagApp = <<TagNameQ> <Expr>>
   
 // The expression `tag-name  expr evaluates to the polymorphic variant value
 // whose tag is tag-name, and whose argument is the value of expr.
@@ -67,25 +73,62 @@ context-free syntax
 // Records
 // -------
 
-context-free syntax // record expressions 
-
-  Expr.Record  = "{"             {FieldInit ";"}+ OptSemicolon "}"
-  Expr.RecordW = "{" Expr "with" {FieldInit ";"}+ OptSemicolon "}"
-                
-  FieldInit.FieldInit = Field TypeAscr? "=" Expr 
-  FieldInit.FieldDecl = Field TypeAscr? 
-  
-  Expr.Proj        = Expr "." Field 
-  Expr.ProjAssign  = Expr "." Field        "<-" Expr //{non-assoc}
-  Expr.Proj1       = Expr "." "(" Expr ")"
-  Expr.Proj1Assign = Expr "." "(" Expr ")" "<-" Expr //{non-assoc}
-  Expr.Proj2       = Expr "." "[" Expr "]"
-  Expr.Proj2Assign = Expr "." "[" Expr "]" "<-" Expr //{non-assoc}
-  
+context-free syntax
+  Expr.Record = <
+    { <{FieldInit "; "}+> <OptSemicolon> }
+  > 
+  Expr.RecordW = <
+    { <Expr> with <{FieldInit ";"}+> <OptSemicolon> }
+  > 
+  FieldInit.FieldInit = <
+    <Field> <TypeAscr?> = <Expr>
+  > 
+  FieldInit.FieldDecl = <
+    <Field> <TypeAscr?>
+  > 
+  Expr.Proj = <
+    <Expr>.<Field>
+  > 
+  Expr.ProjAssign = <
+    <Expr>.<Field> \<- <Expr>
+  > 
+  Expr.Proj1 = <
+    <Expr>.(<Expr>)
+  > 
+  Expr.Proj1Assign = <
+    <Expr>.(<Expr>) \<- <Expr>
+  > 
+  Expr.Proj2 = <
+    <Expr>.[<Expr>]
+  > 
+  Expr.Proj2Assign = <
+    <Expr>.[<Expr>] \<- <Expr>
+  > 
 context-free priorities
-  FieldInit.FieldInit <3> .> Expr.Seq,
+  FieldInit.FieldInit <3>. > Expr.Seq,
+  Expr.Proj <0>. > Expr.Const
   
-  Expr.Proj <0> .> Expr.Const 
+  // TODO: check: too broad? to disambiguate Array.length
+  
+//context-free syntax // record expressions 
+//
+//  Expr.Record  = "{"             {FieldInit ";"}+ OptSemicolon "}"
+//  Expr.RecordW = "{" Expr "with" {FieldInit ";"}+ OptSemicolon "}"
+//                
+//  FieldInit.FieldInit = Field TypeAscr? "=" Expr 
+//  FieldInit.FieldDecl = Field TypeAscr? 
+//  
+//  Expr.Proj        = Expr "." Field 
+//  Expr.ProjAssign  = Expr "." Field        "<-" Expr //{non-assoc}
+//  Expr.Proj1       = Expr "." "(" Expr ")"
+//  Expr.Proj1Assign = Expr "." "(" Expr ")" "<-" Expr //{non-assoc}
+//  Expr.Proj2       = Expr "." "[" Expr "]"
+//  Expr.Proj2Assign = Expr "." "[" Expr "]" "<-" Expr //{non-assoc}
+//  
+//context-free priorities
+//  FieldInit.FieldInit <3> .> Expr.Seq,
+//  
+//  Expr.Proj <0> .> Expr.Const 
   // TODO: check: too broad? to disambiguate Array.length
   
 
@@ -126,8 +169,8 @@ context-free priorities
 // ------
 
 
-context-free syntax
-  Expr.Array  = "[|" {Expr ";"}+ OptSemicolon "|]"
+context-free syntax  
+  Expr.Array = <[| <{Expr "; "}+> <OptSemicolon> |]> 
    
 // The expression [| expr_1 ; ... ;  expr_n |] evaluates to a n-element array,
 // whose elements are initialized with the values of expr_1 to expr_n

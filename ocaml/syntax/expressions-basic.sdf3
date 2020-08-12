@@ -35,8 +35,8 @@ context-free syntax
 
 
 context-free syntax
-  Expr = "(" Expr ")"       {bracket}
-  Expr = "begin" Expr "end" {bracket}
+  Expr = <(<Expr>)> {bracket}
+  Expr = <begin <Expr> end> {bracket}
   
 // The expressions ( expr ) and begin expr end have the same value as expr. The
 // two constructs are semantically equivalent, but it is good style to use begin
@@ -54,22 +54,38 @@ context-free syntax
 // Function application
 // --------------------
 
-sorts Argument 
-lexical syntax
-context-free syntax 
-  Expr.App             = Expr Argument+ {longest-match}
-  Argument.Arg         =           Expr
+sorts Argument
+context-free syntax
+  Expr.App = <
+    <Expr> <{Argument " "}+>
+  > {longest-match}
+  Argument.Arg         = Expr 
   Argument.LabeledArgE = LabelE 
-  Argument.LabeledArg  = Label     Expr  
-  Argument.OptArgE     = OptLabelE  
-  Argument.OptArg      = OptLabel  Expr 
-  // TODO: check if : is required when Expr is left out in labeled argument
-context-free priorities  
-  // nested applications require parentheses
-  Expr.App            <0> .> Expr.App,   
-  Argument.Arg        <0> .> Expr.App,  
-  Argument.LabeledArg <1> .> Expr.App, 
-  Argument.OptArg     <1> .> Expr.App 
+  Argument.LabeledArg  = <<Label> <Expr>> 
+  Argument.OptArgE     = OptLabelE 
+  Argument.OptArg      = <<OptLabel> <Expr>> 
+context-free priorities
+  Expr.App <0>. > Expr.App,
+  Argument.Arg <0>. > Expr.App,
+  Argument.LabeledArg <1>. > Expr.App,
+  Argument.OptArg <1>. > Expr.App
+  
+//sorts Argument 
+//lexical syntax
+//context-free syntax 
+//  Expr.App             = Expr Argument+ {longest-match}
+//  Argument.Arg         =           Expr
+//  Argument.LabeledArgE = LabelE 
+//  Argument.LabeledArg  = Label     Expr  
+//  Argument.OptArgE     = OptLabelE  
+//  Argument.OptArg      = OptLabel  Expr 
+//  // TODO: check if : is required when Expr is left out in labeled argument
+//context-free priorities  
+//  // nested applications require parentheses
+//  Expr.App            <0> .> Expr.App,   
+//  Argument.Arg        <0> .> Expr.App,  
+//  Argument.LabeledArg <1> .> Expr.App, 
+//  Argument.OptArg     <1> .> Expr.App 
   
 
 // Function application is denoted by juxtaposition of (possibly labeled)
@@ -103,28 +119,59 @@ context-free priorities
 // Function definition
 // -------------------
 
-sorts Parameter 
-context-free syntax 
-  Expr.Function  = "function" PatternMatching
-  Expr.FunTyped  = "fun" Parameter+ ":" Typexpr "->" Expr
-  Expr.Fun       = "fun" Parameter+             "->" Expr
+sorts Parameter
+context-free syntax
+  Expr.Function = <
+    function 
+    <PatternMatching>
+  > 
+  Expr.FunTyped = <
+    fun <Parameter+> : <Typexpr> -\> 
+      <Expr>
+  > 
+  Expr.Fun = <
+    fun <Parameter+> -\> 
+      <Expr>
+  > 
+  Parameter.ParamPat = Pattern 
+  Parameter.Param1 = <~<LabelName>> 
+  Parameter.Param2 = <~(<LabelName>: <Typexpr>)> 
+  Parameter.Param3 = <~(<LabelName>)> 
+  Parameter.Param4 = <~<LabelName>: <Pattern>>
   
-  Parameter.ParamPat = Pattern
+  Parameter.Param5 = <?<LabelName>> 
+  Parameter.Param6 = <?(<LabelName>: <Typexpr> = <Expr>)> 
+  Parameter.Param7 = <?(<LabelName> = <Expr>)> 
+  Parameter.Param8 = <?(<LabelName>: <Typexpr>)> 
   
-  Parameter.Param1  = "~" LabelName
-  Parameter.Param2  = "~" "(" LabelName ":" Typexpr ")"
-  Parameter.Param3  = "~" "(" LabelName             ")"
-  Parameter.Param4  = "~" LabelName ":" Pattern
-  
-  Parameter.Param5  = "?" LabelName
-  Parameter.Param6  = "?" "(" LabelName ":" Typexpr "=" Expr ")"
-  Parameter.Param7  = "?" "(" LabelName             "=" Expr ")"
-  Parameter.Param8  = "?" "(" LabelName ":" Typexpr          ")"
-  
-  Parameter.Param9  = "?" LabelName ":" Pattern
-  Parameter.Param10 = "?" LabelName ":" "(" Pattern ":" Typexpr "=" Expr ")"
-  Parameter.Param11 = "?" LabelName ":" "(" Pattern             "=" Expr ")"
-  Parameter.Param12 = "?" LabelName ":" "(" Pattern ":" Typexpr          ")"
+  Parameter.Param9 = <?<LabelName>: <Pattern>> 
+  Parameter.Param10 = <?<LabelName>: (<Pattern> : <Typexpr> = <Expr>)> 
+  Parameter.Param11 = <?<LabelName>: (<Pattern> = <Expr>)> 
+  Parameter.Param12 = <?<LabelName>: (<Pattern> : <Typexpr>)> 
+
+
+//sorts Parameter 
+//context-free syntax 
+//  Expr.Function  = "function" PatternMatching
+//  Expr.FunTyped  = "fun" Parameter+ ":" Typexpr "->" Expr
+//  Expr.Fun       = "fun" Parameter+             "->" Expr
+//  
+//  Parameter.ParamPat = Pattern
+//  
+//  Parameter.Param1  = "~" LabelName
+//  Parameter.Param2  = "~" "(" LabelName ":" Typexpr ")"
+//  Parameter.Param3  = "~" "(" LabelName             ")"
+//  Parameter.Param4  = "~" LabelName ":" Pattern
+//  
+//  Parameter.Param5  = "?" LabelName
+//  Parameter.Param6  = "?" "(" LabelName ":" Typexpr "=" Expr ")"
+//  Parameter.Param7  = "?" "(" LabelName             "=" Expr ")"
+//  Parameter.Param8  = "?" "(" LabelName ":" Typexpr          ")"
+//  
+//  Parameter.Param9  = "?" LabelName ":" Pattern
+//  Parameter.Param10 = "?" LabelName ":" "(" Pattern ":" Typexpr "=" Expr ")"
+//  Parameter.Param11 = "?" LabelName ":" "(" Pattern             "=" Expr ")"
+//  Parameter.Param12 = "?" LabelName ":" "(" Pattern ":" Typexpr          ")"
   
 // Two syntactic forms are provided to define functions. The first form is
 // introduced by the keyword function:
@@ -184,12 +231,55 @@ context-free syntax
 // Guards in pattern-matchings
 // ---------------------------
 
-sorts PatternMatching 
-context-free syntax 
-  PatternMatching.PatMatch = OptBar {MatchCase "|"}+ {longest-match}
+//sorts PatternMatching
+//context-free syntax
+//  PatternMatching.PatMatch = <
+//    <OptBar> <{MatchCase " |\n"}+>
+//  > {longest-match}
+//  MatchCase.MatchCase = <
+//    <Pattern> -\> <Expr>
+//  > 
+//  MatchCase.MatchCaseGuard = <
+//    <Pattern> when <Expr> -\> 
+//      <Expr>
+//  > 
+
+sorts PatternMatching MatchCase
+context-free syntax
+  PatternMatching.PatMatch = <
+    <{MatchCase "\n"}+>
+  > {longest-match}
+  MatchCase.MatchCase = <
+    | <Pattern> -\> 
+        <Expr>
+  > 
+  MatchCase.MatchCaseGuard = <
+    | <Pattern> when <Expr> -\> 
+        <Expr>
+  >   
   
-  MatchCase.MatchCase      = Pattern             "->" Expr 
-  MatchCase.MatchCaseGuard = Pattern "when" Expr "->" Expr
+sorts MatchCaseFirst
+context-free syntax
+  PatternMatching.PatMatchOptBar = <
+      <MatchCaseFirst>
+    <{MatchCase "\n"}*>
+  > {longest-match}
+  
+  MatchCaseFirst.MatchCaseFirst = <
+    <Pattern> -\> 
+      <Expr>
+  > 
+  MatchCaseFirst.MatchCaseFirstGuard = <
+    <Pattern> when <Expr> -\> 
+      <Expr>
+  > 
+  
+//sorts PatternMatching 
+//context-free syntax 
+//  PatternMatching.PatMatch = OptBar {MatchCase "|"}+ {longest-match}
+//  
+//  MatchCase.MatchCase      = Pattern             "->" Expr 
+//  MatchCase.MatchCaseGuard = Pattern "when" Expr "->" Expr
   
 // The cases of a pattern matching (in the function, match and try constructs)
 // can include guard expressions, which are arbitrary boolean expressions that
@@ -211,19 +301,62 @@ context-free syntax
 // -----------------
 
 sorts LetBinding
-context-free syntax // let bindings
-  Expr.Let            = "let"       {LetBinding "and"}+ "in" Expr
-  Expr.LetRec         = "let" "rec" {LetBinding "and"}+ "in" Expr
-  Expr.LetExc         = "let" "exception" ConstrDecl "in" Expr
-  
-  LetBinding.LetPat   = Pattern "=" Expr
-  
-  LetBinding.LetVar   = ValueName ":" PolyTypexpr                      "=" Expr
-  
-  LetBinding.LetFun   = ValueName Parameter+                           "=" Expr
-  LetBinding.LetFunRT = ValueName Parameter+ ":" Typexpr               "=" Expr
-  LetBinding.LetFunTT = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
-  LetBinding.LetFunST = ValueName Parameter*              ":>" Typexpr "=" Expr
+context-free syntax
+  Expr.Let = <
+    let 
+      <{LetBinding "\nand"}+> 
+    in <Expr>
+  > 
+  Expr.LetRec = <
+    let rec 
+      <{LetBinding "\nand"}+> 
+    in <Expr>
+  > 
+  Expr.LetExc = <
+    let exception <ConstrDecl> 
+    in <Expr>
+  > 
+  LetBinding.LetPat   = <
+    <Pattern> = 
+      <Expr>
+  > 
+  LetBinding.LetVar = <
+    <ValueNameDef> : <PolyTypexpr> = 
+      <Expr>
+  > 
+  LetBinding.LetFun = <
+    <ValueNameDef> <Parameter*> = 
+      <Expr>
+  > 
+  LetBinding.LetFunRT = <
+    <ValueNameDef> <Parameter+> : <Typexpr> = 
+      <Expr>
+  > 
+  LetBinding.LetFunTT = <
+    <ValueNameDef> <Parameter*> : <Typexpr> :\> <Typexpr> = 
+      <Expr>
+  > 
+  LetBinding.LetFunST = <
+    <ValueNameDef> <Parameter*> :\> <Typexpr> = <Expr>
+  > 
+
+context-free priorities
+  LetBinding.LetPat <0> .> Pattern.VarPat 
+
+//sorts LetBinding
+//context-free syntax // let bindings
+//  Expr.Let            = "let"       {LetBinding "and"}+ "in" Expr
+//  Expr.LetRec         = "let" "rec" {LetBinding "and"}+ "in" Expr
+//  Expr.LetExc         = "let" "exception" ConstrDecl "in" Expr
+//  
+//  LetBinding.LetPat   = Pattern "=" Expr
+//  
+//  LetBinding.LetVar   = ValueName ":" PolyTypexpr                      "=" Expr
+//  
+//  LetBinding.LetFun   = ValueName Parameter+                           "=" Expr
+//  LetBinding.LetFunRT = ValueName Parameter+ ":" Typexpr               "=" Expr
+//  LetBinding.LetFunTT = ValueName Parameter* ":" Typexpr  ":>" Typexpr "=" Expr
+//  LetBinding.LetFunST = ValueName Parameter*              ":>" Typexpr "=" Expr
   
 // The let and let rec constructs bind value names locally. The construct
 // let pattern_1 =  expr_1 and ... and  pattern_n =  expr_n in  expr

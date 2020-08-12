@@ -6,63 +6,139 @@ imports lex names aux
 // *=*=*=*=*=*=*=*=*=*=*
 
 sorts Typexpr TypeVar
-lexical syntax // TODO: check that this composition is lexical
-  TypeVar = "'" Ident
-  
-context-free syntax
-  Typexpr             = "(" Typexpr ")" {bracket}
-  
-  Typexpr.TypeVar     = TypeVar
-//  Typexpr.TypeAnon    = "_"
-  
-  Typexpr.TypeFun     = Typexpr "->" Typexpr {right}
-  Typexpr.TypeFunL    = OptLabel Typexpr "->" Typexpr {right}
-  
-  Typexpr.TypeTup     = {Typexpr "*"}+ 
-  
-  Typexpr             = Typeconstr
-  Typexpr.TypeApp     = Typexpr Typeconstr {non-assoc}
-  Typexpr.TypeAppN    = "(" {Typexpr ","}+ ")" Typeconstr
-  
-  Typexpr.TypeAlias   = Typexpr "as" TypeVar
-  
-  Typexpr             = PolymorphicVariantType
-  
-sorts MethodType PolyTypexpr // object types
-context-free syntax 
-  Typexpr.ObjTypeMt    = "<" ">"
-  Typexpr.ObjTypeMtRow = "<" ".." ">"
-  Typexpr.ObjType      = "<" {MethodType ";"}+ OptSemicolon ">"
-  Typexpr.ObjTypeRow   = "<" {MethodType ";"}+ ";" ".." ">"
-  
-  MethodType.MethodType = MethodName ":" PolyTypexpr
-  
-  PolyTypexpr.PolyTypexpr  = Typexpr
-  PolyTypexpr.PolyTypexprN = TypeVar+ "." Typexpr
-  
-context-free syntax // # types
+lexical syntax
+  TypeVar = "'" Ident 
 
-  Typexpr.HashType  =                        "#" ClassPath
-  Typexpr.HashType1 =                Typexpr "#" ClassPath
-  Typexpr.HashTypeN = "(" {Typexpr ","}+ ")" "#" ClassPath
+context-free syntax
+
+  Typexpr = <(<Typexpr>)> {bracket}
+  Typexpr = Typeconstr 
+  Typexpr = PolymorphicVariantType 
   
+  Typexpr.TypeVar = 
+    TypeVar 
+  Typexpr.TypeFun = <
+    <Typexpr> -\> <Typexpr>
+  > {right}
+  Typexpr.TypeFunL = <
+    <OptLabel> <Typexpr> -\> <Typexpr>
+  > {right}
+  Typexpr.TypeTup = <
+    <{Typexpr " * "}+>
+  > 
+  Typexpr.TypeApp = <
+    <Typexpr> <Typeconstr>
+  > {non-assoc}
+  Typexpr.TypeAppN = <
+    (<{Typexpr ", "}+>) <Typeconstr>
+  > 
+  Typexpr.TypeAlias = <
+    <Typexpr> as <TypeVar>
+  > 
+
+sorts MethodType PolyTypexpr
+context-free syntax
+  Typexpr.ObjTypeMt = [
+    < >
+  ]
+  Typexpr.ObjTypeMtRow = [
+    <..>
+  ] 
+  Typexpr.ObjType = [
+    < [{MethodType "; "}+] [OptSemicolon] >
+  ] 
+  Typexpr.ObjTypeRow = [
+    < [{MethodType "; "}+]; .. >
+  ] 
+  MethodType.MethodType = <
+    <MethodName> : <PolyTypexpr>
+  >
+  
+  PolyTypexpr.PolyTypexpr = Typexpr 
+  PolyTypexpr.PolyTypexprN = <<TypeVar+>.<Typexpr>>
+
+context-free syntax
+  Typexpr.HashType = <# <ClassPath>> 
+  Typexpr.HashType1 = <<Typexpr> # <ClassPath>> 
+  Typexpr.HashTypeN = <( <{Typexpr ","}+> ) # <ClassPath>> 
+
 context-free priorities
-  {Typexpr.TypeApp Typexpr.TypeAppN}
-  >  {Typexpr.HashType Typexpr.HashType1 Typexpr.HashTypeN}
-  > {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr
-  > {right: Typexpr.TypeFun Typexpr.TypeFunL}
+  {Typexpr.TypeApp Typexpr.TypeAppN} 
+  > {Typexpr.HashType Typexpr.HashType1 Typexpr.HashTypeN} 
+  > {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr  
+  > {right : Typexpr.TypeFun Typexpr.TypeFunL} 
   > Typexpr.TypeAlias
-  
+
 context-free priorities
-  Typexpr.TypeAppN <1> .> {Typexpr ","}+ = Typexpr
-  
+  Typexpr.TypeAppN <1>. > {Typexpr ","}+ = Typexpr 
+
 context-free priorities
-  Typexpr.TypeTup <0> .> {Typexpr "*"}+ = Typexpr,  
-  {Typexpr "*"}+ = Typexpr                    <0> .> Typexpr.TypeTup,  
-  {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr <2> .> Typexpr.TypeTup 
+  Typexpr.TypeTup <0>. > {Typexpr "*"}+ = Typexpr ,
+  {Typexpr "*"}+ = Typexpr  <0>. > Typexpr.TypeTup,
+  {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr  <2>. > Typexpr.TypeTup
 
 context-free syntax
-  TypeAscr.TypeAscr = ":" Typexpr
+  TypeAscr.TypeAscr = <: <Typexpr>> 
+
+
+//sorts Typexpr TypeVar
+//lexical syntax // TODO: check that this composition is lexical
+//  TypeVar = "'" Ident
+//  
+//context-free syntax
+//  Typexpr             = "(" Typexpr ")" {bracket}
+//  
+//  Typexpr.TypeVar     = TypeVar
+////  Typexpr.TypeAnon    = "_"
+//  
+//  Typexpr.TypeFun     = Typexpr "->" Typexpr {right}
+//  Typexpr.TypeFunL    = OptLabel Typexpr "->" Typexpr {right}
+//  
+//  Typexpr.TypeTup     = {Typexpr "*"}+ 
+//  
+//  Typexpr             = Typeconstr
+//  Typexpr.TypeApp     = Typexpr Typeconstr {non-assoc}
+//  Typexpr.TypeAppN    = "(" {Typexpr ","}+ ")" Typeconstr
+//  
+//  Typexpr.TypeAlias   = Typexpr "as" TypeVar
+//  
+//  Typexpr             = PolymorphicVariantType
+//  
+//sorts MethodType PolyTypexpr // object types
+//context-free syntax 
+//  Typexpr.ObjTypeMt    = "<" ">"
+//  Typexpr.ObjTypeMtRow = "<" ".." ">"
+//  Typexpr.ObjType      = "<" {MethodType ";"}+ OptSemicolon ">"
+//  Typexpr.ObjTypeRow   = "<" {MethodType ";"}+ ";" ".." ">"
+//  
+//  MethodType.MethodType = MethodName ":" PolyTypexpr
+//  
+//  PolyTypexpr.PolyTypexpr  = Typexpr
+//  PolyTypexpr.PolyTypexprN = TypeVar+ "." Typexpr
+//  
+//context-free syntax // # types
+//
+//  Typexpr.HashType  =                        "#" ClassPath
+//  Typexpr.HashType1 =                Typexpr "#" ClassPath
+//  Typexpr.HashTypeN = "(" {Typexpr ","}+ ")" "#" ClassPath
+//  
+//context-free priorities
+//  {Typexpr.TypeApp Typexpr.TypeAppN}
+//  >  {Typexpr.HashType Typexpr.HashType1 Typexpr.HashTypeN}
+//  > {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr
+//  > {right: Typexpr.TypeFun Typexpr.TypeFunL}
+//  > Typexpr.TypeAlias
+//  
+//context-free priorities
+//  Typexpr.TypeAppN <1> .> {Typexpr ","}+ = Typexpr
+//  
+//context-free priorities
+//  Typexpr.TypeTup <0> .> {Typexpr "*"}+ = Typexpr,  
+//  {Typexpr "*"}+ = Typexpr                    <0> .> Typexpr.TypeTup,  
+//  {Typexpr "*"}+ = {Typexpr "*"}+ "*" Typexpr <2> .> Typexpr.TypeTup 
+//
+//context-free syntax
+//  TypeAscr.TypeAscr = ":" Typexpr
   
 // See also the following language extensions: first-class modules, attributes
 // and extension nodes.
@@ -160,28 +236,56 @@ context-free syntax
 
 sorts PolymorphicVariantType TagSpecFirst TagSpec TagSpecFull
 context-free syntax
-//  PolymorphicVariantType.PolyVarExact  = "["  TagSpecFirst ("|" TagSpec)* "]"
+  PolymorphicVariantType.PolyVarExact = <
+    [ <{TagSpec " | "}+> ]
+  > 
+  PolymorphicVariantType.PolyVarOpen = <
+    [\> <{TagSpec " | "}*> ]
+  > 
+  PolymorphicVariantType.PolyVarClosed1 = <
+    [\< <BarOpt> <{TagSpecFull "|"}+> ]
+  > 
+  PolymorphicVariantType.PolyVarClosed2 = <
+    [\< <BarOpt> <{TagSpecFull "|"}+> \> <TagNameQ+> ]
+  > 
   
-  PolymorphicVariantType.PolyVarExact   = "["  {TagSpec "|"}+                          "]" // TODO: check refactoring
-  PolymorphicVariantType.PolyVarOpen    = "[>" {TagSpec "|"}*                          "]"
-  PolymorphicVariantType.PolyVarClosed1 = "[<" BarOpt {TagSpecFull "|"}+               "]"
-  PolymorphicVariantType.PolyVarClosed2 = "[<" BarOpt {TagSpecFull "|"}+ ">" TagNameQ+ "]"
- 
-//  TagSpecFirst.TagSpecFirst6 = TagNameQ 
-//  TagSpecFirst.TagSpecFirst6 = TagNameQ "of" Typexpr
-//  TagSpecFirst.TagSpecFirst7 =               Typexpr? "|" TagSpec
-
   TagSpec.TagSpec4 = TagNameQ 
-  TagSpec.TagSpec6 = TagNameQ "of" Typexpr
-  TagSpec.TagSpec5 =               Typexpr
-
-  TagSpecFull.TagSpecFull4 = TagNameQ 
-  TagSpecFull.TagSpecFull6 = TagNameQ "of" AmpersandOpt {Typexpr "&"}+
-  TagSpecFull.TagSpecFull5 = Typexpr
+  TagSpec.TagSpec6 = <<TagNameQ> of <Typexpr>> 
+  TagSpec.TagSpec5 = Typexpr 
   
+  TagSpecFull.TagSpecFull4 = TagNameQ 
+  TagSpecFull.TagSpecFull6 = <<TagNameQ> of <AmpersandOpt> <{Typexpr "&"}+>> 
+  TagSpecFull.TagSpecFull5 = Typexpr 
+
 lexical syntax
-  AmpersandOpt = "&"?
-  BarOpt = "|"?
+
+  AmpersandOpt = "&"? 
+  BarOpt = "|"? 
+  
+//sorts PolymorphicVariantType TagSpecFirst TagSpec TagSpecFull
+//context-free syntax
+////  PolymorphicVariantType.PolyVarExact  = "["  TagSpecFirst ("|" TagSpec)* "]"
+//  
+//  PolymorphicVariantType.PolyVarExact   = "["  {TagSpec "|"}+                          "]" // TODO: check refactoring
+//  PolymorphicVariantType.PolyVarOpen    = "[>" {TagSpec "|"}*                          "]"
+//  PolymorphicVariantType.PolyVarClosed1 = "[<" BarOpt {TagSpecFull "|"}+               "]"
+//  PolymorphicVariantType.PolyVarClosed2 = "[<" BarOpt {TagSpecFull "|"}+ ">" TagNameQ+ "]"
+// 
+////  TagSpecFirst.TagSpecFirst6 = TagNameQ 
+////  TagSpecFirst.TagSpecFirst6 = TagNameQ "of" Typexpr
+////  TagSpecFirst.TagSpecFirst7 =               Typexpr? "|" TagSpec
+//
+//  TagSpec.TagSpec4 = TagNameQ 
+//  TagSpec.TagSpec6 = TagNameQ "of" Typexpr
+//  TagSpec.TagSpec5 =               Typexpr
+//
+//  TagSpecFull.TagSpecFull4 = TagNameQ 
+//  TagSpecFull.TagSpecFull6 = TagNameQ "of" AmpersandOpt {Typexpr "&"}+
+//  TagSpecFull.TagSpecFull5 = Typexpr
+//  
+//lexical syntax
+//  AmpersandOpt = "&"?
+//  BarOpt = "|"?
   
 // Polymorphic variant types describe the values a polymorphic variant may take.
 // The first case is an exact variant type: all possible tags are known, with
