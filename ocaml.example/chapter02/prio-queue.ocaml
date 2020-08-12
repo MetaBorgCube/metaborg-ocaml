@@ -12,8 +12,8 @@ module PrioQueue =
            else Node(p, e, insert right prio elt, left)
      exception Queue_is_empty
      let rec remove_top = function
-         Empty -> raise Queue_is_empty
-       | Node(prio, elt, left, Empty) -> left
+         Empty -> raise Queue_is_empty  
+       | Node(prio, elt, left, Empty) -> left 
        | Node(prio, elt, Empty, right) -> right
        | Node(prio, elt, (Node(lprio, lelt, _, _) as left),
                          (Node(rprio, relt, _, _) as right)) ->
@@ -22,11 +22,11 @@ module PrioQueue =
            else Node(rprio, relt, left, remove_top right)
      let extract = function
          Empty -> raise Queue_is_empty
-       | Node(prio, elt, _, _) as queue -> (prio, elt, remove_top queue)
+       | Node(prio, elt, _, _) as queue -> (prio, elt, remove_top queue) 
    end
  
 module PrioQueueOpt =
-   struct
+   struct 
      include PrioQueue
 
      let remove_top_opt x =
@@ -48,10 +48,10 @@ module type PRIOQUEUE =
    
  module AbstractPrioQueue = (PrioQueue : PRIOQUEUE)
  
- module type PRIOQUEUE_WITH_OPT =
+ module type PRIOQUEUE_WITH_OPT = 
    sig
      include PRIOQUEUE
      val extract_opt : 'a queue -> (int * 'a * 'a queue) option
-   end
+   end 
    
    

@@ -1,0 +1,108 @@
+class point =
+   object
+     val mutable x = 0
+     method get_x = x
+     method move d = x <- x + d
+   end;;
+   
+p#move 3;;
+
+let p = new point 7;;
+
+class point x_init =
+   object
+     val mutable x = x_init
+     method get_x = x
+     method get_offset = x - x_init
+     method move d = x <- x + d 
+   end;;
+   
+class adjusted_point x_init =
+   let origin = (x_init / 10) * 10 in
+   object
+     val mutable x = origin
+     method get_x = x
+     method get_offset = x - origin
+     method move d = x <- x + d
+   end;;
+   
+class adjusted_point x_init =  point ((x_init / 10) * 10);;
+
+let new_adjusted_point x_init = new point ((x_init / 10) * 10);;
+
+let p =
+   object
+     val mutable x = 0
+     method get_x = x
+     method move d = x <- x + d
+   end;;
+   
+class printable_point x_init =
+   let origin = (x_init / 10) * 10 in
+   object (self)
+     val mutable x = origin
+     method get_x = x
+     method move d = x <- x + d
+     method print = print_int self#get_x
+     initializer print_string "new point at "; self#print; print_newline ()
+   end;;
+   
+   
+class printable_colored_point y c =
+   object (self)
+     val c = c
+     method color = c
+     inherit printable_point y as super
+     method! print =
+       print_string "(";
+       super#print;
+       print_string ", ";
+       print_string (self#color);
+       print_string ")"
+   end;;
+   
+let p' = new printable_colored_point 17 "red";;      
+
+class ['a] circle (c : 'a) =
+   object
+     val mutable center = c
+     method center = center
+     method set_center c = center <- c
+     method move = (center#move : int -> unit)
+   end;;
+   
+ class ['a] colored_circle c =
+   object
+     constraint 'a = #colored_point
+     inherit ['a] circle c
+     method color = center#color
+   end;;   
+   
+ let l = [p; (colored_point_to_point q)];;
+  
+class c (m : int) =
+   object (self)
+     method m = m
+     initializer all_c := (self :> c) :: !all_c
+   end;;
+   
+class functional_point y =
+   object
+     val x = y
+     method get_x = x
+     method move d = {< x = x + d >}
+     method move_to x = {< x >}
+   end;;
+   
+let p = new functional_point 7;;
+
+p#get_x;;
+
+class bad_functional_point y =
+   object
+     val x = y
+     method get_x = x
+     method move d = new bad_functional_point (x+d)
+     method move_to x = new bad_functional_point x
+   end;;
+      
