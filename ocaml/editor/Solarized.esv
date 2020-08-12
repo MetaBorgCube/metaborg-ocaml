@@ -1,0 +1,99 @@
+module Solarized
+
+colorer
+                                                                                             
+  // Sort-based highlighting with background color                                           
+  //   Id: yellow green                                                                      
+  //                                                                                         
+  // Sort- and constructor-based highlighting                                                
+  //   ClassBodyDec.MethodDec: yellow                                                        
+  //                                                                                         
+  // Constructor-based highlighting                                                          
+  //   _.MethodDec: 255 0 0                                                                  
+  //                                                                                         
+  // Example: background colors for ToMetaExpr/FromMetaExpr, if supported by the grammar     
+  //   environment _.ToMetaExpr:   _ 220 230 200                                             
+  //   environment _.FromMetaExpr: _ white                                                   
+
+colorer System colors
+
+  // see https://ethanschoonover.com/solarized/
+
+  base03	: 0 43 54
+  base02	: 7 54 66
+  base01	: 88 110 117
+  base00	: 101 123 131
+  base0     : 131 148 150
+	base1	: 147 161 161
+	base2	: 238 232 213
+	base3	: 253 246 227
+	yellow	: 181 137   0
+	orange	: 203  75  22
+	red		: 220  50  47
+	magenta	: 211  54 130
+	violet	: 108 113 196
+	blue	: 38  139 210
+	cyan	: 42  161 152
+	green	: 133 153   0
+	gray : 147 161 161
+	
+colorer Default, token-based highlighting
+                                  
+  keyword    : 203 75 22 bold // orange 
+  identifier : 88 110 117 // base01     
+  string     : 38 139 210 // blue               
+  number     : 108 113 196 // violet          
+  var        : 139 69 19 italic   
+  operator   : 38  139 210 bold // blue      
+  layout     : 133 153   0 italic // green
+  
+colorer Constants
+  
+  DecInt 			: 108 113 196 // violet
+  HexInt 			: red
+  OctInt 			: red
+  BinInt 			: red
+  
+  Int32Literal		: red
+  Int64Literal    	: red
+  NativeintLiteral	: red
+  
+  DecFloat			: red
+  HexFloat 			: red
+  
+  CharLiteral 		: darkgreen
+  StringLiteral		: blue
+  
+colorer Identifiers
+
+  Ident 			: base01 
+  CapitalizedIdent 	: base01
+  LowercaseIdent 	: base01
+
+  LabelName 		: base01 
+  ValueName 		: base02
+  ConstrName   	    : 88 110 117 bold // base02
+  TagName           : base01
+  TypeconstrName    : 88 110 117 bold // base02
+  
+  FieldName         : base01
+  ModuleName        : 88 110 117 bold // base02
+  ModtypeName       : 88 110 117 bold // base02
+  
+  ClassName         : 88 110 117 bold // base02
+  InstVarName       : base01
+  MethodName        : base01
+  
+  TypeVar			: 101 123 131 italic // base0
+  
+colorer Operators 
+
+  InfixOp60 : 38  139 210 // blue   
+  InfixOp50 : 38  139 210 // blue   
+  InfixOp40 : 38  139 210 // blue   
+  InfixOp30 : 38  139 210 // blue    
+  InfixOp20 : 38  139 210 // blue   
+  InfixOp10 : 38  139 210 // blue   
+  InfixOp5  : 38  139 210 // blue   
+   
+

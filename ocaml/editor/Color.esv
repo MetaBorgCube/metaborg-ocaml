@@ -1,0 +1,109 @@
+module Color
+
+colorer
+                                                                                             
+  // Sort-based highlighting with background color                                           
+  //   Id: yellow green                                                                      
+  //                                                                                         
+  // Sort- and constructor-based highlighting                                                
+  //   ClassBodyDec.MethodDec: yellow                                                        
+  //                                                                                         
+  // Constructor-based highlighting                                                          
+  //   _.MethodDec: 255 0 0                                                                  
+  //                                                                                         
+  // Example: background colors for ToMetaExpr/FromMetaExpr, if supported by the grammar     
+  //   environment _.ToMetaExpr:   _ 220 230 200                                             
+  //   environment _.FromMetaExpr: _ white                                                   
+
+colorer Default, token-based highlighting
+                                  
+  keyword    : 127 0 85 bold      
+  //identifier : default            
+//  string     : blue               
+//  number     : darkgreen          
+//  var        : 139 69 19 italic   
+  operator   : 0 0 230        
+  layout     : 63 127 95 italic   
+  
+colorer Constants
+  
+  DecInt 			: red
+  HexInt 			: red2
+  OctInt 			: red3
+  BinInt 			: red4
+  
+  Int32Literal		: red
+  Int64Literal    	: red
+  NativeintLiteral	: red
+  
+  DecFloat			: flred
+  HexFloat 			: flred2
+  
+  CharLiteral 		: darkgreen
+  StringLiteral		: blue
+  
+colorer Identifiers
+
+  Ident 			: 0 0 128 italic     
+  CapitalizedIdent 	: 0 0 200      
+  LowercaseIdent 	: 0 0 128 italic     
+
+  LabelName 		: 0 0 128 italic   
+  ValueName 		: 0 0 200    
+  ConstrName   	    : 0 0 128 bold
+  TagName           : 0 0 210 
+  TypeconstrName    : darkred
+  
+  FieldName         : yellow
+  ModuleName        : darkorange
+  ModtypeName       : darkorange
+  
+  ClassName         : darkorange
+  InstVarName       : darkorange
+  MethodName        : darkorange
+  
+  TypeVar			: 0 0 128 italic   
+  
+  
+colorer Operators 
+
+//  InfixOp60 : 0 0 128   
+//  InfixOp50 : 0 0 128   
+//  InfixOp40 : 0 0 128   
+//  InfixOp30 : 0 0 128   
+//  InfixOp20 : 0 0 128   
+//  InfixOp10 : 0 0 128     
+//  InfixOp5  : 0 0 128 
+
+colorer System colors
+                                  
+  darkblue   = 0 0 128 italic     
+  blue       = 0 0 255     
+  mediumblue = 0 0 200 
+  
+  darkred   = 128 0 0       
+  red       = 255 0 0       
+  red2      = 240 0 0       
+  red3      = 225 0 0       
+  red4      = 210 0 0   
+   
+  flred     = 255 10 0       
+  flred2    = 240 10 0       
+  flred3    = 225 10 0       
+  flred4    = 210 10 0       
+  
+  darkgreen = 0 128 0       
+  green     = 0 255 0       
+  
+  cyan      = 0 255 255     
+  magenta   = 255 0 255     
+  yellow    = 255 255 0     
+  white     = 255 255 255   
+  black     = 0 0 0         
+  gray      = 128 128 128   
+  grey      = gray          
+  orange    		= 255 165 0     
+  darkorange  	= 255 10 0     
+  pink      = 255 105 180   
+  brown     = 139 69 19     
+  default   = _   
