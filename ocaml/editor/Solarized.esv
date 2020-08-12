@@ -19,23 +19,23 @@ colorer System colors
 
   // see https://ethanschoonover.com/solarized/
 
-  base03	: 0 43 54
-  base02	: 7 54 66
-  base01	: 88 110 117
-  base00	: 101 123 131
-  base0     : 131 148 150
-	base1	: 147 161 161
-	base2	: 238 232 213
-	base3	: 253 246 227
-	yellow	: 181 137   0
-	orange	: 203  75  22
-	red		: 220  50  47
-	magenta	: 211  54 130
-	violet	: 108 113 196
-	blue	: 38  139 210
-	cyan	: 42  161 152
-	green	: 133 153   0
-	gray : 147 161 161
+  base03  : 0 43 54
+  base02  : 7 54 66
+  base01  : 88 110 117
+  base00  : 101 123 131
+  base0   : 131 148 150
+  base1	  : 147 161 161
+  base2	  : 238 232 213
+  base3	  : 253 246 227
+  yellow  : 181 137   0
+  orange  : 203  75  22
+  red     : 220  50  47
+  magenta : 211  54 130
+  violet  : 108 113 196
+  blue    : 38  139 210
+  cyan    : 42  161 152
+  green   : 133 153   0
+  gray    : 147 161 161
 	
 colorer Default, token-based highlighting
                                   
@@ -50,50 +50,52 @@ colorer Default, token-based highlighting
 colorer Constants
   
   DecInt 			: 108 113 196 // violet
-  HexInt 			: red
-  OctInt 			: red
-  BinInt 			: red
+  HexInt 			: 108 113 196 // violet
+  OctInt 			: 108 113 196 // violet
+  BinInt 			: 108 113 196 // violet
   
-  Int32Literal		: red
-  Int64Literal    	: red
-  NativeintLiteral	: red
+  Int32Literal		: 108 113 196 // violet
+  Int64Literal    	: 108 113 196 // violet
+  NativeintLiteral	: 108 113 196 // violet
   
-  DecFloat			: red
-  HexFloat 			: red
+  DecFloat			: 108 113 196 // violet
+  HexFloat 			: 108 113 196 // violet
   
-  CharLiteral 		: darkgreen
-  StringLiteral		: blue
+  CharLiteral 		: 181 137   0 // yellow
+  StringLiteral		: 181 137   0 // yellow
   
 colorer Identifiers
 
-  Ident 			: base01 
-  CapitalizedIdent 	: base01
-  LowercaseIdent 	: base01
+  Ident 				: 88 110 117 // base01 
+  CapitalizedIdent 	: 88 110 117 // base01
+  LowercaseIdent 	: 88 110 117 // base01
 
-  LabelName 		: base01 
-  ValueName 		: base02
-  ConstrName   	    : 88 110 117 bold // base02
-  TagName           : base01
-  TypeconstrName    : 88 110 117 bold // base02
+  ValueNameDef      : 7 54 66 // base02
+  ValueName 		: 88 110 117 // base01
+
+  LabelName 		: 88 110 117 // base01 
+  ConstrName   	    : 7 54 66 bold // base02
+  TagName           : 7 54 66 // base01
+  TypeconstrName    : 7 54 66 bold // base02
   
-  FieldName         : base01
-  ModuleName        : 88 110 117 bold // base02
-  ModtypeName       : 88 110 117 bold // base02
+  FieldName         : 88 110 117 // base02
+  ModuleName        : 7 54 66 bold // base02
+  ModtypeName       : 7 54 66 bold // base02
   
-  ClassName         : 88 110 117 bold // base02
-  InstVarName       : base01
-  MethodName        : base01
+  ClassName         : 7 54 66 bold // base02
+  InstVarName       : 88 110 117 // base01
+  MethodName        : 88 110 117 // base01
   
   TypeVar			: 101 123 131 italic // base0
   
 colorer Operators 
 
-  InfixOp60 : 38  139 210 // blue   
-  InfixOp50 : 38  139 210 // blue   
-  InfixOp40 : 38  139 210 // blue   
-  InfixOp30 : 38  139 210 // blue    
-  InfixOp20 : 38  139 210 // blue   
-  InfixOp10 : 38  139 210 // blue   
-  InfixOp5  : 38  139 210 // blue   
+  InfixOp60 : 38  139 210 bold// blue   
+  InfixOp50 : 38  139 210 bold// blue   
+  InfixOp40 : 38  139 210 bold// blue   
+  InfixOp30 : 38  139 210 bold// blue    
+  InfixOp20 : 38  139 210 bold// blue   
+  InfixOp10 : 38  139 210 bold// blue   
+  InfixOp5  : 38  139 210 bold// blue   
    
 
