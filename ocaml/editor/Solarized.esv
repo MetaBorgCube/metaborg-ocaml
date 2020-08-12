@@ -85,6 +85,8 @@ colorer Identifiers
   ClassName         : 7 54 66 bold // base02
   InstVarName       : 88 110 117 // base01
   MethodName        : 88 110 117 // base01
+  InstVarNameDef    : 7 54 66 // base02
+  MethodNameDef     : 7 54 66 // base02
   
   TypeVar			: 101 123 131 italic // base0
   
