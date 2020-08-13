@@ -15,7 +15,7 @@ context-free syntax
     end
   > 
   Expr.Invoke = <
-    <Expr> # <MethodName>
+    <Expr>#<MethodName>
   > 
   Expr.InstAssign = [
     [InstVarName] <- [Expr]
