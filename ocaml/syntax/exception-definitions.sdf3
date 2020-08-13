@@ -7,8 +7,12 @@ imports lex names type-definitions
 
 sorts ExceptionDefinition
 context-free syntax
-  ExceptionDefinition.ExceptionDefinition0 = "exception" ConstrDecl
-  ExceptionDefinition.ExceptionDefinition1 = "exception" ConstrName "=" Constr
+  ExceptionDefinition.ExcDef = <
+    exception <ConstrDecl> 
+  >
+  ExceptionDefinition.ExcDefNamed = <
+    exception <ConstrName> = <Constr>
+  >
   
 // Exception definitions add new constructors to the built-in variant type exn
 // of exception values. The constructors are declared as for a definition of a
