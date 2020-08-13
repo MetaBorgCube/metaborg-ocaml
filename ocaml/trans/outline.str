@@ -3,13 +3,68 @@ module outline
 imports
   
   signatures/ocaml-sig
+  signatures/-
   libspoofax/editor/outline
-
+  
 rules
   
   editor-outline:
     (_, _, ast, path, project-path) -> outline
     where
-      outline := <simple-label-outline(to-outline-label)> ast
+      outline := <mk-outline> ast
+      
+  mk-outline = 
+    custom-label-outline(to-outline-label, to-outline-node)
+    
+rules // basic expressions
+
+  to-outline-label :
+    LetFun(x,_,_) -> x
+    
+rules // 
+
+  to-outline-label :
+    Typedef(_,x,_,_,_) -> x
+
+  to-outline-label :
+	ValSpec(x,_) -> x
+
+  to-outline-label :
+	Val(_,x,_,_) -> x
+ 
+rules // modules
+
+  to-outline-node :
+    Struct(xs) -> Node("struct", <map(mk-outline)>xs)
+
+  to-outline-label :
+    DefMod(x,_,_) -> x
+
+  to-outline-label :
+    DefModTyped(x,_,_,_) -> x
+
+  to-outline-label :
+    DefModType(x,_) -> x
+
+  to-outline-label :
+    ConstrDecl0(x) -> x
+  to-outline-label :
+    ConstrDeclN(x,_) -> x
+
+  to-outline-label :
+    ExcDefNamed(x,_) -> x
+    
+
+
+rules // classes
+
+  to-outline-label :
+    ClassBinding(_,_,x,_,_,_) -> x
+    
+  to-outline-label :
+    Method(_,x,_,_,_) -> x
+    
   
-  to-outline-label = fail
+    
+    
+    
