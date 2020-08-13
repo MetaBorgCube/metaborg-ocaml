@@ -87,7 +87,7 @@ context-free syntax
   Definition.DefClasstype = ClasstypeDefinition
 
   Definition.DefLetRec = <
-    let rec <{LetBinding "\nand"}+; float>
+    let rec <{LetBinding "\nand"}+>
   > 
   Definition.DefLet = <
     let <{LetBinding "\nand"}+>

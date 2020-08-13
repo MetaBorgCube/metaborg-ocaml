@@ -8,10 +8,10 @@ imports lex names type-definitions
 sorts ExceptionDefinition
 context-free syntax
   ExceptionDefinition.ExcDef = <
-    exception <ConstrDecl> 
+    exception <ConstrDeclFirst> 
   >
   ExceptionDefinition.ExcDefNamed = <
-    exception <ConstrName> = <Constr>
+    exception <ConstrDeclFirst> = <Constr>
   >
   
 // Exception definitions add new constructors to the built-in variant type exn

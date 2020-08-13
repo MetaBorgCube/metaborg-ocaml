@@ -57,17 +57,19 @@ context-free priorities
   > Expr.Match 
   > {Expr.Fun Expr.FunTyped Expr.Function Expr.Try}
   
-context-free priorities
-  {non-nested: Argument.Arg Expr.Lazy Expr.Assert}
+//context-free priorities
+//  {non-nested: Argument.Arg Expr.Lazy Expr.Assert}
    
 context-free priorities
   // TODO: check ambiguity between argument and constructor app
-  Expr.App            <0> .> {Expr.Lazy Expr.Assert Expr.Const}, 
+  Expr.App            <0> .> {Expr.Lazy Expr.Assert Expr.Const Expr.ConApp }, 
   Argument.Arg        <0> .> {Expr.App Expr.ConApp Expr.Tuple},   
   Argument.LabeledArg <1> .> {Expr.ConApp Expr.Lazy Expr.Assert},
-  Argument.OptArg     <1> .> {Expr.ConApp Expr.Lazy Expr.Assert},
-  Expr.Lazy           <0> .> {Expr.ConApp}
-
+  Argument.OptArg     <1> .> {Expr.ConApp Expr.Lazy Expr.Assert}
+context-free priorities
+         {Expr.ConApp Expr.Lazy Expr.Assert}         
+  <1> .> {Expr.ConApp Expr.Lazy Expr.Assert Expr.App }
+  
 context-free priorities
 
   Argument.Arg <0> .> {Expr.Min Expr.MinF}

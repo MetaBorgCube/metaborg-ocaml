@@ -44,14 +44,10 @@ context-free syntax
 
 sorts TypeRepresentation
 context-free syntax
-  TypeRepresentation.TypeRep1 = [
-    = [OptBar] [{ConstrDecl " | "}+]
-  ] 
-  
-  TypeRepresentation.TypeRep2 = [
+  TypeRepresentation.RecRep = [
     = [RecordDecl]
   ] 
-  TypeRepresentation.TypeRep3 = [
+  TypeRepresentation.MtRep = [
     = |
   ] 
   
@@ -63,21 +59,32 @@ context-free syntax
   Variance.PosVar = <+> 
   Variance.NegVar = [-] 
   
+  
 sorts ConstrDecl
 context-free syntax
-  ConstrDecl.ConstrDecl0     = ConstrName 
-  ConstrDecl.ConstrDeclNil   = <[]> 
-  ConstrDecl.ConstrDeclCons0 = <(::)> 
+  TypeRepresentation.ConstRepNoBar = [
+    =   [ConstrDeclFirst] 
+      [{ConstrDecl "\n"}*] 
+  ] 
+  TypeRepresentation.ConstRep = [
+    = [{ConstrDecl "\n"}+]
+  ] 
+  ConstrDeclFirst.ConstrDeclFirst0 = <
+    <ConstrDeclName> 
+  > 
+  ConstrDeclFirst.ConstrDeclFirst = <
+    <ConstrDeclName> of <{Typexpr " * "}+>
+  > 
+  ConstrDecl.ConstrDecl0 = <
+    | <ConstrDeclName>
+  > 
+  ConstrDecl.ConstrDecl = <
+    | <ConstrDeclName> of <{Typexpr " * "}+>
+  > 
   
-  ConstrDecl.ConstrDeclN = <
-    <ConstrName> of <{Typexpr " * "}+>
-  > 
-  ConstrDecl.ConstrDeclNilN = <
-    [] of <{Typexpr " * "}+>
-  > 
-  ConstrDecl.ConstrDeclCons = <
-    (::) of <{Typexpr " * "}+>
-  > 
+  ConstrDeclName.ConstrDeclName  = ConstrName 
+  ConstrDeclName.ConstrDeclNil   = <[]> 
+  ConstrDeclName.ConstrDeclCons0 = <(::)> 
     
 context-free priorities
   {Typexpr "*"}+ = Typexpr                    <0> .> Typexpr.TypeTup,

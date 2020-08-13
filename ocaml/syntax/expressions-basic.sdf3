@@ -35,7 +35,7 @@ context-free syntax
 
 context-free syntax
   Expr = <(<Expr>)> {bracket}
-  Expr = <begin <Expr; float> end> {bracket}
+  Expr = <begin <Expr> end> {bracket}
   
 // The expressions ( expr ) and begin expr end have the same value as expr. The
 // two constructs are semantically equivalent, but it is good style to use begin
@@ -56,7 +56,7 @@ context-free syntax
 sorts Argument
 context-free syntax
   Expr.App = <
-    <Expr> <{Argument " "}+; float>
+    <Expr> <{Argument " "}+>
   > {longest-match}
   Argument.Arg         = Expr 
   Argument.LabeledArgE = LabelE 
@@ -125,10 +125,12 @@ context-free syntax
       <PatternMatching>
   > 
   Expr.FunTyped = [
-    fun [Parameter+] : [Typexpr] -> [Expr; float]
+    fun [Parameter+] : [Typexpr] -> 
+      [Expr]
   ] 
   Expr.Fun = [
-    fun [Parameter+] -> [Expr; float]
+    fun [Parameter+] -> 
+      [Expr]
   ] 
   Parameter.ParamPat = Pattern 
   Parameter.Param1 = <~<LabelName>> 
@@ -247,10 +249,12 @@ context-free syntax
     <{MatchCase "\n"}+>
   > {longest-match}
   MatchCase.MatchCase = [
-    | [Pattern] -> [Expr; float]
+    | [Pattern] -> 
+      [Expr]
   ] 
   MatchCase.MatchCaseGuard = [
-    | [Pattern] when [Expr] -> [Expr; float]
+    | [Pattern] when [Expr] -> 
+      [Expr]
   ]   
   
 sorts MatchCaseFirst
@@ -261,10 +265,12 @@ context-free syntax
   > {longest-match}
   
   MatchCaseFirst.MatchCaseFirst = [
-    [Pattern] -> [Expr; float]
+    [Pattern] -> 
+    [Expr]
   ] 
   MatchCaseFirst.MatchCaseFirstGuard = [
-    [Pattern] when [Expr] -> [Expr; float]
+    [Pattern] when [Expr] -> 
+    [Expr]
   ] 
   
 // The cases of a pattern matching (in the function, match and try constructs)
@@ -293,21 +299,24 @@ context-free syntax
     <Expr>
   > 
   Expr.LetRec = <
-    let rec <{LetBinding "\nand"}+; float> in 
+    let rec <{LetBinding "\nand"}+> in 
     <Expr>
   > 
   Expr.LetExc = <
-    let exception <ConstrDecl> in 
+    let exception <ConstrDeclFirst> in 
     <Expr>
   > 
   LetBinding.LetPat = <
-    <Pattern> = <Expr; float>
+    <Pattern> = 
+    <Expr>
   > 
   LetBinding.LetVar = <
-    <ValueNameDef> : <PolyTypexpr> = <Expr; float>
+    <ValueNameDef> : <PolyTypexpr> = 
+    <Expr>
   > 
   LetBinding.LetFun = <
-    <ValueNameDef> <Parameter*> = <Expr; float>
+    <ValueNameDef> <Parameter*> = 
+    <Expr>
   > 
   LetBinding.LetFunRT = <
     <ValueNameDef> <Parameter+> : <Typexpr> = 
@@ -318,7 +327,8 @@ context-free syntax
       <Expr>
   > 
   LetBinding.LetFunST = <
-    <ValueNameDef> <Parameter*> :\> <Typexpr> = <Expr>
+    <ValueNameDef> <Parameter*> :\> <Typexpr> = 
+    <Expr>
   > 
 
 context-free priorities

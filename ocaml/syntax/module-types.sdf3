@@ -63,7 +63,7 @@ context-free syntax
     val <ValueNameDef> : <Typexpr>
   > 
   Specification.ExcSpec = <
-    exception <ConstrDecl>
+    exception <ConstrDeclFirst>
   > 
   Specification.ModSpec = <
     module <ModuleName> <ModParam*> : <ModuleType>
