@@ -10,9 +10,9 @@ language
   table         : target/metaborg/sdf.tbl
   start symbols : CompilationUnit Expr TypeDefinition Definition
 
-  line comment  : "//"
-  block comment : "/*" * "*/"
-  fences        : [ ] ( ) { }
+  //line comment  : "//"
+  block comment : "(*" * "*)"
+  fences        : [ ] ( ) { } [| |] < >
 
 menus
   
@@ -21,7 +21,7 @@ menus
     action: "Format"          = editor-format (source)
     action: "Show parsed AST" = debug-show-aterm (source)
 
-//views
-//  
-//  outline view: editor-outline (source)
-//    expand to level: 3
+views
+  
+  outline view: editor-outline (source)
+    expand to level: 3
