@@ -29,7 +29,7 @@ rules //
   to-outline-label :
 	ValSpec(x,_) -> x
 
-  to-outline-label :
+  to-outline-label : 
 	Val(_,x,_,_) -> x
  
 rules // modules
@@ -47,9 +47,13 @@ rules // modules
     DefModType(x,_) -> x
 
   to-outline-label :
+    ConstrDeclFirst0(x) -> x
+  to-outline-label :
+    ConstrDeclFirst(x,_) -> x
+  to-outline-label :
     ConstrDecl0(x) -> x
   to-outline-label :
-    ConstrDeclN(x,_) -> x
+    ConstrDecl(x,_) -> x
 
   to-outline-label :
     ExcDefNamed(x,_) -> x
