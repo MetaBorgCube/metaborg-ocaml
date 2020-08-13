@@ -43,6 +43,7 @@ context-free syntax
   ModuleItems.ModuleItems = <
     <DoubleSemi*> 
     <DefOrExpr> 
+    
     <{DefOrExprDelim "\n\n"}*> <DoubleSemi*>
   > 
   DefOrExpr = Definition 
@@ -56,6 +57,28 @@ context-free syntax
     <Expr>
   > 
 
+//sorts ModuleItems ModuleItemSeq
+//context-free syntax 
+//  ModuleItems.ModuleItemsEnd = <
+//    <ModuleItemSeq><DoubleSemi*>
+//  >
+//  ModuleItemSeq.ModuleItems1 = <
+//    <DoubleSemi*>
+//    <DefOrExpr>
+//  >
+//  ModuleItemSeq.ModuleItemsDef = <
+//    <ModuleItemSeq><DoubleSemi*>
+//    
+//    <Definition>
+//  >
+//  ModuleItemSeq.ModuleItemsExpr = <
+//    <ModuleItems><DoubleSemi+>
+//    
+//    <Expr>
+//  >
+//  DefOrExpr = Definition 
+//  DefOrExpr = Expr 
+  
 sorts Definition
 context-free syntax
   Definition.DefType      = TypeDefinition 
