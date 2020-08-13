@@ -322,7 +322,9 @@ context-free syntax
   > 
 
 context-free priorities
-  LetBinding.LetPat <0> .> Pattern.VarPat 
+  LetBinding.LetPat <0> .> Pattern.VarPat,
+  
+  Parameter.ParamPat <0> .> Pattern.ConstrPat
 
   
 // The let and let rec constructs bind value names locally. The construct
