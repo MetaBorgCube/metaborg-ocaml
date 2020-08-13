@@ -171,6 +171,10 @@ context-free priorities
 
 context-free syntax  
   Expr.Array = <[| <{Expr "; "}+> <OptSemicolon> |]> 
+  
+context-free priorities
+  {Expr ";"}+ = {Expr ";"}+ ";" Expr <2> .> Expr.Seq,
+  {Expr ";"}+ = Expr                 <0> .> Expr.Seq
    
 // The expression [| expr_1 ; ... ;  expr_n |] evaluates to a n-element array,
 // whose elements are initialized with the values of expr_1 to expr_n
