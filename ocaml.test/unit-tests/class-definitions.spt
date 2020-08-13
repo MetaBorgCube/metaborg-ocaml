@@ -18,3 +18,67 @@ class c (m : int) =
      initializer all_c := (self :> c) :: !all_c
    end
 ]] parse succeeds
+
+test class type [[ 
+class point x_init =
+   object
+     val mutable x = x_init
+     method get_x = x
+     method get_offset = x - x_init
+     method move d = x <- x + d 
+   end
+]] parse succeeds
+
+test class type [[ 
+  class functional_point y =
+   object
+     val x = y
+     method get_x = x
+     method move d = {< x = x + d >}
+     method move_to x = {< x >}
+   end
+]] parse succeeds
+
+test class type [[ 
+class c (m : int) =
+   object (self)
+     method m = m
+     initializer all_c := (self :> c) :: !all_c 
+   end
+]] parse succeeds
+
+test class type [[ 
+ class ['a] colored_circle c =
+   object
+     constraint 'a = #colored_point
+     inherit ['a] circle c
+     method color = center#color
+   end
+]] parse succeeds
+
+test class type [[ 
+class printable_colored_point y c =
+   object (self)
+     val c = c
+     method color = c
+     inherit printable_point y as super
+     method! print =
+       print_string "(";
+       super#print;
+       print_string ", ";
+       print_string (self#color);
+       print_string ")"
+   end
+]] parse succeeds
+
+test class type [[ 
+class adjusted_point x_init =
+   let origin = (x_init / 10) * 10 in
+   object
+     val mutable x = origin
+     method get_x = x
+     method get_offset = x - origin
+     method move d = x <- x + d
+   end
+]] parse succeeds
+
