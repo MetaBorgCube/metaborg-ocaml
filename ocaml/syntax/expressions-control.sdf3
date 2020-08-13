@@ -27,12 +27,12 @@ context-free syntax
 context-free syntax
   Expr.IfT = <
     if <Expr> 
-    then <Expr>
+      then <Expr>
   > 
   Expr.IfE = <
     if <Expr> 
-    then <Expr>
-    else <Expr>
+      then <Expr>
+      else <Expr>
   >
    
 // The expression if expr_1 then  expr_2 else  expr_3 evaluates to the value of
@@ -47,7 +47,7 @@ context-free syntax
 context-free syntax
   Expr.Match = <
     match <Expr> with 
-    <PatternMatching>
+      <PatternMatching>
   > 
 
   
