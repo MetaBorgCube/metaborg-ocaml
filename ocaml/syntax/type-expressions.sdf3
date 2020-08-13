@@ -8,6 +8,7 @@ imports lex names aux
 sorts Typexpr TypeVar
 lexical syntax
   TypeVar = "'" Ident 
+  Typexpr.TypeAnon = "_"
 
 context-free syntax
 
@@ -17,12 +18,12 @@ context-free syntax
   
   Typexpr.TypeVar = 
     TypeVar 
-  Typexpr.TypeFun = <
-    <Typexpr> -\> <Typexpr>
-  > {right}
-  Typexpr.TypeFunL = <
-    <OptLabel> <Typexpr> -\> <Typexpr>
-  > {right}
+  Typexpr.TypeFun = [
+    [Typexpr] -> [Typexpr]
+  ] {right}
+  Typexpr.TypeFunL = [
+    [OptLabel] [Typexpr] -> [Typexpr]
+  ] {right}
   Typexpr.TypeTup = <
     <{Typexpr " * "}+>
   > 
@@ -39,10 +40,10 @@ context-free syntax
 sorts MethodType PolyTypexpr
 context-free syntax
   Typexpr.ObjTypeMt = [
-    < >
+    <>
   ]
   Typexpr.ObjTypeMtRow = [
-    <..>
+    < .. >
   ] 
   Typexpr.ObjType = [
     < [{MethodType "; "}+] [OptSemicolon] >
@@ -80,6 +81,10 @@ context-free priorities
 context-free syntax
   TypeAscr.TypeAscr = <: <Typexpr>> 
 
+template options
+  tokenize: "<"
+  tokenize: ">"
+  tokenize: ".."
 
 //sorts Typexpr TypeVar
 //lexical syntax // TODO: check that this composition is lexical
