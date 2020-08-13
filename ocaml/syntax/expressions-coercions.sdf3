@@ -7,8 +7,8 @@ imports type-expressions
 // ================
 
 context-free syntax 
-  Expr.CoerceTo     = "(" Expr ":>" Typexpr ")"
-  Expr.CoerceFromTo = "(" Expr ":" Typexpr ":>" Typexpr ")"
+  Expr.CoerceTo     = [( [Expr] :> [Typexpr] )]
+  Expr.CoerceFromTo = [( [Expr] : [Typexpr] :> [Typexpr] )]
   
 // Expressions whose type contains object or polymorphic variant types can be
 // explicitly coerced (weakened) to a supertype. The expression (expr :>  typexpr)
