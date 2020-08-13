@@ -82,7 +82,18 @@ test argument labels [[
 test labels are lexical [[ 
   mkcoord ? y:3 ?x :1 
 ]] parse fails
-
+ 
+test labels are lexical [[ 
+  f Cons a
+]] parse to [[ 
+  f (Cons) (a)
+]]  
+ 
+test labels are lexical [[ 
+  C f a
+]] parse to [[ 
+  (C f) a
+]]
 
 // function definition
 
@@ -129,5 +140,11 @@ test tuple [[
   1, 2, 3
 ]] parse succeeds
 
+test tuple [[  
+ deriv f dv, deriv g dv
+]] parse succeeds
 
+test tuple [[ 
+ Sum(deriv f dv, deriv g dv)
+]] parse succeeds
 

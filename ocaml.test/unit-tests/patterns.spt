@@ -31,7 +31,10 @@ test alias pattern [[
 test alias pattern [[  
   let Cons(x, xs) as xyz
   = 1
-]] parse succeeds
+]] parse to [[  
+  let (Cons(x, xs)) as xyz
+  = 1
+]]
 
 test ascription pattern [[ 
   let (Cons(x, xs) : int list)
@@ -190,9 +193,17 @@ test range pattern [[
 ]]
 
 test lazy pattern (this is safe; correct in OCaml?) [[
-  let lazy Cons a
+  let f Cons a 
   = 1
-]] parse fails
+]] parse to [[
+  let f (Cons) (a)
+  = 1
+]]
+
+test lazy pattern (this is safe; correct in OCaml?) [[
+  let lazy Cons a 
+  = 1 
+]] parse fails   
  
 test lazy pattern  [[    
   let lazy x | exception y
@@ -210,5 +221,20 @@ test record pattern [[
   let { hd : int = 1; tl : int list = nil; _ } 
   = 1
 ]] parse succeeds
+
+test record pattern [[   
+  let { hd : int = 1; tl : int list = nil; _ ; } 
+  = 1
+]] parse succeeds
+
+test record pattern [[   
+  let {hd : int = 1; tl : int list = nil; _} 
+  = 1
+]] parse succeeds 
+
+test record pattern [[   
+  let {hd : int = 1; tl : int list = nil; _;} 
+  = 1
+]] parse succeeds 
 
  

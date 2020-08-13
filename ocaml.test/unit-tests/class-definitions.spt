@@ -11,3 +11,10 @@ test class type [[
   end
 ]] parse succeeds
 
+test class type [[ 
+class c (m : int) =
+   object (self)
+     method m = m
+     initializer all_c := (self :> c) :: !all_c
+   end
+]] parse succeeds

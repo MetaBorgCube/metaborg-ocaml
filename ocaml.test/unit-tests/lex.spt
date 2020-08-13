@@ -32,6 +32,18 @@ test integer constant [[
 ]] parse succeeds
 
 test integer constant [[  
+  134526l
+]] parse succeeds
+
+test integer constant [[   
+  134526L
+]] parse succeeds
+
+test integer constant [[  
+  134526n
+]] parse succeeds
+
+test integer constant [[  
   1345asd
 ]] parse fails
 

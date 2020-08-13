@@ -135,7 +135,11 @@ test object type [[
 ]] parse succeeds
 
 test object type [[ 
-  type x = < .. >
+  type x = < .. >  
+]] parse succeeds
+
+test object type [[ 
+  type x = <..>  
 ]] parse succeeds
 
 test object type [[ 
