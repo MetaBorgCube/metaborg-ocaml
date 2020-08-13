@@ -53,21 +53,7 @@ test test [[
 test test [[ 
   module StringSet = Set(OrderedString)
 ]] parse succeeds   
-
-test test [[ 
-  module StringSet :
-  sig
-    type element = OrderedString.t
-    type set = element list
-    val empty : 'a list
-    val add : OrderedString.t -> OrderedString.t list -> OrderedString.t list
-    val member : OrderedString.t -> OrderedString.t list -> bool
-  end
-]] parse succeeds   
-
-test test [[ 
-  module StringSet = Set(OrderedString)
-]] parse succeeds 
+ 
 
 
 
