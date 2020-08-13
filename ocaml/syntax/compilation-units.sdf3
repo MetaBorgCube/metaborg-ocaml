@@ -9,16 +9,21 @@ sorts CompilationUnit UnitInterface UnitImplementation
 context-free syntax
 
   CompilationUnit.CompilationUnit = <
-    <UnitInterface>
-    <UnitImplementation>
-  >  
-  UnitInterface.UnitInterface = <
-    <{SpecDelim "\n\n"}*>
-  >  
-  UnitImplementation.UnitImplementation = <
     <ModuleItems?>
-  >
+  >  
   
+  
+//  CompilationUnit.CompilationUnit = <
+//    <UnitInterface>
+//    <UnitImplementation>
+//  >  
+//  UnitInterface.UnitInterface = <
+//    <{SpecDelim "\n\n"}*>
+//  >  
+//  UnitImplementation.UnitImplementation = <
+//    <ModuleItems?>
+//  >
+//  
 // Compilation units bridge the module system and the separate compilation
 // system. A compilation unit is composed of two parts: an interface and an
 // implementation. The interface contains a sequence of specifications, just as
