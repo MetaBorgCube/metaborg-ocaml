@@ -208,18 +208,16 @@ context-free syntax
   ClassExpr.ClassApp = <
     <ClassExpr> <Argument+>
   > 
-  ClassExpr.ClassFun = <
-    fun <Parameter+> -\> <ClassExpr>
-  > 
+  ClassExpr.ClassFun = [
+    fun [{Parameter " "}+] -> [ClassExpr]
+  ]
   ClassExpr.ClassLetRec = <
-    let rec 
-      <{LetBinding "\nand"}+> 
-    in <ClassExpr>
+    let rec <{LetBinding "\nand"}+; float> in 
+    <ClassExpr>
   > 
   ClassExpr.ClassLet = <
-    let 
-      <{LetBinding "\nand"}+> 
-    in <ClassExpr>
+    let <{LetBinding "\nand"}+; float> in 
+    <ClassExpr>
   > 
   ClassExpr.Object = <
     object 
@@ -227,13 +225,12 @@ context-free syntax
     end
   > 
   ClassExpr.LetOpenCE = <
-    let open <ModulePath> 
-    in <ClassExpr>
+    let open <ModulePath> in 
+    <ClassExpr>
   > 
 
 sorts ClassField
 context-free syntax
-
   ClassField.InheritCE = <
     inherit <ClassExpr> <Alias?>
   > 
@@ -241,10 +238,10 @@ context-free syntax
     inherit! <ClassExpr> <Alias?>
   > 
   ClassField.Val = <
-    val <Mutable?> <InstVarNameDef> <TypeAscr?> = <Expr>
+    val <Mutable?> <InstVarNameDef> <TypeAscr?> = <Expr; float>
   > 
   ClassField.Val = <
-    val! <Mutable?> <InstVarNameDef> <TypeAscr?> = <Expr>
+    val! <Mutable?> <InstVarNameDef> <TypeAscr?> = <Expr; float>
   > 
   ClassField.ValV = <
     val <Mutable?> virtual <InstVarNameDef> : <Typexpr>
@@ -252,6 +249,7 @@ context-free syntax
   ClassField.ValVM = <
     val virtual mutable <InstVarNameDef> : <Typexpr>
   > 
+context-free syntax
   ClassField.Method = <
     method <Private?> <MethodNameDef> <Parameter*> <TypeAscr?> = 
       <Expr>
@@ -274,6 +272,7 @@ context-free syntax
   ClassField.MethodVP = <
     method virtual private <MethodNameDef> : <PolyTypexpr>
   > 
+context-free syntax
   ClassField.Constraint = <
     constraint <Typexpr> = <Typexpr>
   > 
@@ -359,7 +358,7 @@ sorts ClassBody
 context-free syntax
 
   ClassBody.ClassBody = <
-    (<Pattern> <TypeAscr?>) 
+    (<Pattern><TypeAscr?>) 
     <{ClassField "\n"}*>
   >
   ClassBody.ClassBody = <
@@ -530,7 +529,8 @@ context-free syntax
 context-free syntax
 
   ClassDefinition.ClassDef = <
-    class <{ClassBinding "\nand"}+; float>
+    class 
+      <{ClassBinding "\nand"}+>
   > 
   ClassBinding.ClassBinding = <
     <Virtual?> <TypeParams?> <ClassName> <Parameter*> <ClassTypeAscr?> = 
