@@ -26,28 +26,43 @@ context-free syntax
   Pattern.ExcPat     = <exception <Pattern>> 
 context-free priorities
   Pattern.RangePat 
-  > Pattern.LazyPat 
-  > {Pattern.ConstrPat Pattern.PolyPat} 
+  > {non-nested: Pattern.LazyPat Pattern.ConstrPat Pattern.PolyPat} 
+  > Pattern.ConsPat
   > {Pattern ","}+ = {Pattern ","}+ "," Pattern  
-  > Pattern.OrPat > Pattern.AliasPat
+  > Pattern.OrPat 
+  > Pattern.AliasPat
 
 context-free priorities
   Pattern.TuplePat <0>. > {Pattern ","}+ = Pattern ,
   {Pattern ","}+ = Pattern  <0>. > Pattern.TuplePat,
   {Pattern ","}+ = {Pattern ","}+ "," Pattern  <2>. > Pattern.TuplePat
+  
+context-free syntax
+  Pattern.NegInt       = NegIntegerLiteral
+  Pattern.NegInt32     = NegInt32Literal
+  Pattern.NegInt64     = NegInt64Literal
+  Pattern.NegNativeint = NegNativeintLiteral
 
 context-free syntax
-  Pattern.RecPat         = <{<{FieldPat "; "}+>}> 
-  Pattern.RecPatSugar    = <{<{FieldPat "; "}+>;}> 
-  Pattern.RecPatWld      = <{<{FieldPat "; "}+>; _}> 
-  Pattern.RecPatWldSugar = <{<{FieldPat "; "}+>; _;}> 
+  Pattern.RecPat         = <{ <{FieldPat "; "}+> }> 
+  Pattern.RecPatSugar    = <{ <{FieldPat "; "}+>; }> 
+  Pattern.RecPatWld      = <{ <{FieldPat "; "}+>; _ }> 
+  Pattern.RecPatWldSugar = <{ <{FieldPat "; "}+>; _ ; }> 
   
   FieldPat.FieldPat      = <<Field> : <Typexpr> = <Pattern>> 
   FieldPat.FieldPatInit  = <<Field> = <Pattern>> 
   FieldPat.FieldPatTyped = <<Field> : <Typexpr>> 
   FieldPat.FieldPatUT    = Field 
   
-  Field                  = <_> {reject}
+  //Field                  = <_> {reject}
+  
+template options
+  tokenize: "{"
+  tokenize: "}"
+  tokenize: ";"
+  tokenize: "_"
+  tokenize: "<"
+  tokenize: ">"
 
 context-free syntax
   Pattern.LocalOpenPat      = <<ModulePath>.(<Pattern>)> 
@@ -56,59 +71,7 @@ context-free syntax
   Pattern.LocalOpenPatRec   = <<ModulePath>.{<Pattern>}> 
 
 
-//sorts Pattern
-//context-free syntax
-//  Pattern            = "(" Pattern ")" {bracket}
-//  Pattern.VarPat     = ValueName
-//  Pattern.WldPat     = "_"
-//  Pattern.ConstPat   = Constant
-//  Pattern.AliasPat   = Pattern "as" ValueName
-//  Pattern.AscrPat    = "(" Pattern ":" Typexpr ")"
-//  Pattern.OrPat      = Pattern "|" Pattern {left}
-//  Pattern.ConstrPat  = Constr Pattern
-//  Pattern.PolyPat    = TagNameQ Pattern
-//  Pattern.TConstrPat = "#" Typeconstr
-//  Pattern.TuplePat   = {Pattern ","}+
-//  Pattern.ListPat    = "[" {Pattern ";"}+ OptSemicolon "]" 
-//  Pattern.ConsPat    = Pattern "::" Pattern
-//  Pattern.ArrayPat   = "[|" {Pattern ";"}+ OptSemicolon "|]"
-//  Pattern.RangePat   = CharLiteral ".." CharLiteral
-//  Pattern.LazyPat    = "lazy" Pattern
-//  Pattern.ExcPat     = "exception" Pattern
-//
-//context-free priorities 
-//  Pattern.RangePat
-//  > Pattern.LazyPat
-//  > {Pattern.ConstrPat Pattern.PolyPat}
-//  > {Pattern ","}+ = {Pattern ","}+ "," Pattern
-//  > Pattern.OrPat
-//  > Pattern.AliasPat
-//  
-//context-free priorities 
-//  Pattern.TuplePat         <0> .> {Pattern ","}+ = Pattern,
-//  {Pattern ","}+ = Pattern <0> .> Pattern.TuplePat,
-//  {Pattern ","}+ = {Pattern ","}+ "," Pattern <2> .> Pattern.TuplePat
-//     
-//context-free syntax // record patterns
-//
-//  Pattern.RecPat         = "{" {FieldPat ";"}+             "}"
-//  Pattern.RecPatSugar    = "{" {FieldPat ";"}+ ";"         "}"
-//  Pattern.RecPatWld      = "{" {FieldPat ";"}+ ";" "_"     "}"
-//  Pattern.RecPatWldSugar = "{" {FieldPat ";"}+ ";" "_" ";" "}"
-//                       
-//  FieldPat.FieldPat      = Field ":" Typexpr "=" Pattern 
-//  FieldPat.FieldPatInit  = Field             "=" Pattern
-//  FieldPat.FieldPatTyped = Field ":" Typexpr
-//  FieldPat.FieldPatUT    = Field  
-//  
-//  Field = "_" {reject}
-//  
-//context-free syntax // local open patterns
-//
-//  Pattern.LocalOpenPat      = ModulePath "." "(" Pattern ")"
-//  Pattern.LocalOpenPatList  = ModulePath "." "[" Pattern "]"
-//  Pattern.LocalOpenPatArray = ModulePath "." "[|" Pattern "|]"
-//  Pattern.LocalOpenPatRec   = ModulePath "." "{" Pattern "}"
+
  
 // See also the following language extensions: first-class modules, attributes
 // and extension nodes.

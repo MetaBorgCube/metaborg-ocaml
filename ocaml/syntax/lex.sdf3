@@ -29,6 +29,7 @@ lexical syntax
   LAYOUT = Com
   Com    = "(*" (~[\(\*] | AST | LBR | Com)* "*)"
   AST    = [\*]
+  LBR    = [\(]
 lexical restrictions
   AST -/- [\/]
   LBR -/- [\*]
@@ -40,9 +41,11 @@ context-free restrictions
   
 lexical sorts Ident CapitalizedIdent LowercaseIdent
 lexical syntax
-  Ident            = [a-zA-Z\_] [a-zA-Z0-9\_\']*
-  CapitalizedIdent = [A-Z]      [a-zA-Z0-9\_\']*
-  LowercaseIdent   = [a-z\_]    [a-zA-Z0-9\_\']* 
+  Ident            = [a-zA-Z] [a-zA-Z0-9\_\']*
+  Ident            = [\_]     [a-zA-Z0-9\_\']+ // TODO: confirm that _ is not identifier
+  CapitalizedIdent = [A-Z]    [a-zA-Z0-9\_\']*
+  LowercaseIdent   = [a-z]    [a-zA-Z0-9\_\']* 
+  LowercaseIdent   = [\_]     [a-zA-Z0-9\_\']+ // TODO: confirm that _ is not identifier
 lexical restrictions
   Ident            -/- [a-zA-Z0-9\_\']
   CapitalizedIdent -/- [a-zA-Z0-9\_\']
@@ -51,57 +54,94 @@ lexical restrictions
 // Integer literals
 // ----------------
 
-sorts IntegerLiteral
-context-free syntax  
-  IntegerLiteral.DecInt = DecInt
-  IntegerLiteral.HexInt = HexInt
-  IntegerLiteral.OctInt = OctInt
-  IntegerLiteral.BinInt = BinInt
-context-free restrictions 
-  IntegerLiteral -/- [0-9A-Fa-fxXoObB]
-  "-" -/- [0-9A-Fa-fxXoObB]
-  
+//sorts IntegerLiteral
+//context-free syntax  
+//  IntegerLiteral.DecInt = DecInt
+//  IntegerLiteral.HexInt = HexInt
+//  IntegerLiteral.OctInt = OctInt
+//  IntegerLiteral.BinInt = BinInt
+//context-free restrictions 
+//  IntegerLiteral -/- [0-9A-Fa-fxXoObBlLn]
+//  "-" -/- [0-9A-Fa-fxXoObB]
 //lexical syntax
-//  DecInt = [0-9] [0-9\_]*
-//  HexInt = ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
-//  OctInt = ("0o" | "0O") [0-7] [0-7\_]*
-//  BinInt = ("0b" | "0B") [0-1] [0-1\_]*
+//  DecInt = [\-]? [0-9] [0-9\_]*
+//  HexInt = [\-]? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
+//  OctInt = [\-]? ("0o" | "0O") [0-7] [0-7\_]*
+//  BinInt = [\-]? ("0b" | "0B") [0-1] [0-1\_]*
   
+sorts PosIntegerLiteral
+context-free syntax  
+  PosIntegerLiteral.DecPosInt = DecPosInt
+  PosIntegerLiteral.HexPosInt = HexPosInt
+  PosIntegerLiteral.OctPosInt = OctPosInt
+  PosIntegerLiteral.BinPosInt = BinPosInt
+context-free restrictions 
+  PosIntegerLiteral -/- [0-9A-Fa-fxXoObBlLn]
 lexical syntax
-  DecInt = [\-]? [0-9] [0-9\_]*
-  HexInt = [\-]? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
-  OctInt = [\-]? ("0o" | "0O") [0-7] [0-7\_]*
-  BinInt = [\-]? ("0b" | "0B") [0-1] [0-1\_]*
+  DecPosInt = [0-9] [0-9\_]*
+  HexPosInt = ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
+  OctPosInt = ("0o" | "0O") [0-7] [0-7\_]*
+  BinPosInt = ("0b" | "0B") [0-1] [0-1\_]*
+    
+sorts NegIntegerLiteral
+context-free syntax  
+  NegIntegerLiteral.DecNegInt = DecNegInt
+  NegIntegerLiteral.HexNegInt = HexNegInt
+  NegIntegerLiteral.OctNegInt = OctNegInt
+  NegIntegerLiteral.BinNegInt = BinNegInt
+context-free restrictions 
+  NegIntegerLiteral -/- [0-9A-Fa-fxXoObBlLn]
+lexical syntax
+  DecNegInt = [\-] [0-9] [0-9\_]*
+  HexNegInt = [\-] ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]*
+  OctNegInt = [\-] ("0o" | "0O") [0-7] [0-7\_]*
+  BinNegInt = [\-] ("0b" | "0B") [0-1] [0-1\_]*
   
 sorts Int32Literal Int64Literal NativeintLiteral
 lexical syntax
-  Int32Literal.Int32Literal         = (DecInt | HexInt | OctInt | BinInt) "l"
-  Int64Literal.Int64Literal         = (DecInt | HexInt | OctInt | BinInt) "L"
-  NativeintLiteral.NativeintLiteral = (DecInt | HexInt | OctInt | BinInt) "n"
+  PosInt32Literal     = (DecPosInt | HexPosInt | OctPosInt | BinPosInt) "l"
+  PosInt64Literal     = (DecPosInt | HexPosInt | OctPosInt | BinPosInt) "L"
+  PosNativeintLiteral = (DecPosInt | HexPosInt | OctPosInt | BinPosInt) "n"
+ 
+sorts Int32Literal Int64Literal NativeintLiteral
+lexical syntax
+  NegInt32Literal     = (DecNegInt | HexNegInt | OctNegInt | BinNegInt) "l"
+  NegInt64Literal     = (DecNegInt | HexNegInt | OctNegInt | BinNegInt) "L"
+  NegNativeintLiteral = (DecNegInt | HexNegInt | OctNegInt | BinNegInt) "n"
   
-// TODO: CF in LEX
-  
+   
 // Floating-point literals
 // -----------------------
 
 sorts FloatLiteral
 context-free syntax
-  FloatLiteral.DecFloat = DecFloat
-  FloatLiteral.HexFloat = HexFloat  
-  FloatLiteral          = IntegerLiteral {reject}
+  PosFloatLiteral.DecPosFloat = DecPosFloat
+  PosFloatLiteral.HexPosFloat = HexPosFloat  
+  NegFloatLiteral.DecNegFloat = DecNegFloat
+  NegFloatLiteral.HexNegFloat = HexNegFloat  
+  PosFloatLiteral             = PosIntegerLiteral {reject}
+  NegFloatLiteral             = NegIntegerLiteral {reject}
 lexical syntax
-  DecFloat = 
-    [\-]? [0-9] [0-9\_]* 
+  DecPosFloat = 
+    [0-9] [0-9\_]* 
     ([\.] [0-9\_]*)? 
-    ([eE] [\+\-]? [0-9] [0-9\_]*)?
-  
-  HexFloat = 
-    [\-]? ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]* 
+    ([eE] [\+\-]? [0-9] [0-9\_]*)? 
+  HexPosFloat = 
+    ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]* 
     ([\.] [0-9A-Fa-f\_]*)? 
     ([pP] [\+\-]? [0-9] [0-9\_]*)?
-                 
+lexical syntax
+  DecNegFloat = 
+    [\-] [0-9] [0-9\_]* 
+    ([\.] [0-9\_]*)? 
+    ([eE] [\+\-]? [0-9] [0-9\_]*)  
+  HexNegFloat = 
+    [\-] ("0x" | "0X") [0-9A-Fa-f] [0-9A-Fa-f\_]* 
+    ([\.] [0-9A-Fa-f\_]*)? 
+    ([pP] [\+\-]? [0-9] [0-9\_]*)?                 
 context-free restrictions 
-  FloatLiteral -/- [0-9pPA-Fa-f\+\-]
+  NegFloatLiteral -/- [0-9pPA-Fa-f\+\-] 
+  PosFloatLiteral -/- [0-9pPA-Fa-f\+\-]
 
 // Floating-point decimal literals consist in an integer part, a fractional part
 // and an exponent part. The integer part is a sequence of one or more digits,
