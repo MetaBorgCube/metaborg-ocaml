@@ -455,7 +455,7 @@ context-free syntax
     [InstVarName] <- [Expr]
   ] 
   Expr.Clone = [
-    {< [{InstVar "; "}+] <OptSemicolon> >}
+    {< [{InstVar "; "}+] [OptSemicolon] >}
   ]
 
 
