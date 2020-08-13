@@ -1,0 +1,13 @@
+module Exception44
+
+language ocaml 
+start symbol CompilationUnit
+
+test Exception44 [[exception E ;;
+(* Exception E defined. *)
+
+let e = E ;;
+(* e : exn = E *)
+
+raise e ;;
+(* Uncaught exception: E *)]] parse succeeds

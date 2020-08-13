@@ -1,0 +1,20 @@
+module Input2
+
+language ocaml 
+start symbol CompilationUnit
+
+test Input2 [[let n = print_string("Enter your name: ") ;
+        read_line()
+;;
+
+print_string("Hello " ^ n ^ "!") ;
+print_newline()
+;;
+  
+(*
+Enter your name: Neil
+n : string = "Neil"
+Hello Neil!
+- : unit = ()
+- : unit = ()
+*)]] parse succeeds

@@ -1,0 +1,10 @@
+module Exception32
+
+language ocaml 
+start symbol CompilationUnit
+
+test Exception32 [[exception E ;;
+(* Exception E defined. *)
+
+() ; (raise E) ;;
+(* Uncaught exception: E *)]] parse succeeds

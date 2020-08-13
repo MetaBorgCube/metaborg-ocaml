@@ -1,0 +1,18 @@
+module ValRes5
+
+language ocaml 
+start symbol CompilationUnit
+
+test ValRes5 [[(* See also StaticFail48 *)
+
+let e = [] ;;
+(* e : forall a. 'a list = [] *)
+
+let nil = function _ -> e ;;
+(* nil : forall a b. 'a -> 'b list = <fun> *)
+
+1 :: nil () ;;
+(* - : int list = [1] *)
+
+true :: nil () ;;
+(* - : bool list = [true] *)]] parse succeeds

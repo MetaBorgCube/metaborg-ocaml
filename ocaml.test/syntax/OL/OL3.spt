@@ -1,0 +1,7 @@
+module OL3
+
+language ocaml 
+start symbol CompilationUnit
+
+test OL3 [[(1 < 2) = false;;
+(* - : bool = false *)]] parse succeeds

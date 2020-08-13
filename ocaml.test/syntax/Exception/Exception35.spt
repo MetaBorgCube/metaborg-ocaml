@@ -1,0 +1,10 @@
+module Exception35
+
+language ocaml 
+start symbol CompilationUnit
+
+test Exception35 [[exception EEE ;;
+(* Exception EEE defined. *)
+
+let f = function _ -> raise EEE ;;
+(* f : 'a -> 'b = <fun> *)]] parse succeeds

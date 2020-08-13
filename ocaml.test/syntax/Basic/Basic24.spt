@@ -1,0 +1,7 @@
+module Basic24
+
+language ocaml 
+start symbol CompilationUnit
+
+test Basic24 [[true = not false ;;
+(* - : bool = true *)]] parse succeeds

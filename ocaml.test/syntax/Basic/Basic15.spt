@@ -1,0 +1,11 @@
+module Basic15
+
+language ocaml 
+start symbol CompilationUnit
+
+test Basic15 [[type 'a option = None | Some of 'a ;;
+(* Type option defined. *)
+
+(function None -> 1+2 | Some x -> 1+x) (Some 4) ;;
+(* - : int = 5 *)]] parse succeeds
+ 

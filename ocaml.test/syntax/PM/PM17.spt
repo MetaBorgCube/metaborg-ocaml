@@ -1,0 +1,10 @@
+module PM17
+
+language ocaml 
+start symbol CompilationUnit
+
+test PM17 [[type ty = A | B ;;
+(* Type ty defined. *)
+
+let A = B ;;
+(* Match_failure *)]] parse succeeds

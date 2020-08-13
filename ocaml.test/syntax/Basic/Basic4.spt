@@ -1,0 +1,7 @@
+module Basic4
+
+language ocaml 
+start symbol CompilationUnit
+
+test Basic4 [[not not true ;;
+(* - : bool = true *)]] parse succeeds

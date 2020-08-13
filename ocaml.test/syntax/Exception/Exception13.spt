@@ -1,0 +1,10 @@
+module Exception13
+
+language ocaml 
+start symbol CompilationUnit
+
+test Exception13 [[exception E2 ;;
+(* Exception E2 defined. *)
+
+true && raise E2 ;;
+(* Uncaught exception: E2 *)]] parse succeeds

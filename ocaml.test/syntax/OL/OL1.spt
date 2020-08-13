@@ -1,0 +1,7 @@
+module OL1
+
+language ocaml 
+start symbol CompilationUnit
+
+test OL1 [[1+2*3;;
+(* - : int = 7 *)]] parse succeeds

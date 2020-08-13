@@ -1,0 +1,12 @@
+module PM14
+
+language ocaml 
+start symbol CompilationUnit
+
+test PM14 [[
+match [ 1 ] with
+    [] | 0 :: [] -> "bad"
+  | 1 :: []      -> "ok" ;;
+(* - : string = "ok" *)
+]] parse succeeds
+ 

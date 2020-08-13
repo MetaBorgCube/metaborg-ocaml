@@ -1,0 +1,10 @@
+module ValRes2
+
+language ocaml 
+start symbol CompilationUnit
+
+test ValRes2 [[(* Value restriction test. *)
+
+let id = function x -> x
+ in (id 1, id true) ;;
+(* - : int * bool = 1, true *)]] parse succeeds

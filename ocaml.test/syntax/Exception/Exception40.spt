@@ -1,0 +1,7 @@
+module Exception40
+
+language ocaml 
+start symbol CompilationUnit
+
+test Exception40 [[7 / 0 ;;
+(* Uncaught exception: Division_by_zero *)]] parse succeeds

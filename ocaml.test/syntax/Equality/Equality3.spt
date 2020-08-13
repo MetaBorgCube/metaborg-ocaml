@@ -1,0 +1,7 @@
+module Equality3
+
+language ocaml 
+start symbol CompilationUnit
+
+test Equality3 [[(function x -> 1) = (function x -> 1) ;;
+(* Uncaught exception: Invalid_argument "equal: functional value" *)]] parse succeeds

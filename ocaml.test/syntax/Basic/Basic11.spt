@@ -1,0 +1,7 @@
+module Basic11
+
+language ocaml 
+start symbol CompilationUnit
+
+test Basic11 [[(1+2) :: if true then [] else (1 :: []) ;;
+(* - : int list = [3] *)]] parse succeeds
